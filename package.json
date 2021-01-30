@@ -1,0 +1,16 @@
+{
+  "name": "comp4451",
+  "version": "1.0.0",
+  "description": "COMP4451 Final Project",
+  "main": "index.js",
+  "dependencies": {
+    "stats.js": "^0.17.0",
+    "three": "^0.125.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
