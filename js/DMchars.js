@@ -1,56 +1,23 @@
 maxHealth = 10;
 
-class Shield {
-    constructor(max) {
-        this.max = max;
-        this.current = max;
-    }
-
-    getDamaged(amt, by, owner) {
-        if (this.current > amt) {
-            this.current -= amt;
-            return 0;
-        } else {
-            amt -= this.current;
-            this.current = 0;
-            return amt;
-        }
-    }
-
-    reset() {
-        this.current = this.max;
-    }
-}
-
-class DamagingShield extends Shield {
-    constructor(max, dmg) {
-        this.max = max;
-        this.current = max;
-        this.dmg = dmg;
-    }
-
-
-    getDamaged(amt, by, owner) {
-        const ret = this.getDamaged(amt, by);
-        if (this.current == 0) {
-            by.getDamaged(this.dmg, owner);
-        }
-        return ret;
-    }
-}
-
-class Character {
+export class Character {
     constructor(name) {
         this.health = maxHealth;
         this.shields = [];
     }
 
     mightyPowers() {
-        return [];
+        throw new Error('Called mightyPowers() on abstract Character, You have to use a subclass of Character');
+    }
+    defaultDeck() {
+        throw new Error('Called defaultDeck() on abstract Character, You have to use a subclass of Character');
     }
 
     targetable() {
         return true;
+    }
+    numTargets() {
+        return 1; // return -1 for all, return >1 for multiattack
     }
     get shield() {
         return this.shields.map((a) => a.current).reduce(0, (a, b) => (a + b));
@@ -113,37 +80,52 @@ class Character {
     endTurn() { }
 }
 
-class Druid extends Character {
+export class Wizard extends Character {
     constructor(name) {
         super(name);
-        this.forme = '';
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
     }
-
-    bearForme() {
-        this.forme = 'bear';
-    }
-    wolfForme() {
-        this.forme = 'wolf';
-    }
-    formeAction(other) {
-        if (this.forme == 'bear') {
-            this.heal(n);
-        } else if (this.forme == 'wolf') {
-            other.getDamaged(n);
-        }
+    defaultDeck() {
+        return []; // TOOD: Add defaultDeck
     }
 }
 
-class Rogue extends Character {
+export class Paladin extends Character {
+    constructor(name) {
+        super(name);
+    }
+    mightyPowers() {
+        return []; // TODO: Add mightyPowers
+    }
+    defaultDeck() {
+        return []; // TOOD: Add defaultDeck
+    }
+}
+
+export class Barbarian extends Character {
+    constructor(name) {
+        super(name);
+    }
+    mightyPowers() {
+        return []; // TODO: Add mightyPowers
+    }
+    defaultDeck() {
+        return []; // TOOD: Add defaultDeck
+    }
+}
+
+export class Rogue extends Character {
     constructor(name) {
         super(name);
         this.disguised = false;
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
+    }
+    defaultDeck() {
+        return []; // TOOD: Add defaultDeck
     }
 
     targetable() {
@@ -159,13 +141,44 @@ class Rogue extends Character {
     }
 }
 
-class Ranger extends Character {
+
+export class Druid extends Character {
+    constructor(name) {
+        super(name);
+        this.forme = '';
+    }
+    mightyPowers() {
+        return []; // TODO: Add mightyPowers
+    }
+    defaultDeck() {
+        return []; // TOOD: Add defaultDeck
+    }
+
+    bearForme() {
+        this.forme = 'bear';
+    }
+    wolfForme() {
+        this.forme = 'wolf';
+    }
+    formeAction(other, amt) {
+        if (this.forme == 'bear') {
+            this.heal(amt);
+        } else if (this.forme == 'wolf') {
+            other.getDamaged(amt);
+        }
+    }
+}
+
+export class Ranger extends Character {
     constructor(name) {
         super(name);
         this.bonus = 0;
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
+    }
+    defaultDeck() {
+        return []; // TOOD: Add defaultDeck
     }
 
     chargeBonus() {
@@ -181,30 +194,33 @@ class Ranger extends Character {
     }
 }
 
-class GelatinousCube extends Character {
+export class GelatinousCube extends Character {
     constructor(name) {
         super(name);
-        this.ignoring = false;
+        this.ignoringShields = false;
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
     }
+    defaultDeck() {
+        return []; // TOOD: Add defaultDeck
+    }
 
     ignoreShields() {
-        this.ignoring = true;
+        this.ignoringShields = true;
     }
     doDamage(other, amt) {
-        if (this.ignoring) { other.directDamage(amt); }
+        if (this.ignoringShields) { other.directDamage(amt); }
         else { other.getDamaged(amt); }
     }
 
     endTurn() {
-        this.ignoring = false;
+        this.ignoringShields = false;
         super.endTurn();
     }
 }
 
-class OwlBear extends Character {
+export class OwlBear extends Character {
     constructor(name) {
         super(name);
         this.multi = false;
@@ -212,7 +228,17 @@ class OwlBear extends Character {
     mightyPowers() {
         return []; // TODO: Add mightyPowers
     }
+    defaultDeck() {
+        return []; // TOOD: Add defaultDeck
+    }
 
+    numTargets() {
+        if (this.multi) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
 
     endTurn() {
         this.multi = false;
