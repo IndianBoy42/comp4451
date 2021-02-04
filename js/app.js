@@ -45,6 +45,8 @@ function dir_light(scene) {
 
 const canvas = document.querySelector('#c');
 const renderer = new THREE.WebGLRenderer({ canvas });
+
+const cam = camera();
 function resizeCanvasToDisplaySize() {
     // look up the size the canvas is being displayed
     const width = canvas.clientWidth;
@@ -54,14 +56,12 @@ function resizeCanvasToDisplaySize() {
     if (canvas.width !== width || canvas.height !== height) {
         // you must pass false here or three.js sadly fights the browser
         renderer.setSize(width, height, false);
-        camera.aspect = width / height;
-        // camera.updateProjectionMatrix();
+        cam.aspect = width / height;
+        cam.updateProjectionMatrix();
 
         // update any render target sizes here
     }
 }
-
-const cam = camera();
 
 const scene = new THREE.Scene();
 
@@ -86,4 +86,3 @@ function render(time) {
     requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
-
