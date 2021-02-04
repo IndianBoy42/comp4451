@@ -1,12 +1,14 @@
 import { Shield, DamagingShield } from 'DMshields.js';
 // TODO: 
 export class DMCard {
-    constructor(name, shieldValue, healValue, dmgValue, actionsValue) {
+    constructor(name, shieldValue, healValue, dmgValue, actionsValue, extraPowers = []) {
         this.name = name;
         this.shieldValue = shieldValue;
         this.healValue = healValue;
         this.dmgValue = dmgValue;
         this.actionsValue = actionsValue;
+        this.extraPowers = extraPowers;
+        this.animation = {}; //TODO: figure out how to handle animations
     }
     /**
      * Play the card, override this to give the card unique actions
@@ -18,7 +20,7 @@ export class DMCard {
      */
     play(player, context) {
         if (this.shieldValue != 0) {
-            player.character.addShield(self.shield());
+            player.character.addShield(Shield(this.shieldValue));
         }
         if (this.healValue != 0) {
             player.character.heal(this.healValue);
@@ -32,11 +34,8 @@ export class DMCard {
                 player.character.doDamage(target, this.dmgValue);
             }
         }
-
-    }
-
-    // override this
-    shield() {
-        return Shield(this.shieldValue);
+        for (const p of this.extraPowers) {
+            p.play(player, context)
+        }
     }
 }
