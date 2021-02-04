@@ -6,7 +6,9 @@ export class MightyPower {
     }
 
     play(player, context) {
-        throw new Error('Called play on an abstract MightyPower, You have to use a subclass');
+        throw new Error(
+            "Called play on an abstract MightyPower, You have to use a subclass"
+        );
     }
 }
 
@@ -16,6 +18,6 @@ export class GelCubeDmgShield extends MightyPower {
     }
 
     play(player, context) {
-        player.character.addShield(DamagingShield(this.amount, 2))
+        player.character.addShield(DamagingShield(this.amount, 2));
     }
 }

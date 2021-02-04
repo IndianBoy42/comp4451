@@ -1,7 +1,14 @@
-import { Shield, DamagingShield } from 'DMshields.js';
-// TODO: 
+import { Shield, DamagingShield } from "DMshields.js";
+// TODO:
 export class DMCard {
-    constructor(name, shieldValue, healValue, dmgValue, actionsValue, extraPowers = []) {
+    constructor(
+        name,
+        shieldValue,
+        healValue,
+        dmgValue,
+        actionsValue,
+        extraPowers = []
+    ) {
         this.name = name;
         this.shieldValue = shieldValue;
         this.healValue = healValue;
@@ -12,10 +19,10 @@ export class DMCard {
     }
     /**
      * Play the card, override this to give the card unique actions
-     * 
+     *
      * @param {*} player The object of the player playing this card rn
      * See DMplayer.js
-     * @param {*} context A object that gives access to the game context (players etc) 
+     * @param {*} context A object that gives access to the game context (players etc)
      * See DMgame.js
      */
     play(player, context) {
@@ -35,7 +42,7 @@ export class DMCard {
             }
         }
         for (const p of this.extraPowers) {
-            p.play(player, context)
+            p.play(player, context);
         }
     }
 }

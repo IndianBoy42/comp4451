@@ -1,4 +1,4 @@
-import * as THREE from '../node_modules/three/build/three.module.js';
+import * as THREE from "../node_modules/three/build/three.module.js";
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -7,7 +7,7 @@ document.body.appendChild(stats.dom);
 
 function camera() {
     const fov = 75;
-    const aspect = 2;  // the canvas default
+    const aspect = 2; // the canvas default
     const near = 0.1;
     const far = 5;
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
@@ -33,7 +33,7 @@ function cube(scene, matprops = { color: 0x44aa88 }) {
 }
 
 function dir_light(scene) {
-    const color = 0xFFFFFF;
+    const color = 0xffffff;
     const intensity = 1;
     const light = new THREE.DirectionalLight(color, intensity);
     light.position.set(-1, 2, 4);
@@ -43,7 +43,7 @@ function dir_light(scene) {
     return light;
 }
 
-const canvas = document.querySelector('#c');
+const canvas = document.querySelector("#c");
 const renderer = new THREE.WebGLRenderer({ canvas });
 
 const cam = camera();
@@ -76,7 +76,7 @@ function render(time) {
     stats.begin();
     resizeCanvasToDisplaySize();
 
-    time *= 0.001;  // convert time to seconds
+    time *= 0.001; // convert time to seconds
 
     cube1.rotation.x = time;
     cube1.rotation.y = time;

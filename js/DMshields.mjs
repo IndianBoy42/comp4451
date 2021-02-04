@@ -1,4 +1,3 @@
-
 export class Shield {
     constructor(max) {
         this.max = max;
@@ -27,7 +26,6 @@ export class DamagingShield extends Shield {
         this.current = max;
         this.dmg = dmg;
     }
-
 
     getDamaged(amt, by, owner) {
         const ret = this.getDamaged(amt, by);

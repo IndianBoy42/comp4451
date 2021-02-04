@@ -1,4 +1,4 @@
-import shuffle from 'shuffle.js';
+import shuffle from "shuffle.js";
 
 class Player {
     constructor(name, character) {

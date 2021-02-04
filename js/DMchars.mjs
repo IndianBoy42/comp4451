@@ -7,10 +7,14 @@ export class Character {
     }
 
     mightyPowers() {
-        throw new Error('Called mightyPowers() on abstract Character, You have to use a subclass of Character');
+        throw new Error(
+            "Called mightyPowers() on abstract Character, You have to use a subclass of Character"
+        );
     }
     defaultDeck() {
-        throw new Error('Called defaultDeck() on abstract Character, You have to use a subclass of Character');
+        throw new Error(
+            "Called defaultDeck() on abstract Character, You have to use a subclass of Character"
+        );
     }
 
     targetable() {
@@ -20,7 +24,7 @@ export class Character {
         return 1; // return -1 for all, return >1 for multiattack
     }
     get shield() {
-        return this.shields.map((a) => a.current).reduce(0, (a, b) => (a + b));
+        return this.shields.map(a => a.current).reduce(0, (a, b) => a + b);
     }
     get dead() {
         return this.health <= 0;
@@ -77,7 +81,7 @@ export class Character {
         return this.shields.splice(i, 1);
     }
 
-    endTurn() { }
+    endTurn() {}
 }
 
 export class Wizard extends Character {
@@ -141,11 +145,10 @@ export class Rogue extends Character {
     }
 }
 
-
 export class Druid extends Character {
     constructor(name) {
         super(name);
-        this.forme = '';
+        this.forme = "";
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
@@ -155,15 +158,15 @@ export class Druid extends Character {
     }
 
     bearForme() {
-        this.forme = 'bear';
+        this.forme = "bear";
     }
     wolfForme() {
-        this.forme = 'wolf';
+        this.forme = "wolf";
     }
     formeAction(other, amt) {
-        if (this.forme == 'bear') {
+        if (this.forme == "bear") {
             this.heal(amt);
-        } else if (this.forme == 'wolf') {
+        } else if (this.forme == "wolf") {
             other.getDamaged(amt);
         }
     }
@@ -185,7 +188,7 @@ export class Ranger extends Character {
         this.bonus += 1;
     }
     doDamage(other, amt) {
-        super.doDamage(other, amt + this.bonus)
+        super.doDamage(other, amt + this.bonus);
     }
 
     endTurn() {
@@ -210,8 +213,11 @@ export class GelatinousCube extends Character {
         this.ignoringShields = true;
     }
     doDamage(other, amt) {
-        if (this.ignoringShields) { other.directDamage(amt); }
-        else { other.getDamaged(amt); }
+        if (this.ignoringShields) {
+            other.directDamage(amt);
+        } else {
+            other.getDamaged(amt);
+        }
     }
 
     endTurn() {
