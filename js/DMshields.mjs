@@ -32,7 +32,8 @@ export class DamagingShield extends Shield {
     getDamaged(amt, by, owner) {
         const ret = this.getDamaged(amt, by);
         if (this.current == 0) {
-            by.getDamaged(this.dmg, owner);
+            // by.getDamaged(this.dmg, owner);
+            owner.doDamage(by, this.dmg);
         }
         return ret;
     }

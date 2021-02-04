@@ -3,7 +3,7 @@
  * 
  * @param {array} deck The array(deck) to shuffle
  */
-function shuffle(deck) {
+export function shuffle(deck) {
     // Simple implementation of Fisher-Yates
     var currentIndex = deck.length, temporaryValue, randomIndex;
 
