@@ -13,13 +13,15 @@ class Player {
     }
 
     drawCard() {
-        if (this.deck.length > 0) {
-            return this.deck.pop();
-        } else {
+        if (this.deck.length == 0) {
             this.deck = this.discardPile;
             this.discardPile = [];
             shuffle(this.deck);
         }
+        return this.deck.pop();
+    }
+    addCardToHand(card) {
+        this.hand.push(card);
     }
     disCard(card) {
         this.discardPile.push(card);
