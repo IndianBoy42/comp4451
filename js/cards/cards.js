@@ -1,7 +1,8 @@
 import DMCard from "../DMcards.mjs";
 import GelCubeDmgShield from "../powers/powers.js";
+export * from 'druid.js';
 
-function GelCubeDmgShieldCard(dmcard) {
+function GelCubeDmgShieldCard() {
     // return new DMCard("[GelCubeDmgShieldCard]", 0, 0, 0, 0, [
     //     GelCubeDmgShield(3),
     // ]);
