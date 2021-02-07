@@ -91,25 +91,12 @@ export class Druid extends Character {
 export class Ranger extends Character {
     constructor(name) {
         super(name);
-        this.bonus = 0;
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
     }
     defaultDeck() {
         return []; // TOOD: Add defaultDeck
-    }
-
-    chargeBonus() {
-        this.bonus += 1;
-    }
-    doDamage(other, amt) {
-        super.doDamage(other, amt + this.bonus);
-    }
-
-    endTurn() {
-        this.bonus = 0;
-        super.endTurn();
     }
 }
 

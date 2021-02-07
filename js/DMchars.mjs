@@ -4,6 +4,7 @@ export class Character {
     constructor(name) {
         this.health = maxHealth;
         this.shields = [];
+        this.bonus = 0;
     }
 
     mightyPowers() {
@@ -80,6 +81,14 @@ export class Character {
         if (!this.targetable()) return [];
         return this.shields.splice(i, 1);
     }
+    chargeBonus() {
+        this.bonus += 1;
+    }
+    doDamage(other, amt) {
+        super.doDamage(other, amt + this.bonus);
+    }
 
-    endTurn() {}
+    endTurn() {
+        this.bonus = 0;
+    }
 }
