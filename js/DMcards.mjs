@@ -1,4 +1,4 @@
-import { Shield, DamagingShield } from "DMshields.js";
+import { Shield } from "DMshields.js";
 
 export class DMCard {
     constructor(
@@ -7,6 +7,7 @@ export class DMCard {
         healValue = 0,
         dmgValue = 0,
         extraActions = 0,
+        drawCards = 0,
         extraPowers = []
     ) {
         this.name = name;
@@ -14,24 +15,28 @@ export class DMCard {
         this.healValue = healValue;
         this.dmgValue = dmgValue;
         this.extraActions = extraActions;
+        this.drawCards = drawCards;
         this.extraPowers = extraPowers;
         this.animation = {}; //TODO: figure out how to handle animations
     }
 
     static shieldCard(name, amount) {
-        return DMCard(name, amount, 0, 0, 0);
+        return DMCard(name, amount, 0, 0, 0, 0);
     }
     static healCard(name, amount) {
-        return DMCard(name, 0, amount, 0, 0);
+        return DMCard(name, 0, amount, 0, 0, 0);
     }
     static damageCard(name, amount) {
-        return DMCard(name, 0, 0, amount, 0);
+        return DMCard(name, 0, 0, amount, 0, 0);
     }
     static actionCard(name, amount) {
-        return DMCard(name, 0, 0, 0, amount);
+        return DMCard(name, 0, 0, 0, amount, 0);
+    }
+    static drawCardsCard(name, amount) {
+        return DMCard(name, 0, 0, 0, 0, amount);
     }
     static powerCard(name, power, extraPowers = []) {
-        return DMCard(name, 0, 0, 0, 0, [power].concat(extraPowers));
+        return DMCard(name, 0, 0, 0, 0, 0, [power].concat(extraPowers));
     }
 
     addHeal(amount) {
@@ -48,6 +53,14 @@ export class DMCard {
     }
     addActions(amount) {
         this.extraActions = amount;
+        return this;
+    }
+    addDrawCards(amount) {
+        this.drawCards = amount;
+        return this;
+    }
+    addMightyPower(power) {
+        this.extraPowers.push(power);
         return this;
     }
 
@@ -74,6 +87,9 @@ export class DMCard {
             for (const target of targets) {
                 player.character.doDamage(target, this.dmgValue);
             }
+        }
+        if (this.drawCards != 0) {
+            context.drawCards(player, this.drawCards);
         }
         for (const p of this.extraPowers) {
             p.play(player, context);
