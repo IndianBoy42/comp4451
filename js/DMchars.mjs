@@ -65,7 +65,7 @@ export class Character {
     addShield(shield) {
         this.shields.push(shield);
     }
-    swap(other) {
+    swapHealth(other) {
         if (!this.targetable()) return;
         const tmp = other.health;
         other.health = this.health;
