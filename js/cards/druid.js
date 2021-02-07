@@ -1,4 +1,11 @@
-const { DruidFormePower } = require("../powers/druid");
+import DMCard from "../DMcards.mjs";
+import {
+    DruidFormePower,
+    DruidShapeshiftWolf,
+    DruidShapeshiftBear,
+    DruidAnimalMultiattack,
+    DruidFreeShapeshift,
+} from "../powers/druid.js";
 
 function Poochie() {
     return DMCard("Poochie").addShield(1).addDamage(1);
