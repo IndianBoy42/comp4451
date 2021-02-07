@@ -8,8 +8,22 @@ export class GelCubeDmgShield extends MightyPower {
 }
 export class DruidFormePower extends MightyPower {
     play(player, context) {
-        if (typeof myObj.formeAction === "function") {
+        if (typeof player.character.formeAction === "function") {
             player.character.formeAction(context.choosePlayer());
+        }
+    }
+}
+export class DruidShapeshiftWolf extends MightyPower {
+    play(player, context) {
+        if (typeof player.character.shapeshiftWolf === "function") {
+            player.character.shapeshiftWolf();
+        }
+    }
+}
+export class DruidShapeshiftBear extends MightyPower {
+    play(player, context) {
+        if (typeof player.character.shapeshiftBear === "function") {
+            player.character.shapeshiftBear();
         }
     }
 }

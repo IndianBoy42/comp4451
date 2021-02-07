@@ -73,10 +73,10 @@ export class Druid extends Character {
         return []; // TOOD: Add defaultDeck
     }
 
-    bearForme() {
+    shapeshiftBear() {
         this.forme = "bear";
     }
-    wolfForme() {
+    shapeshiftWolf() {
         this.forme = "wolf";
     }
     formeAction(other, amt) {
