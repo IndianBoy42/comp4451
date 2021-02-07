@@ -17,6 +17,11 @@ export class DMCard {
         this.extraPowers = extraPowers;
         this.animation = {}; //TODO: figure out how to handle animations
     }
+
+    static powerCard(name, power, extraPowers = []) {
+        return DMCard(name, 0, 0, 0, 0, [power].concat(extraPowers));
+    }
+
     /**
      * Play the card, override this to give the card unique actions
      *
