@@ -5,6 +5,12 @@ export class Character {
         this.health = maxHealth;
         this.shields = [];
         this.bonus = 0;
+        this.disguised = false;
+        this.forme = "";
+        this.ignoringShields = false;
+        this.multiattack = 1;
+        this.properties = {};
+        this.propertiesTemp = {};
     }
 
     mightyPowers() {
@@ -18,11 +24,24 @@ export class Character {
         );
     }
 
+    setProperty(key, value) {
+        this.properties[key] = value;
+    }
+    setPropertyTemp(key, value) {
+        this.propertiesTemp[key] = value;
+    }
+    getProperty(key) {
+        return this.properties[key];
+    }
+    getPropertyTemp(key) {
+        return this.properties[key];
+    }
+
     targetable() {
-        return true;
+        return !this.disguised;
     }
     numTargets() {
-        return 1; // return -1 for all, return >1 for multiattack
+        return this.multiattack;
     }
     get shield() {
         return this.shields.map(a => a.current).reduce(0, (a, b) => a + b);
@@ -35,7 +54,11 @@ export class Character {
         return this.health + this.shield;
     }
     doDamage(other, amt) {
-        other.getDamaged(amt, this);
+        if (this.ignoringShields) {
+            other.directDamage(amt);
+        } else {
+            other.getDamaged(amt);
+        }
     }
     directDamage(amt, by) {
         if (this.health > amt) {
@@ -87,8 +110,15 @@ export class Character {
     doDamage(other, amt) {
         super.doDamage(other, amt + this.bonus);
     }
+    shapeshift(forme) {
+        this.forme = forme;
+    }
 
     endTurn() {
         this.bonus = 0;
+        this.multi = 1;
+        this.disguised = false;
+        this.ignoringShields = false;
+        this.propertiesTemp = {};
     }
 }

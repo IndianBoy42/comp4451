@@ -2,24 +2,23 @@
 // If in Wolf Form ATTACK(1)
 export class DruidFormePower extends MightyPower {
     play(player, context) {
-        if (typeof player.character.formeAction === "function") {
-            player.character.formeAction(context.choosePlayer(), this.amount);
+        const form = player.character.forme;
+        if (this.forme == "bear") {
+            this.heal(amt);
+        } else if (this.forme == "wolf") {
+            other.getDamaged(amt);
         }
     }
 }
 
 export class DruidShapeshiftWolf extends MightyPower {
     play(player, context) {
-        if (typeof player.character.shapeshiftWolf === "function") {
-            player.character.shapeshiftWolf();
-        }
+        player.character.shapeshift("wolf");
     }
 }
 export class DruidShapeshiftBear extends MightyPower {
     play(player, context) {
-        if (typeof player.character.shapeshiftBear === "function") {
-            player.character.shapeshiftBear();
-        }
+        player.character.shapeshift("bear");
     }
 }
 
