@@ -9,6 +9,8 @@ export class Character {
         this.forme = "";
         this.ignoringShields = false;
         this.multiattack = 1;
+        this.startTurnCallbacks = [];
+        this.endTurnCallbacks = [];
     }
 
     mightyPowers() {
@@ -39,10 +41,12 @@ export class Character {
         return this.health + this.shield;
     }
     doDamage(other, amt) {
-        if (this.ignoringShields) {
-            other.directDamage(amt);
-        } else {
-            other.getDamaged(amt);
+        for (const oth of other) {
+            if (this.ignoringShields) {
+                other.directDamage(amt + this.bonus);
+            } else {
+                other.getDamaged(amt + this.bonus);
+            }
         }
     }
     directDamage(amt, by) {
@@ -85,25 +89,26 @@ export class Character {
     copyShield(i) {
         return this.shields[i];
     }
-    stealShield(i) {
+    stealShield(i) { //same as destroyShield, just dont add it to player
         if (!this.targetable()) return [];
         return this.shields.splice(i, 1);
     }
     chargeBonus() {
         this.bonus += 1;
     }
-    doDamage(other, amt) {
-        super.doDamage(other, amt + this.bonus);
-    }
     shapeshift(forme) {
         this.forme = forme;
     }
 
+    startTurn() {
+        //TODO
+    }
     endTurn() {
         this.bonus = 0;
         this.multi = 1;
         this.disguised = false;
         this.ignoringShields = false;
         this.propertiesTemp = {};
+        //TODO
     }
 }

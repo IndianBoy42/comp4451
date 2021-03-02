@@ -26,9 +26,7 @@ export class DruidShapeshiftBear extends MightyPower {
 export class DruidAnimalMultiattack extends MightyPower {
     play(player, context) {
         if (context.makeAnimalNoise()) {
-            for (const other of context.allPlayers) {
-                play.character.doDamage(other, 1);
-            }
+            player.character.doDamage(context.allOpponents(player), 1);
         }
     }
 }

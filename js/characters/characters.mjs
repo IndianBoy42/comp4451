@@ -1,8 +1,10 @@
 import Character from '../DMchars.mjs';
+import * as Cards from '../cards/cards.js';
+import * as Powers from '../powers/powers.js'
 
 export class Wizard extends Character {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super("Azzan");
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
@@ -13,32 +15,39 @@ export class Wizard extends Character {
 }
 
 export class Paladin extends Character {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super("Lia");
     }
     mightyPowers() {
-        return []; // TODO: Add mightyPowers
+        return [
+            Powers.PaladinGetDiscard,
+            Powers.PaladinDestroyShields,
+        ];
     }
     defaultDeck() {
-        return []; // TOOD: Add defaultDeck
+        return Cards.getPaladinDeck();
     }
 }
 
 export class Barbarian extends Character {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super("Sutha");
     }
     mightyPowers() {
-        return []; // TODO: Add mightyPowers
+        return [
+            Powers.BarbarianHeal,
+            Powers.BarbarianDiscardHand,
+            Powers.BarbarianDestroyShield,
+        ];
     }
     defaultDeck() {
-        return []; // TOOD: Add defaultDeck
+        return Cards.getBarbarianDeck();
     }
 }
 
 export class Rogue extends Character {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super("Oriax");
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
@@ -49,32 +58,40 @@ export class Rogue extends Character {
 }
 
 export class Druid extends Character {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super("Jaheira");
     }
     mightyPowers() {
-        return []; // TODO: Add mightyPowers
+        return [
+            Powers.DruidAnimalMultiattack,
+            Powers.DruidFormePower,
+            Powers.DruidFreeShapeshift,
+        ];
     }
     defaultDeck() {
-        return []; // TOOD: Add defaultDeck
+        return Cards.getDruidDeck();
     }
 }
 
 export class Ranger extends Character {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super("Minsc & Boo");
     }
     mightyPowers() {
-        return []; // TODO: Add mightyPowers
+        return [
+            Powers.RangerRotateHP,
+            Powers.RangerStealCards,
+            Powers.RangerBonusDamage,
+        ]; 
     }
     defaultDeck() {
-        return []; // TOOD: Add defaultDeck
+        return Cards.getRangerDeck();
     }
 }
 
 export class GelatinousCube extends Character {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super("Blorp");
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
@@ -89,8 +106,8 @@ export class GelatinousCube extends Character {
 }
 
 export class OwlBear extends Character {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super("Hoots McGoots");
     }
     mightyPowers() {
         return []; // TODO: Add mightyPowers
