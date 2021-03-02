@@ -9,8 +9,6 @@ export class Character {
         this.forme = "";
         this.ignoringShields = false;
         this.multiattack = 1;
-        this.properties = {};
-        this.propertiesTemp = {};
     }
 
     mightyPowers() {
@@ -22,19 +20,6 @@ export class Character {
         throw new Error(
             "Called defaultDeck() on abstract Character, You have to use a subclass of Character"
         );
-    }
-
-    setProperty(key, value) {
-        this.properties[key] = value;
-    }
-    setPropertyTemp(key, value) {
-        this.propertiesTemp[key] = value;
-    }
-    getProperty(key) {
-        return this.properties[key];
-    }
-    getPropertyTemp(key) {
-        return this.properties[key];
     }
 
     targetable() {
