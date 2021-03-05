@@ -40,12 +40,12 @@ export class Character {
     get effectiveHealth() {
         return this.health + this.shield;
     }
-    doDamage(other, amt) {
-        for (const oth of other) {
+    doDamage(others, amt) {
+        for (const oth of others) {
             if (this.ignoringShields) {
-                other.directDamage(amt + this.bonus);
+                oth.directDamage(amt + this.bonus);
             } else {
-                other.getDamaged(amt + this.bonus);
+                oth.getDamaged(amt + this.bonus);
             }
         }
     }

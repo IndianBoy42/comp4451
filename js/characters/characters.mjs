@@ -7,10 +7,14 @@ export class Wizard extends Character {
         super("Azzan");
     }
     mightyPowers() {
-        return []; // TODO: Add mightyPowers
+        return [
+            Powers.WizardFireball,
+            Powers.WizardStealShield,
+            Powers.WizardSwapHP,
+        ];
     }
     defaultDeck() {
-        return []; // TOOD: Add defaultDeck
+        return Cards.getWizardDeck();
     }
 }
 
@@ -50,10 +54,14 @@ export class Rogue extends Character {
         super("Oriax");
     }
     mightyPowers() {
-        return []; // TODO: Add mightyPowers
+        return [
+            Powers.RogueImmune,
+            Powers.RogueDestroyShield,
+            Powers.RogueStealDiscard,
+        ];
     }
     defaultDeck() {
-        return []; // TOOD: Add defaultDeck
+        return Cards.getRogueDeck();
     }
 }
 

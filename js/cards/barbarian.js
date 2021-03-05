@@ -2,7 +2,7 @@ import DMCard from "../DMcards.mjs";
 import {
     BarbarianDiscardHand,
     BarbarianDestroyShield,
-    BarbarianHeal
+    BarbarianHeal,
 } from "../powers/barbarian.js";
 
 /**
