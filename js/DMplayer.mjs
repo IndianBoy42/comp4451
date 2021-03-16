@@ -1,7 +1,8 @@
-import shuffle from "shuffle.js";
+import { shuffle } from "./shuffle.mjs";
 
-class Player {
+export class Player {
     constructor(name, character) {
+        this.name = name;
         this.character = character;
         this.discardPile = [];
         this.deck = this.character.defaultDeck();

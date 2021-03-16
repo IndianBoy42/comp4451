@@ -1,4 +1,4 @@
-import { Shield } from "DMshields.js";
+import { Shield } from "./DMshields.mjs";
 
 export class DMCard {
     constructor(
@@ -21,22 +21,22 @@ export class DMCard {
     }
 
     static shieldCard(name, amount) {
-        return DMCard(name, amount, 0, 0, 0, 0);
+        return new DMCard(name, amount, 0, 0, 0, 0);
     }
     static healCard(name, amount) {
-        return DMCard(name, 0, amount, 0, 0, 0);
+        return new DMCard(name, 0, amount, 0, 0, 0);
     }
     static damageCard(name, amount) {
-        return DMCard(name, 0, 0, amount, 0, 0);
+        return new DMCard(name, 0, 0, amount, 0, 0);
     }
     static actionCard(name, amount) {
-        return DMCard(name, 0, 0, 0, amount, 0);
+        return new DMCard(name, 0, 0, 0, amount, 0);
     }
     static drawCardsCard(name, amount) {
-        return DMCard(name, 0, 0, 0, 0, amount);
+        return new DMCard(name, 0, 0, 0, 0, amount);
     }
     static powerCard(name, power, extraPowers = []) {
-        return DMCard(name, 0, 0, 0, 0, 0, [power].concat(extraPowers));
+        return new DMCard(name, 0, 0, 0, 0, 0, [power].concat(extraPowers));
     }
 
     addHeal(amount) {
@@ -68,9 +68,9 @@ export class DMCard {
      * Play the card
      *
      * @param {*} player The object of the player playing this card rn
-     * See DMplayer.js
+     * See DMplayer.mjs
      * @param {*} context A object that gives access to the game context (players etc)
-     * See DMgame.js
+     * See DMgame.mjs
      */
     play(player, context) {
         if (this.shieldValue != 0) {

@@ -1,3 +1,5 @@
+import { MightyPower } from '../DMpower.mjs';
+
 // do 3 damage to everyone
 export class WizardFireball extends MightyPower {
     play(player, context) {

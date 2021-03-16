@@ -1,3 +1,5 @@
+import { MightyPower } from '../DMpower.mjs';
+
 // If in Bear Form HEAL(1)
 // If in Wolf Form ATTACK(1)
 export class DruidFormePower extends MightyPower {

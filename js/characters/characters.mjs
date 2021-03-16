@@ -1,6 +1,6 @@
-import Character from '../DMchars.mjs';
-import * as Cards from '../cards/cards.js';
-import * as Powers from '../powers/powers.js'
+import { Character } from '../DMchars.mjs';
+import * as Cards from '../cards/cards.mjs';
+import * as Powers from '../powers/powers.mjs'
 
 export class Wizard extends Character {
     constructor() {

@@ -1,3 +1,5 @@
+import { MightyPower } from '../DMpower.mjs';
+
 // immune for 1 turn
 export class RogueImmune extends MightyPower {
     play(player, context) {

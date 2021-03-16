@@ -1,7 +1,8 @@
-maxHealth = 10;
+const maxHealth = 10;
 
 export class Character {
     constructor(name) {
+        this.name = name;
         this.health = maxHealth;
         this.shields = [];
         this.bonus = 0;
