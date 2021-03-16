@@ -74,7 +74,7 @@ export class DMCard {
      */
     play(player, context) {
         if (this.shieldValue != 0) {
-            player.character.addShield(Shield(this.shieldValue));
+            player.character.addShield(new Shield(this.shieldValue));
         }
         if (this.healValue != 0) {
             player.character.heal(this.healValue);
@@ -83,13 +83,14 @@ export class DMCard {
             player.addExtraAction(this.extraActions);
         }
         if (this.dmgValue != 0) {
-            const targets = context.choosePlayer();
+            const targets = context.choosePlayer(player);
+            // TODO: OWl multiattack
             for (const target of targets) {
-                player.character.doDamage(target, this.dmgValue);
+                player.character.doDamage([target.character], this.dmgValue);
             }
         }
         if (this.drawCards != 0) {
-            context.drawCards(player, this.drawCards);
+            player.drawCards(this.drawCards);
         }
         for (const p of this.extraPowers) {
             p.play(player, context);

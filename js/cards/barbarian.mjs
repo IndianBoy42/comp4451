@@ -45,13 +45,13 @@ function Flex() { //x2
     return new DMCard("Flex!").addHeal(1).addDrawCards(1);
 }
 function BattleRoar() { //x2
-    return new DMCard("Battle Roar").addMightyPower(BarbarianDiscardHand).addActions(1);
+    return new DMCard("Battle Roar").addMightyPower(new BarbarianDiscardHand()).addActions(1);
 }
 function MightyToss() { //x2
-    return new DMCard("Mighty Toss").addMightyPower(BarbarianDestroyShield).addDrawCards(1);
+    return new DMCard("Mighty Toss").addMightyPower(new BarbarianDestroyShield()).addDrawCards(1);
 }
 function WhirlingAxes() { //x1
-    return new DMCard("Whirling Axes").addMightyPower(BarbarianHeal);
+    return new DMCard("Whirling Axes").addMightyPower(new BarbarianHeal());
 }
 
 export function getBarbarianDeck() {

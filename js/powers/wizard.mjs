@@ -19,7 +19,7 @@ export class WizardStealShield extends MightyPower {
 // swap hp with another player
 export class WizardSwapHP extends MightyPower {
     play(player, context) {
-        const opponent = context.choosePlayer();
+        const opponent = context.choosePlayer(player);
         player.character.swapHealth(opponent.character);
     }
 }

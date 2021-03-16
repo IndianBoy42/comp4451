@@ -22,7 +22,7 @@ export class RogueDestroyShield extends MightyPower {
 // steal discarded card and play
 export class RogueStealDiscard extends MightyPower {
     play(player, context) {
-        const opponent = context.choosePlayer();
+        const opponent = context.choosePlayer(player);
         const card = opponent.getFromDiscard(true);
         card.play(player, context);
     }

@@ -21,7 +21,8 @@ export class Player {
     }
     drawCards(numCards) {
         for (let i = 0; i < numCards; i++) {
-            this.hand.push(this.drawCard());
+            const card = this.drawCard();
+            this.hand.push(card);
         }
     }
     addCardToHand(card) {

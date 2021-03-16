@@ -11,37 +11,37 @@ import {
  */
 
 function KrydleAndShandie() { //x1
-    return new DMCard.shieldCard("Krydle And Shandie", 3);
+    return new DMCard("Krydle And Shandie").addShield(3);
 }
 function WrapItUp() { //x1
     return new DMCard("Wrap It Up").addHeal(1).addDrawCards(1);
 }
 function ScoutingOuting() { //x2
-    return new DMCard.powerCard("Scouting Outing", RangerStealCards(1));
+    return new DMCard("Scouting Outing").addMightyPower(new RangerStealCards());
 }
 function SqueakyWheel() { //x3
     return new DMCard("Squeaky Wheel Gets the Kick").addActions(1).addDamage(1);
 }
 function TwiceTheSmiting() { //x3
-    return new DMCard.damageCard("Twice The Smiting").addDamage(2);
+    return new DMCard("Twice The Smiting").addDamage(2);
 }
 function PalePriestessNerys() { //x2
     return new DMCard("Pale Priestess Nerys").addShield(1).addHeal(1);
 }
 function MinscMightyMount() { //x2
-    return new DMCard.shieldCard("Minsc's Mighty Mount", 2);
+    return new DMCard("Minsc's Mighty Mount").addShield(2);
 }
 function GoForTheEyesBoo() { //x3
-    return new DMCard.damageCard("Go For The Eyes, BOO!!!", 3);
+    return new DMCard("Go For The Eyes, BOO!!!").addDamage(3);
 }
 function BooWhatDoWeDo() { //x2
-    return new DMCard.drawCardsCard("Boo, What Do We Do?", 2);
+    return new DMCard("Boo, What Do We Do?").addDrawCards(2);
 }
 function Swapportunity() { //x2
-    return new DMCard.powerCard("Swapportunity", RangerRotateHP(1));
+    return new DMCard("Swapportunity").addMightyPower(new RangerRotateHP());
 }
 function JusticeWaitsForNoOne() { //x2
-    return new DMCard.actionCard("Justice Waits For No One", 2);
+    return new DMCard("Justice Waits For No One").addActions(2);
 }
 function SomeoneHoldMyRodent() { //x2
     return new DMCard("Someone Hold My Rodent").addDamage(2).addHeal(1);
@@ -52,7 +52,7 @@ function TimeToPunchEvil() { //x1
 function FavoredFrienemies() { //x2
     return new DMCard("Favored Frienemies")
         .addActions(1)
-        .addMightyPower(RangerBonusDamage(1));
+        .addMightyPower(new RangerBonusDamage());
 }
 
 export function getRangerDeck() {

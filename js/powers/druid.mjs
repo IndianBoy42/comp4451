@@ -6,9 +6,9 @@ export class DruidFormePower extends MightyPower {
     play(player, context) {
         const form = player.character.forme;
         if (this.forme == "bear") {
-            this.heal(amt);
+            this.heal(this.amount);
         } else if (this.forme == "wolf") {
-            other.getDamaged(amt);
+            other.getDamaged(this.amount);
         }
     }
 }
@@ -35,6 +35,7 @@ export class DruidAnimalMultiattack extends MightyPower {
 
 export class DruidFreeShapeshift extends MightyPower {
     play(player, context) {
+        //TODO
         throw new Error("Not Implemented");
     }
 }

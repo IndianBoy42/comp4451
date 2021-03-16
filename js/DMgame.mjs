@@ -1,12 +1,13 @@
-class DungeonMayhem {
+export class DungeonMayhem {
     constructor() {
         this.players = [];
         //this.shields = [];
     }
 
-    choosePlayer() {
+    choosePlayer(player) {
         // TODO: pop up GUI for choosing the target
         //TODO: choose left/right only vs choose anyone
+        return this.allOpponents(player);
     }
 
     allOpponents(player) {
@@ -21,5 +22,9 @@ class DungeonMayhem {
     chooseShield() {
         //TODO
         //return [player, ishield];
+    }
+
+    makeAnimalNoise() {
+        return true;
     }
 }

@@ -1,7 +1,7 @@
 import { DamagingShield } from "./DMshields.mjs";
 
 export class MightyPower {
-    constructor(n) {
+    constructor(n = 1) {
         this.amount = n;
     }
 

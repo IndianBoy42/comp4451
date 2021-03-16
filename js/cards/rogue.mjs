@@ -39,13 +39,13 @@ function MyLittleFriend() { //x1
     return new DMCard("My Little Friend").addShield(3);
 }
 function CleverDisguise() { //x2
-    return new DMCard("Clever Disguise").addMightyPower(RogueImmune);
+    return new DMCard("Clever Disguise").addMightyPower(new RogueImmune());
 }
 function SneakAttack() { //x2
-    return new DMCard("Sneak Attack!").addMightyPower(RogueDestroyShield).addActions(1);
+    return new DMCard("Sneak Attack!").addMightyPower(new RogueDestroyShield()).addActions(1);
 }
 function PickPocket() { //x2
-    return new DMCard("Pick Pocket").addMightyPower(RogueStealDiscard);
+    return new DMCard("Pick Pocket").addMightyPower(new RogueStealDiscard());
 }
 
 export function getRogueDeck() {

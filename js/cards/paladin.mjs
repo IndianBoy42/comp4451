@@ -44,10 +44,10 @@ function Fluffly() { //x1
     return new DMCard("Fluffly").addShield(2);
 }
 function BanishingSmite() { //x1
-    return new DMCard("Banishing Smite").addMightyPower(PaladinDestroyShields).addActions(1);
+    return new DMCard("Banishing Smite").addMightyPower(new PaladinDestroyShields()).addActions(1);
 }
 function DivineInspiration() { //x2
-    return new DMCard("Divine Inspiration").addMightyPower(PaladinGetDiscard).addHeal(2);
+    return new DMCard("Divine Inspiration").addMightyPower(new PaladinGetDiscard()).addHeal(2);
 }
 
 export function getPaladinDeck() {

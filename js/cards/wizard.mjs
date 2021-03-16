@@ -39,13 +39,13 @@ function MirrorImage() { //x1
     return new DMCard("Mirror Image").addShield(3);
 }
 function Fireball() { //x2
-    return new DMCard("Fireball").addMightyPower(WizardFireball);
+    return new DMCard("Fireball").addMightyPower(new WizardFireball());
 }
 function Charm() { //x2
-    return new DMCard("Charm").addMightyPower(WizardStealShield);
+    return new DMCard("Charm").addMightyPower(new WizardStealShield());
 }
 function VampiricTouch() { //x2
-    return new DMCard("Vampiric Touch").addMightyPower(WizardSwapHP);
+    return new DMCard("Vampiric Touch").addMightyPower(new WizardSwapHP());
 }
 
 export function getWizardDeck() {

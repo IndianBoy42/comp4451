@@ -23,13 +23,13 @@ function ThornWhip() { //x3
 }
 function GiftOfSilvanus() { //x2
     return new DMCard("Gift Of Silvanus")
-        .addMightyPower(DruidFormePower(1))
+        .addMightyPower(new DruidFormePower())
         .addDamage(2);
 }
 function CommuneWNature() { //x2
     return new DMCard("Commune With Nature")
         .addDrawCards(2)
-        .addMightyPower(DruidFreeShapeshift(1));
+        .addMightyPower(new DruidFreeShapeshift());
 }
 function DruidicBalance() { //x2
     return new DMCard("Druidic Balance").addHeal(1).addDrawCards(1).addDamage(1);
@@ -38,17 +38,17 @@ function QuickAsAFox() { //x2
     return new DMCard("Quick As A Fox").addActions(2);
 }
 function Bearnard() { //x2
-    return new DMCard("Bearnard").addShield(1).addMightyPower(DruidFormePower(1));
+    return new DMCard("Bearnard").addShield(1).addMightyPower(new DruidFormePower());
 }
 function ShapeshiftBear() { //x2
     return new DMCard("Shapeshift: Bear")
         .addHeal(2)
-        .addMightyPower(DruidShapeshiftBear(1));
+        .addMightyPower(new DruidShapeshiftBear());
 }
 function ShapeshiftWolf() { //x3
     return new DMCard("Shapeshift: Wolf")
         .addDamage(2)
-        .addMightyPower(DruidShapeshiftWolf(1));
+        .addMightyPower(new DruidShapeshiftWolf());
 }
 function CallLightning() { //x3
     return new DMCard("Call Lightning").addDamage(3);
@@ -56,12 +56,12 @@ function CallLightning() { //x3
 function PrimalStrike() { //x2
     return new DMCard("Primal Strike")
         .addActions(1)
-        .addMightyPower(DruidAnimalMultiattack(1));
+        .addMightyPower(new DruidAnimalMultiattack());
 }
 function WildRush() { //x2
     return new DMCard("Wild Rush")
         .addDrawCards(2)
-        .addMightyPower(DruidFormePower(1));
+        .addMightyPower(new DruidFormePower());
 }
 
 export function getDruidDeck() {
