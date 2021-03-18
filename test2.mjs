@@ -2,11 +2,28 @@ import { DungeonMayhem } from './js/DMgame.mjs';
 import { Player } from './js/DMplayer.mjs';
 import * as Characters from './js/characters/characters.mjs';
 
-const p1 = new Player("Player1", new Characters.Ranger());
-const p2 = new Player("Player2", new Characters.Paladin());
+// import * as readline from 'readline';
+// const rl = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+// });
+// var userInput;
+// var userHasInput = false;
+// rl.on('line', (input) => {
+//     //console.log(`Received: ${input}`);
+//     userInput = input;
+//     userHasInput = true;
+// });
+
+const p1 = new Player("P1", new Characters.Ranger());
+const p2 = new Player("P2", new Characters.Paladin());
+const p3 = new Player("P3", new Characters.Rogue());
+const p4 = new Player("P4", new Characters.Wizard());
 const game = new DungeonMayhem();
 game.players.push(p1);
 game.players.push(p2);
+game.players.push(p3);
+game.players.push(p4);
 
 function logPlayer(player) {
     const char = player.character;
@@ -14,8 +31,8 @@ function logPlayer(player) {
     console.log("Character: " + char.name + " (" + char.constructor.name + ")");
     console.log("HP: " + char.health);
 
-    function logCard(card, verbose = false) {
-        console.log("Card: " + card.name + (verbose ? ", shield = " + card.shieldValue + 
+    function logCard(card, verbose = false, cardNo = "") {
+        console.log("Card " + cardNo + ": " + card.name + (verbose ? ", shield = " + card.shieldValue + 
                     ", heal = " + card.healValue + ", dmg = " + card.dmgValue + 
                     ", extra = " + card.extraActions + ", draw = " + card.drawCards + 
                     ", super = " + 
@@ -23,12 +40,14 @@ function logPlayer(player) {
     }
 
     console.log("Hand:")
+    let i = 0;
     for (const card of player.hand) {
-        logCard(card, true);
+        logCard(card, true, i);
+        ++i;
     }
 
     function logShield(shield) {
-        console.log("Shield: " + shield.name + "" + shield.current + "/" + shield.max);
+        console.log("Shield: " + shield.name + "-" + shield.shieldObj.current + "/" + shield.shieldObj.max);
     }
 
     console.log("Shields:")
@@ -44,21 +63,56 @@ function logPlayer(player) {
     console.log("====================================");
 }
 
-function playerPlayCard(player) {
-    const playCard = player.hand.pop();
-    console.log("Player " + player.name + " plays " + playCard.name);
+function playerPlayCard(player, cardPos) {
+    const playCard = player.hand.splice(cardPos, 1)[0];
+    console.log("" + player.name + " plays " + playCard.name);
     playCard.play(player, game);
-    player.disCard(playCard);
     console.log("====================================");
 }
 
 //game
 console.log("====================================");
-logPlayer(p1);
-logPlayer(p2);
+for (const pl of game.players) {
+    logPlayer(pl);
+}
 
-p1.drawCards(1);
-playerPlayCard(p1);
+let turn = 1;
+let pTurn = 1;
+const NUM_PLAYERS = 4;
 
-logPlayer(p1);
-logPlayer(p2);
+while (true) {
+    console.log("==========PLAYER " + pTurn + " TURN " + turn + "===========");
+    var player;
+
+    player = game.players[pTurn - 1];
+
+    if (player.character.health > 0) {
+        player.startTurn();
+        player.drawCards(1);
+        logPlayer(player);
+        // AAAAAAAAAAAA I DONT KNOW HOW TO READ FROM CONSOLE REEEEEEEEEEEEEE
+        while (player.character.actionsLeft > 0) {
+            var cardPos = Math.floor(Math.random() * player.hand.length);
+            playerPlayCard(player, cardPos);
+            if (game.gameEnded()) break;
+        }
+        player.endTurn();
+    }
+
+    ++pTurn;
+    if (pTurn > NUM_PLAYERS) {
+        pTurn = 1;
+        ++turn;
+    } 
+    for (const pl of game.players) {
+        console.log("" + pl.name + " has " + pl.character.health + " hp left");
+    }
+    if (game.gameEnded()) break;
+}
+
+console.log("==============GAME END==============");
+for (const pl of game.players) {
+    logPlayer(pl);
+}
+
+// rl.close();

@@ -4,6 +4,7 @@ export class Player {
     constructor(name, character) {
         this.name = name;
         this.character = character;
+        this.character.player = this;
         this.discardPile = [];
         this.deck = this.character.defaultDeck();
         shuffle(this.deck);
@@ -38,16 +39,18 @@ export class Player {
         this.drawCards(numCardsRedraw);
     }
     getFromDiscard(top) {
+        if (this.discardPile.length === 0) return null;
         if (top) {
             return this.discardPile.pop();
         }
         else {
             //TODO: let player pick any from discard pile
+            return this.discardPile.pop();
         }
     }
 
-    addExtraAction() {
-        // TODO:
+    addExtraAction(numExtraActions) {
+        this.character.actionsLeft += numExtraActions;
     }
 
     startTurn() {

@@ -13,17 +13,21 @@ export class RogueImmune extends MightyPower {
 // destroy shield
 export class RogueDestroyShield extends MightyPower {
     play(player, context) {
-        [opponent, ishield] = context.chooseShield();
-        const shield = opponent.character.stealShield(ishield);
-        opponent.disCard(shield);
+        const ps = context.chooseShield();
+        const opponent = ps[0];
+        const ishield = ps[1];
+        if (ishield > -1) {
+            const shield = opponent.character.stealShield(ishield);
+            opponent.disCard(shield);
+        }
     }
 }
 
 // steal discarded card and play
 export class RogueStealDiscard extends MightyPower {
     play(player, context) {
-        const opponent = context.choosePlayer(player);
+        const opponent = context.choosePlayer(player)[0];
         const card = opponent.getFromDiscard(true);
-        card.play(player, context);
+        if (!(card === null)) card.play(player, context);
     }
 }

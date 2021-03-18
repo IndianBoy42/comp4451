@@ -10,16 +10,20 @@ export class WizardFireball extends MightyPower {
 // steal a shield
 export class WizardStealShield extends MightyPower {
     play(player, context) {
-        [opponent, ishield] = context.chooseShield();
-        const shield = opponent.character.stealShield(ishield);
-        player.character.addShield(shield);
+        const ps = context.chooseShield();
+        const opponent = ps[0];
+        const ishield = ps[1];
+        if (ishield > -1) {
+            const shield = opponent.character.stealShield(ishield);
+            player.character.addShield(shield);
+        }
     }
 }
 
 // swap hp with another player
 export class WizardSwapHP extends MightyPower {
     play(player, context) {
-        const opponent = context.choosePlayer(player);
+        const opponent = context.choosePlayer(player)[0];
         player.character.swapHealth(opponent.character);
     }
 }

@@ -73,8 +73,12 @@ export class DMCard {
      * See DMgame.mjs
      */
     play(player, context) {
+        let discard = true;
+        player.character.actionsLeft -= 1;
         if (this.shieldValue != 0) {
-            player.character.addShield(new Shield(this.shieldValue));
+            this.shieldObj = new Shield(this.shieldValue);
+            player.character.addShield(this);
+            discard = false;
         }
         if (this.healValue != 0) {
             player.character.heal(this.healValue);
@@ -85,15 +89,19 @@ export class DMCard {
         if (this.dmgValue != 0) {
             const targets = context.choosePlayer(player);
             // TODO: OWl multiattack
-            for (const target of targets) {
-                player.character.doDamage([target.character], this.dmgValue);
-            }
+            player.character.doDamage(targets, this.dmgValue);   
         }
         if (this.drawCards != 0) {
             player.drawCards(this.drawCards);
         }
         for (const p of this.extraPowers) {
             p.play(player, context);
+            //TODO some effects need to be kept like for druid?
+            //although that can be discarded fine
+        }
+        if (discard) player.disCard(this);
+        if (player.hand.length === 0) {
+            player.drawCards(2);
         }
     }
 }

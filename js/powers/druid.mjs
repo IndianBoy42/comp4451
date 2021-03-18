@@ -8,7 +8,8 @@ export class DruidFormePower extends MightyPower {
         if (this.forme == "bear") {
             this.heal(this.amount);
         } else if (this.forme == "wolf") {
-            other.getDamaged(this.amount);
+            const other = context.choosePlayer(player);
+            other.getDamaged(this.amount, this);
         }
     }
 }

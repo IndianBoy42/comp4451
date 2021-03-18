@@ -3,7 +3,7 @@ import { MightyPower } from '../DMpower.mjs';
 // Each player gives their hit point total to the player on their right
 export class RangerRotateHP extends MightyPower {
     play(player, context) {
-        const players = context.allPlayers;
+        const players = context.players;
         for (let i = 1; i < players.length; i++) {
             const a = players[i];
             const b = players[i - 1];
@@ -15,7 +15,7 @@ export class RangerRotateHP extends MightyPower {
 // Draw a card from the top of each opponent's deck
 export class RangerStealCards extends MightyPower {
     play(player, context) {
-        const players = context.allPlayers;
+        const players = context.players;
         for (const other of players) {
             if (other == player) continue;
             const card = other.drawCard();
