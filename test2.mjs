@@ -19,11 +19,16 @@ const p1 = new Player("P1", new Characters.Ranger());
 const p2 = new Player("P2", new Characters.Paladin());
 const p3 = new Player("P3", new Characters.Rogue());
 const p4 = new Player("P4", new Characters.Wizard());
+const p5 = new Player("P5", new Characters.Barbarian());
+const p6 = new Player("P6", new Characters.Druid());
 const game = new DungeonMayhem();
 game.players.push(p1);
 game.players.push(p2);
 game.players.push(p3);
 game.players.push(p4);
+game.players.push(p5);
+game.players.push(p6);
+const NUM_PLAYERS = game.players.length;
 
 function logPlayer(player) {
     const char = player.character;
@@ -65,7 +70,6 @@ function logPlayer(player) {
 
 function playerPlayCard(player, cardPos) {
     const playCard = player.hand.splice(cardPos, 1)[0];
-    console.log("" + player.name + " plays " + playCard.name);
     playCard.play(player, game);
     console.log("====================================");
 }
@@ -78,7 +82,6 @@ for (const pl of game.players) {
 
 let turn = 1;
 let pTurn = 1;
-const NUM_PLAYERS = 4;
 
 while (true) {
     console.log("==========PLAYER " + pTurn + " TURN " + turn + "===========");

@@ -37,6 +37,18 @@ export class DruidAnimalMultiattack extends MightyPower {
 export class DruidFreeShapeshift extends MightyPower {
     play(player, context) {
         //TODO
-        throw new Error("Not Implemented");
+        let shapeshiftCards = [];
+        for (const card of player.hand) {
+            if (card.extraPowers.length > 0) {
+                if (card.extraPowers[0].constructor.name === "DruidShapeshiftWolf" || 
+                    card.extraPowers[0].constructor.name === "DruidShapeshiftBear") {
+                    shapeshiftCards.push(card);
+                }
+            }
+        }
+        if (shapeshiftCards.length > 0) {
+            const card = shapeshiftCards[Math.floor(Math.random() * shapeshiftCards.length)];
+            card.play(player, context);
+        }
     }
 }

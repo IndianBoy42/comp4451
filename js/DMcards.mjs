@@ -73,6 +73,9 @@ export class DMCard {
      * See DMgame.mjs
      */
     play(player, context) {
+        //debug
+        console.log("" + player.name + " plays " + this.name);
+
         let discard = true;
         player.character.actionsLeft -= 1;
         if (this.shieldValue != 0) {
