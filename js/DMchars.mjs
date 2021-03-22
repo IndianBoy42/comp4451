@@ -46,6 +46,7 @@ export class Character {
     }
     doDamage(others, amt) { //others are PLAYERS not CHARACTERS
         for (const oth of others) {
+            if (oth === undefined) continue; //prevent passing no one into others
             if (this.ignoringShields) {
                 oth.character.directDamage(amt + this.bonus, this);
             } else {
@@ -108,20 +109,20 @@ export class Character {
     }
 
     startTurn() {
-        //TODO
+        this.disguised = false;
         this.actionsLeft = 1;
-        for (const func of this.startTurnCallbacks) {
+        while (this.startTurnCallbacks.length > 0) {
+            const func = this.startTurnCallbacks.pop();
             func();
         }
     }
     endTurn() {
-        // this.bonus = 0;
-        // this.multi = 1;
-        // this.disguised = false;
-        // this.ignoringShields = false;
-        // this.propertiesTemp = {};
-        //TODO
-        for (const func of this.endTurnCallbacks) {
+        this.bonus = 0;
+        this.multi = 1;
+        this.ignoringShields = false;
+        this.propertiesTemp = {};
+        while (this.endTurnCallbacks.length > 0) {
+            const func = this.endTurnCallbacks.pop();
             func();
         }
     }

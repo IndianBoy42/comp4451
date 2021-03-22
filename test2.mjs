@@ -65,6 +65,8 @@ function logPlayer(player) {
         logCard(card);
     }
 
+    console.log("Cards left in deck: " + player.deck.length);
+
     console.log("====================================");
 }
 

@@ -3,7 +3,12 @@ import { MightyPower } from '../DMpower.mjs';
 // Each player gives their hit point total to the player on their right
 export class RangerRotateHP extends MightyPower {
     play(player, context) {
-        const players = context.players;
+        const players = context.players.slice();
+        for (const i in players) {
+            if (!players[i].character.targetable()) {
+                players.splice(i, 1);
+            }
+        }
         for (let i = 1; i < players.length; i++) {
             const a = players[i];
             const b = players[i - 1];

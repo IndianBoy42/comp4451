@@ -4,9 +4,6 @@ import { MightyPower } from '../DMpower.mjs';
 export class RogueImmune extends MightyPower {
     play(player, context) {
         player.character.disguised = true;
-        player.character.startTurnCallbacks.push(function() {
-            player.character.disguised = false;
-        });
     }
 }
 

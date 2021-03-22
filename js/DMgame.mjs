@@ -15,7 +15,7 @@ export class DungeonMayhem {
     allAliveOpponents(player) {
         let opp = [];
         for (const other of this.players) {
-            if (other === player || other.character.health === 0) continue;
+            if (other === player || other.character.health === 0 || !other.character.targetable()) continue;
             opp.push(other);
         }
         return opp;
@@ -46,6 +46,6 @@ export class DungeonMayhem {
         for (const player of this.players) {
             if (player.character.health === 0) ++playerDead;
         }
-        return (playerDead + 1 === this.players.length);
+        return (playerDead + 1 >= this.players.length);
     }
 }

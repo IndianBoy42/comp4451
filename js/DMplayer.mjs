@@ -13,8 +13,9 @@ export class Player {
     }
 
     drawCard() {
-        if (this.deck.length == 0) {
-            this.deck = this.discardPile;
+        if (this.deck.length === 0) {
+            if (this.discardPile.length === 0) return null;
+            this.deck = this.discardPile.slice();
             this.discardPile = [];
             shuffle(this.deck);
         }
@@ -23,10 +24,11 @@ export class Player {
     drawCards(numCards) {
         for (let i = 0; i < numCards; i++) {
             const card = this.drawCard();
-            this.hand.push(card);
+            this.addCardToHand(card);
         }
     }
     addCardToHand(card) {
+        if (card === null) return;
         this.hand.push(card);
     }
     disCard(card) {
