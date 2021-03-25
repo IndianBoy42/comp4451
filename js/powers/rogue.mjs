@@ -26,7 +26,7 @@ export class RogueStealDiscard extends MightyPower {
         //TODO only pick from players with discard pile
         const o = await context.choosePlayer(player);
         const opponent = o[0];
-        const card = opponent.getFromDiscard(true);
+        const card = await opponent.getFromDiscard(true);
         if (!(card === null)) await card.play(player, context);
     }
 }

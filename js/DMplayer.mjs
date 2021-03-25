@@ -1,4 +1,5 @@
 import { shuffle } from "./shuffle.mjs";
+import { askIntInput } from '../input.mjs';
 
 export class Player {
     constructor(name, character) {
@@ -40,14 +41,14 @@ export class Player {
         }
         this.drawCards(numCardsRedraw);
     }
-    getFromDiscard(top) {
+    async getFromDiscard(top) {
         if (this.discardPile.length === 0) return null;
         if (top) {
             return this.discardPile.pop();
         }
         else {
-            //TODO: let player pick any from discard pile
-            return this.discardPile.pop();
+            const i = await askIntInput("Choose discarded card: ", 0, this.discardPile.length-1);
+            return this.discardPile.splice(i, 1)[0];
         }
     }
 

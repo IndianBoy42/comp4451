@@ -2,8 +2,8 @@ import { MightyPower } from '../DMpower.mjs';
 
 // gain any discarded card
 export class PaladinGetDiscard extends MightyPower {
-    play(player, context) {
-        const card = player.getFromDiscard(false);
+    async play(player, context) {
+        const card = await player.getFromDiscard(false);
         if (!(card === null)) player.addCardToHand(card);
     }
 }
