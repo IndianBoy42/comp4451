@@ -1,3 +1,5 @@
+import { askIntInput } from '../input.mjs';
+
 export class DungeonMayhem {
     constructor() {
         this.players = [];
@@ -12,29 +14,54 @@ export class DungeonMayhem {
         }
         return opp;
     }
-    allAliveOpponents(player) {
+    allAliveOpponents(player, targetSelf = false) {
         let opp = [];
-        for (const other of this.players) {
-            if (other === player || other.character.health === 0 || !other.character.targetable()) continue;
-            opp.push(other);
+        for (const oppIndex in this.players) {
+            if (!this.isValidOpponent(player, oppIndex, targetSelf)) continue;
+            opp.push(this.players[oppIndex]);
         }
         return opp;
     }
-
-    choosePlayer(player) {
-        // TODO: pop up GUI for choosing the target
-        //TODO: choose left/right only vs choose anyone
-        let allOpps = this.allAliveOpponents(player);
-        return [allOpps[Math.floor(Math.random() * allOpps.length)]];
+    isValidOpponent(player, oppIndex, targetSelf = false, targetDisguise = false) {
+        const opp = this.players[oppIndex];
+        let valid = (opp.character.health > 0);
+        if (!targetSelf) valid = valid && !(opp === player);
+        if (!targetDisguise) valid = valid && opp.character.targetable();
+        return valid;
     }
 
-    chooseShield() {
+    async choosePlayer(player, targetSelf = false) {
+        // TODO: pop up GUI for choosing the target
+        //TODO: choose left/right only vs choose anyone 
+        let allOpps = this.allAliveOpponents(player, targetSelf);
+        let finish = (allOpps.length === 0);
+        let overflowCount = 0;
+        while (!finish) {
+            const input = await askIntInput("Choose target from 1 to 6: ", 1, 6);
+            const oppIndex = input - 1;
+            if (this.isValidOpponent(player, oppIndex, targetSelf)) {
+                //finish = true;
+                console.log("Target player " + input);
+                return [this.players[oppIndex]];
+            }
+            ++overflowCount;
+            if (overflowCount > 100) throw new Error("Infinite loop in choosePlayer(), " + allOpps.length);
+            console.log("Invalid target!");
+        }
+        return [];
+        //return [allOpps[Math.floor(Math.random() * allOpps.length)]];
+    }
+
+    async chooseShield(player, targetSelf = false) {
         //TODO
-        let player = this.players[Math.floor(Math.random() * this.players.length)];
+        const t = await this.choosePlayer(player, targetSelf);
+        if (t.length === 0) return [null, -1];
+        const target = t[0];
         let ishield = -1;
-        if (player.character.shields.length > 0)
-            player.character.shields[Math.floor(Math.random() * player.character.shields.length)];
-        return [player, ishield];
+        if (target.character.shields.length > 0)
+            ishield = await askIntInput("Choose shield index: ", 0, target.character.shields.length-1);
+            //target.character.shields[Math.floor(Math.random() * target.character.shields.length)];
+        return [target, ishield];
     }
 
     makeAnimalNoise() {

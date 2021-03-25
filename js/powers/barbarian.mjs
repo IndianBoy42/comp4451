@@ -11,8 +11,8 @@ export class BarbarianDiscardHand extends MightyPower {
 
 // destroy a shield card
 export class BarbarianDestroyShield extends MightyPower {
-    play(player, context) {
-        const ps = context.chooseShield();
+    async play(player, context) {
+        const ps = await context.chooseShield(player);
         const opponent = ps[0];
         const ishield = ps[1];
         if (ishield > -1) {

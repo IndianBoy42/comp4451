@@ -5,7 +5,7 @@ export class MightyPower {
         this.amount = n;
     }
 
-    play(player, context) {
+    async play(player, context) {
         throw new Error(
             "Called play on an abstract MightyPower, You have to use a subclass"
         );

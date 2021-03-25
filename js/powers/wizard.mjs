@@ -9,8 +9,8 @@ export class WizardFireball extends MightyPower {
 
 // steal a shield
 export class WizardStealShield extends MightyPower {
-    play(player, context) {
-        const ps = context.chooseShield();
+    async play(player, context) {
+        const ps = await context.chooseShield(player);
         const opponent = ps[0];
         const ishield = ps[1];
         if (ishield > -1) {
@@ -22,8 +22,9 @@ export class WizardStealShield extends MightyPower {
 
 // swap hp with another player
 export class WizardSwapHP extends MightyPower {
-    play(player, context) {
-        const opponent = context.choosePlayer(player)[0];
+    async play(player, context) {
+        const o = await context.choosePlayer(player);
+        const opponent = o[0];
         if (opponent === undefined) return;
         player.character.swapHealth(opponent.character);
     }

@@ -1,34 +1,23 @@
+import { DMCard } from './js/DMCards.mjs';
 import { DungeonMayhem } from './js/DMgame.mjs';
 import { Player } from './js/DMplayer.mjs';
 import * as Characters from './js/characters/characters.mjs';
+import { askIntInput } from './input.mjs';
 
-// import * as readline from 'readline';
-// const rl = readline.createInterface({
-//     input: process.stdin,
-//     output: process.stdout
-// });
-// var userInput;
-// var userHasInput = false;
-// rl.on('line', (input) => {
-//     //console.log(`Received: ${input}`);
-//     userInput = input;
-//     userHasInput = true;
-// });
-
-const p1 = new Player("P1", new Characters.Ranger());
-const p2 = new Player("P2", new Characters.Paladin());
-const p3 = new Player("P3", new Characters.Rogue());
-const p4 = new Player("P4", new Characters.Wizard());
-const p5 = new Player("P5", new Characters.Barbarian());
-const p6 = new Player("P6", new Characters.Druid());
 const game = new DungeonMayhem();
-game.players.push(p1);
-game.players.push(p2);
-game.players.push(p3);
-game.players.push(p4);
-game.players.push(p5);
-game.players.push(p6);
+const p1 = new Player("P1", new Characters.Rogue()); game.players.push(p1);
+const p2 = new Player("P2", new Characters.Paladin()); game.players.push(p2);
+const p3 = new Player("P3", new Characters.Ranger()); game.players.push(p3);
+const p4 = new Player("P4", new Characters.Wizard()); game.players.push(p4);
+const p5 = new Player("P5", new Characters.Barbarian()); game.players.push(p5);
+const p6 = new Player("P6", new Characters.Druid()); game.players.push(p6);
 const NUM_PLAYERS = game.players.length;
+
+//======testing setups======//
+// import * as Powers from './js/powers/powers.mjs';
+// p1.hand.push(new DMCard("Clever Disguise").addMightyPower(new Powers.RogueImmune()));
+// p5.hand.push(new DMCard("Mighty Toss").addMightyPower(new Powers.BarbarianDestroyShield()).addDrawCards(1));
+//======testing setups======//
 
 function logPlayer(player) {
     const char = player.character;
@@ -37,7 +26,7 @@ function logPlayer(player) {
     console.log("HP: " + char.health);
 
     function logCard(card, verbose = false, cardNo = "") {
-        console.log("Card " + cardNo + ": " + card.name + (verbose ? ", shield = " + card.shieldValue + 
+        console.log("Card " + cardNo + ": " + card.name.padEnd(30) + (verbose ? ", shield = " + card.shieldValue + 
                     ", heal = " + card.healValue + ", dmg = " + card.dmgValue + 
                     ", extra = " + card.extraActions + ", draw = " + card.drawCards + 
                     ", super = " + 
@@ -70,9 +59,9 @@ function logPlayer(player) {
     console.log("====================================");
 }
 
-function playerPlayCard(player, cardPos) {
+async function playerPlayCard(player, cardPos) {
     const playCard = player.hand.splice(cardPos, 1)[0];
-    playCard.play(player, game);
+    await playCard.play(player, game);
     console.log("====================================");
 }
 
@@ -94,11 +83,11 @@ while (true) {
     if (player.character.health > 0) {
         player.startTurn();
         player.drawCards(1);
-        logPlayer(player);
-        // AAAAAAAAAAAA I DONT KNOW HOW TO READ FROM CONSOLE REEEEEEEEEEEEEE
+        // ok i figured out how to read from console
         while (player.character.actionsLeft > 0) {
-            var cardPos = Math.floor(Math.random() * player.hand.length);
-            playerPlayCard(player, cardPos);
+            logPlayer(player);
+            const cardPos = await askIntInput("Choose card to play: ", 0, player.hand.length-1);
+            await playerPlayCard(player, cardPos);
             if (game.gameEnded()) break;
         }
         player.endTurn();

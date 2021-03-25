@@ -9,8 +9,8 @@ export class RogueImmune extends MightyPower {
 
 // destroy shield
 export class RogueDestroyShield extends MightyPower {
-    play(player, context) {
-        const ps = context.chooseShield();
+    async play(player, context) {
+        const ps = await context.chooseShield(player);
         const opponent = ps[0];
         const ishield = ps[1];
         if (ishield > -1) {
@@ -22,9 +22,11 @@ export class RogueDestroyShield extends MightyPower {
 
 // steal discarded card and play
 export class RogueStealDiscard extends MightyPower {
-    play(player, context) {
-        const opponent = context.choosePlayer(player)[0];
+    async play(player, context) {
+        //TODO only pick from players with discard pile
+        const o = await context.choosePlayer(player);
+        const opponent = o[0];
         const card = opponent.getFromDiscard(true);
-        if (!(card === null)) card.play(player, context);
+        if (!(card === null)) await card.play(player, context);
     }
 }

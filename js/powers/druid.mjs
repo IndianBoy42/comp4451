@@ -1,14 +1,15 @@
 import { MightyPower } from '../DMpower.mjs';
+import { askIntInput } from '../../input.mjs';
 
 // If in Bear Form HEAL(1)
 // If in Wolf Form ATTACK(1)
 export class DruidFormePower extends MightyPower {
-    play(player, context) {
+    async play(player, context) {
         const form = player.character.forme;
         if (form == "bear") {
             player.character.heal(this.amount);
         } else if (form == "wolf") {
-            const others = context.choosePlayer(player);
+            const others = await context.choosePlayer(player);
             player.character.doDamage(others, this.amount);
         }
     }
@@ -35,20 +36,24 @@ export class DruidAnimalMultiattack extends MightyPower {
 }
 
 export class DruidFreeShapeshift extends MightyPower {
-    play(player, context) {
+    async play(player, context) {
         let shapeshiftCardsIndex = [];
+        let j = 0; //shapeshiftCardsIndex.length
         for (const i in player.hand) {
             const card = player.hand[i];
             if (card.extraPowers.length > 0) {
                 if (card.extraPowers[0].constructor.name === "DruidShapeshiftWolf" || 
-                    card.extraPowers[0].constructor.name === "DruidShapeshiftBear") {
+                        card.extraPowers[0].constructor.name === "DruidShapeshiftBear") {
+                    console.log("Playable card " + j + ": " + card.name);
+                    ++j;
                     shapeshiftCardsIndex.push(i);
                 }
             }
         }
-        if (shapeshiftCardsIndex.length > 0) {
+        if (j > 0) {
             // TODO choose card
-            const cardIndex = shapeshiftCardsIndex[Math.floor(Math.random() * shapeshiftCardsIndex.length)];
+            const k = await askIntInput("Choose card to play for free: ", 0, j-1);
+            const cardIndex = shapeshiftCardsIndex[k];
             const card = player.hand.splice(cardIndex, 1)[0];
             card.play(player, context);
         }

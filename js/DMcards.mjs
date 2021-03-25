@@ -72,7 +72,7 @@ export class DMCard {
      * @param {*} context A object that gives access to the game context (players etc)
      * See DMgame.mjs
      */
-    play(player, context) {
+    async play(player, context) {
         //debug
         console.log("" + player.name + " plays " + this.name);
 
@@ -90,7 +90,7 @@ export class DMCard {
             player.addExtraAction(this.extraActions);
         }
         if (this.dmgValue != 0) {
-            const targets = context.choosePlayer(player);
+            const targets = await context.choosePlayer(player);
             // TODO: OWl multiattack
             player.character.doDamage(targets, this.dmgValue);   
         }
@@ -98,9 +98,7 @@ export class DMCard {
             player.drawCards(this.drawCards);
         }
         for (const p of this.extraPowers) {
-            p.play(player, context);
-            //TODO some effects need to be kept like for druid?
-            //although that can be discarded fine
+            await p.play(player, context);
         }
         if (discard) player.disCard(this);
         if (player.hand.length === 0) {
