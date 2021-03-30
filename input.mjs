@@ -12,7 +12,7 @@ export function askQuestion(query) {
 }
 
 //set this to true to randomize all actions for testing
-const DEBUG_RNG_INPUT = false;
+export const DEBUG_RNG_INPUT = true;
 
 export async function askIntInput(query, min, max) {
     if (DEBUG_RNG_INPUT) {

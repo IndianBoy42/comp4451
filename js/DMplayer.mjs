@@ -2,7 +2,7 @@ import { shuffle } from "./shuffle.mjs";
 import { askIntInput } from '../input.mjs';
 
 export class Player {
-    constructor(name, character) {
+    constructor(name, character, isAI = false) {
         this.name = name;
         this.character = character;
         this.character.player = this;

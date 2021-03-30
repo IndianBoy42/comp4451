@@ -92,6 +92,11 @@ while (true) {
         }
         player.endTurn();
     }
+    else {
+        // ghost ping
+        const opp = await game.choosePlayer(player, true, false, false, true);
+        if (opp.length > 0) player.character.doDamage(opp, 1);
+    }
 
     ++pTurn;
     if (pTurn > NUM_PLAYERS) {

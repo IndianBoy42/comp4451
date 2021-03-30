@@ -90,8 +90,13 @@ export class DMCard {
             player.addExtraAction(this.extraActions);
         }
         if (this.dmgValue != 0) {
-            const targets = await context.choosePlayer(player);
-            // TODO: OWl multiattack
+            let targets = [];
+            if (player.multiAttack) {
+                targets = context.allAliveOpponents(player);
+            }
+            else {
+                targets = await context.choosePlayer(player);
+            }
             player.character.doDamage(targets, this.dmgValue);   
         }
         if (this.drawCards != 0) {

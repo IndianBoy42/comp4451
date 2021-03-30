@@ -8,11 +8,15 @@ export class Character {
         this.health = maxHealth;
         this.shields = [];
         this.actionsLeft = 0;
-        this.bonus = 0;
-        this.disguised = false;
-        this.forme = "";
-        this.ignoringShields = false;
-        this.multiattack = 1;
+
+        // mighty powers
+        this.bonus = 0; //ranger
+        this.disguised = false; //rogue
+        this.forme = ""; //druid
+        this.ignoringShields = false; //icecube
+        this.multiattack = false; //owl
+
+        // other special callbacks
         this.startTurnCallbacks = [];
         this.endTurnCallbacks = [];
     }
@@ -30,9 +34,6 @@ export class Character {
 
     targetable() {
         return !this.disguised;
-    }
-    numTargets() {
-        return this.multiattack;
     }
     get shield() {
         return this.shields.map(a => a.current).reduce(0, (a, b) => a + b);
@@ -118,9 +119,8 @@ export class Character {
     }
     endTurn() {
         this.bonus = 0;
-        this.multi = 1;
+        this.multiAttack = false;
         this.ignoringShields = false;
-        this.propertiesTemp = {};
         while (this.endTurnCallbacks.length > 0) {
             const func = this.endTurnCallbacks.pop();
             func();
