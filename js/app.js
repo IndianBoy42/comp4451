@@ -1,9 +1,10 @@
-import * as THREE from "../node_modules/three/build/three.module.js";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import * as Stats from "stats.js";
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
-// import { OrbitControls } from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
 
 function camera() {
     const fov = 75;
@@ -36,7 +37,6 @@ function dir_light(scene) {
     const color = 0xffffff;
     const intensity = 1;
     const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
 
     scene.add(light);
 
@@ -67,10 +67,11 @@ const scene = new THREE.Scene();
 
 const cube1 = cube(scene, { color: 0x44aa88 });
 const cube2 = cube(scene, { color: 0x44aa88 });
-cube2.position.z -= 2;
+cube2.position.x -= 2;
 const cube3 = cube(scene, { color: 0x44aa88 });
-cube3.position.z += 2;
+cube3.position.x += 2;
 const light1 = dir_light(scene);
+light1.position.set(-1, 2, 4);
 
 function render(time) {
     stats.begin();
@@ -78,8 +79,8 @@ function render(time) {
 
     time *= 0.001; // convert time to seconds
 
-    cube1.rotation.x = time;
-    cube1.rotation.y = time;
+    // cube1.rotation.x = time;
+    // cube1.rotation.y = time;
 
     renderer.render(scene, cam);
     stats.end();
