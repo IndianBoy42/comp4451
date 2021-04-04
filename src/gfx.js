@@ -4,11 +4,13 @@ import wizard from "./assets/wizard.glb";
 
 const loader = new GLTFLoader();
 
-export function loadModel(scene, modelpath) {
+export function loadModel(scene, models, objects, modelpath) {
     loader.load(
         modelpath,
         function (gltf) {
             scene.add(gltf.scene);
+            models.push(gltf.scene);
+            objects.push(gltf);
             // gltf.animations; // Array<THREE.AnimationClip>
             // gltf.scene; // THREE.Group
             // gltf.scenes; // Array<THREE.Group>
@@ -27,5 +29,10 @@ export function loadModel(scene, modelpath) {
 }
 
 export function loadAll(scene) {
-    loadModel(scene, wizard);
+    const models = [];
+    const objects = [];
+
+    loadModel(scene, models, objects, wizard);
+
+    return [models, objects];
 }
