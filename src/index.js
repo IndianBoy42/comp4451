@@ -1,7 +1,7 @@
 import "./css/style.css";
 import * as THREE from "three";
 import * as Stats from "stats.js";
-import { loadAll, createTestScene } from "./gfx.js";
+import { createTestScene } from "./gfx.js";
 import { initControls } from "./controls.js";
 
 var stats = new Stats();
@@ -19,7 +19,6 @@ function newCamera() {
 
     return newCamera;
 }
-
 
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
