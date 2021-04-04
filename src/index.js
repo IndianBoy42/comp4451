@@ -1,6 +1,8 @@
+import "./css/style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as Stats from "stats.js";
+import { loadAll } from "./gfx.js";
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -27,7 +29,8 @@ function cube(scene, matprops = { color: 0x44aa88 }) {
     const material = new THREE.MeshPhongMaterial(matprops);
 
     const cube = new THREE.Mesh(geometry, material);
-
+    cube.position.set(0, 0, 0);
+    cube.rotation.set(0, 0, 0);
     scene.add(cube);
 
     return cube;
@@ -37,13 +40,15 @@ function dir_light(scene) {
     const color = 0xffffff;
     const intensity = 1;
     const light = new THREE.DirectionalLight(color, intensity);
+    // light.position.set(-1, 2, 4);
 
     scene.add(light);
 
     return light;
 }
 
-const canvas = document.querySelector("#c");
+const canvas = document.createElement("canvas");
+document.body.appendChild(canvas);
 const renderer = new THREE.WebGLRenderer({ canvas });
 
 const cam = camera();
@@ -65,13 +70,16 @@ function resizeCanvasToDisplaySize() {
 
 const scene = new THREE.Scene();
 
-const cube1 = cube(scene, { color: 0x44aa88 });
-const cube2 = cube(scene, { color: 0x44aa88 });
-cube2.position.x -= 2;
-const cube3 = cube(scene, { color: 0x44aa88 });
-cube3.position.x += 2;
+let cube1 = cube(scene, { color: 0x44aa88 });
+// cube1.position.x = 0;
+// const cube2 = cube(scene, { color: 0x44aa88 });
+// cube2.position.x -= 2;
+// const cube3 = cube(scene, { color: 0x44aa88 });
+// cube3.position.x += 2;
 const light1 = dir_light(scene);
 light1.position.set(-1, 2, 4);
+
+loadAll(scene);
 
 function render(time) {
     stats.begin();
