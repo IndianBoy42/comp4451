@@ -5,7 +5,6 @@
     "private": true,
     "mode": "development",
     "dependencies": {
-        "npm-watch": "^0.9.0",
         "stats.js": "^0.17.0",
         "three": "^0.125.2"
     },
@@ -19,11 +18,11 @@
         "webpack-cli": "^4.6.0"
     },
     "watch": {
-        "pack": "{js, css}/*"
+        "build": "{src}/**"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "npm-watch build",
+        "start": "webpack --config webpack/watch.config.js",
         "build": "webpack",
         "build-release": "webpack --config webpack/production.config.js"
     },

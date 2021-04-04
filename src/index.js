@@ -81,9 +81,17 @@ light1.position.set(-1, 2, 4);
 
 loadAll(scene);
 
+console.log(OrbitControls);
+
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.update();
+
 function render(time) {
+    requestAnimationFrame(render);
     stats.begin();
     resizeCanvasToDisplaySize();
+    controls.update();
 
     time *= 0.001; // convert time to seconds
 
@@ -92,6 +100,5 @@ function render(time) {
 
     renderer.render(scene, cam);
     stats.end();
-    requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
