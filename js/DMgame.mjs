@@ -1,5 +1,3 @@
-import { askIntInput, DEBUG_RNG_INPUT } from '../input.mjs';
-
 export class DungeonMayhem {
     constructor() {
         this.players = [];
@@ -47,33 +45,13 @@ export class DungeonMayhem {
                     targetSelf = false, targetDisguise = false, isGhostPing = false) 
     {
         // TODO: pop up GUI for choosing the target
+        let opps = [];
         if (chooseAnyone) {
-            let allOpps = this.allAliveOpponents(player, targetSelf, targetDisguise, isGhostPing);
-            let finish = (allOpps.length === 0);
-            let overflowCount = 0;
-            while (!finish) {
-                let input = 0;
-                let opp = null;
-                if (DEBUG_RNG_INPUT) {
-                    input = await askIntInput("Choose target: ", 0, allOpps.length - 1);
-                    opp = allOpps[input];
-                }
-                else {
-                    input = await askIntInput("Choose target from 1 to 6: ", 1, 6);
-                    opp = this.players[input - 1];
-                } 
-                if (this.isValidOpponent(player, opp, targetSelf, targetDisguise, isGhostPing)) {
-                    //finish = true;
-                    console.log("Target player " + (DEBUG_RNG_INPUT ? opp.name : input));
-                    return [opp];
-                }
-                ++overflowCount;
-                if (overflowCount > 100) throw new Error("Infinite loop in choosePlayer(), " + allOpps.length);
-                console.log("Invalid target!");
-            }
+            opps = this.allAliveOpponents(player, targetSelf, targetDisguise, isGhostPing);
         }
         else {
             const allPlayers = this.allAliveOpponents(player, true); //ghostPing doesnt care about left/right
+            //TODO can rewrite this part using ID
             let thisIndex = 0;
             for (const pIndex in allPlayers) {
                 if (player === allPlayers[pIndex]) {
@@ -81,7 +59,6 @@ export class DungeonMayhem {
                     break;
                 }
             }
-            let opps = [];
             const leftOppIndex = (thisIndex - 1 + allPlayers.length) % allPlayers.length;
             const leftOpp = allPlayers[leftOppIndex];
             if (this.isValidOpponent(player, leftOpp, targetSelf, targetDisguise, isGhostPing)) {
@@ -92,21 +69,21 @@ export class DungeonMayhem {
             if (rightOppIndex != leftOppIndex && this.isValidOpponent(player, rightOpp, targetSelf)) {
                 opps.push(rightOpp);
             }
-
-            if (opps.length === 2) {
-                const input = await askIntInput("Choose 0 to target left, 1 to target right: ", 0, 1);
-                return [opps[input]];
-            }
-            else if (opps.length === 1 || opps.length === 0) return opps;
-            else {
-                throw new Error("WHAT\n\n\nHOW");
-            } 
         }
 
-        return [];
+        if (opps.length === 0 || opps.length === 1) return opps;
+        const opp = await player.selectPlayer(opps);
+        return [opp];
+
         //return [allOpps[Math.floor(Math.random() * allOpps.length)]];
     }
 
+    /**
+     * Select a shield in the game
+     * @param player player doing the selection
+     * @param targetSelf whether to target own shields
+     * @returns array of the targetted player and the index of the chosen shield (to be used in stealShield())
+     */
     async chooseShield(player, targetSelf = false) {
         //TODO
         const t = await this.choosePlayer(player, true, targetSelf);
@@ -114,8 +91,7 @@ export class DungeonMayhem {
         const target = t[0];
         let ishield = -1;
         if (target.character.shields.length > 0)
-            ishield = await askIntInput("Choose shield index: ", 0, target.character.shields.length-1);
-            //target.character.shields[Math.floor(Math.random() * target.character.shields.length)];
+            ishield = await player.selectShield(target.character.shields);
         return [target, ishield];
     }
 
