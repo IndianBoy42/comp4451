@@ -1,6 +1,6 @@
-import { Character } from '../DMchars.mjs';
-import * as Cards from '../cards/cards.mjs';
-import * as Powers from '../powers/powers.mjs'
+import { Character } from "../DMchars.mjs";
+import * as Cards from "../cards/cards.mjs";
+import * as Powers from "../powers/powers.mjs";
 
 export class Wizard extends Character {
     constructor() {
@@ -23,10 +23,7 @@ export class Paladin extends Character {
         super("Lia");
     }
     mightyPowers() {
-        return [
-            Powers.PaladinGetDiscard,
-            Powers.PaladinDestroyShields,
-        ];
+        return [Powers.PaladinGetDiscard, Powers.PaladinDestroyShields];
     }
     defaultDeck() {
         return Cards.getPaladinDeck();
@@ -90,7 +87,7 @@ export class Ranger extends Character {
             Powers.RangerRotateHP,
             Powers.RangerStealCards,
             Powers.RangerBonusDamage,
-        ]; 
+        ];
     }
     defaultDeck() {
         return Cards.getRangerDeck();

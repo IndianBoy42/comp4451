@@ -1,4 +1,4 @@
-import { MightyPower } from '../DMpower.mjs';
+import { MightyPower } from "../DMpower.mjs";
 
 // gain any discarded card
 export class PaladinGetDiscard extends MightyPower {

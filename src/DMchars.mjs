@@ -45,7 +45,8 @@ export class Character {
     get effectiveHealth() {
         return this.health + this.shield;
     }
-    doDamage(others, amt) { //others are PLAYERS not CHARACTERS
+    doDamage(others, amt) {
+        //others are PLAYERS not CHARACTERS
         for (const oth of others) {
             if (oth === undefined) continue; //prevent passing no one into others
             if (this.ignoringShields) {
@@ -56,7 +57,7 @@ export class Character {
         }
     }
     directDamage(amt, by) {
-        console.log("" + this.player.name + " took " + amt +  " damage");
+        console.log("" + this.player.name + " took " + amt + " damage");
         if (this.health > amt) {
             this.health -= amt;
             return 0;
@@ -80,7 +81,7 @@ export class Character {
         this.directDamage(amt, by);
     }
     heal(amt) {
-        console.log("" + this.player.name + " healed " + amt +  " hp");
+        console.log("" + this.player.name + " healed " + amt + " hp");
         this.health = Math.min(this.health + amt, maxHealth);
     }
     addShield(shield) {
@@ -98,7 +99,8 @@ export class Character {
     copyShield(i) {
         return this.shields[i];
     }
-    stealShield(i) { //same as destroyShield, just dont add it to player
+    stealShield(i) {
+        //same as destroyShield, just dont add it to player
         if (!this.targetable() || this.shields.length === 0) return null;
         return this.shields.splice(i, 1)[0];
     }

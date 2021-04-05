@@ -1,5 +1,5 @@
 import { shuffle } from "./shuffle.mjs";
-import { askIntInput } from '../input.mjs';
+import { askIntInput } from "./input.mjs";
 
 export class Player {
     constructor(name, character, isAI = false) {
@@ -45,9 +45,12 @@ export class Player {
         if (this.discardPile.length === 0) return null;
         if (top) {
             return this.discardPile.pop();
-        }
-        else {
-            const i = await askIntInput("Choose discarded card: ", 0, this.discardPile.length-1);
+        } else {
+            const i = await askIntInput(
+                "Choose discarded card: ",
+                0,
+                this.discardPile.length - 1
+            );
             return this.discardPile.splice(i, 1)[0];
         }
     }
