@@ -31,31 +31,26 @@ function cube(scene, matprops = { color: 0x44aa88 }) {
 export function createGui() {
     const scene = new THREE.Scene();
 
-    // let cube1 = cube(scene, { color: 0x44aa88 });
-    // cube1.position.set(1, 1, 1);
-    // cube1.scale.multiplyScalar(100);
-    const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
-    const plane = new THREE.PlaneBufferGeometry(0.4, 0.4);
-    const quad = new THREE.Mesh(plane, material);
-    quad.position.z = 5;
-    quad.position.x = 0.5;
-    quad.position.y = 0.5;
-    scene.add(quad);
+    // const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
+    // const plane = new THREE.PlaneBufferGeometry(0.4, 0.4);
+    // const quad = new THREE.Mesh(plane, material);
+    // quad.position.z = 5;
+    // quad.position.x = 0.5;
+    // quad.position.y = 0.5;
+    // scene.add(quad);
 
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -10, 10);
     camera.position.z = 0;
 
     const update = renderer => {
-        raycaster.setFromCamera(mouse, camera);
-        // raycaster.
-
-        const intersects = raycaster.intersectObjects([quad]);
-        for (const inte of intersects) {
-            inte.object.material.color.set(0xff0000);
-            console.log(inte);
-        }
-
-        renderer.render(scene, camera);
+        // raycaster.setFromCamera(mouse, camera);
+        //
+        // const intersects = raycaster.intersectObjects([quad]);
+        // for (const inte of intersects) {
+        //     inte.object.material.color.set(0xff0000);
+        //     console.log(inte);
+        // }
+        // renderer.render(scene, camera);
     };
 
     return [scene, camera, update];

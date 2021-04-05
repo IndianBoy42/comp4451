@@ -31,6 +31,9 @@ export class Character {
             "Called defaultDeck() on abstract Character, You have to use a subclass of Character"
         );
     }
+    modelPath(i = 0) {
+        return null;
+    }
 
     targetable() {
         return !this.disguised;

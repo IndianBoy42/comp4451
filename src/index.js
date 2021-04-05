@@ -50,7 +50,7 @@ function resizeCanvasToDisplaySize() {
 const [scene, movables] = createTestScene();
 const [hudScene, hudCamera, hudUpdate] = createGui();
 
-const [orbitControls, dragControls] = initControls(movables, camera, renderer);
+const [orbitControls, dragControls, controlUpdate] = initControls(movables, camera, renderer);
 
 function render(time) {
     stats.begin();
@@ -58,7 +58,7 @@ function render(time) {
     requestAnimationFrame(render);
 
     resizeCanvasToDisplaySize();
-    orbitControls.update();
+    controlUpdate();
 
     time *= 0.001; // convert time to seconds
 

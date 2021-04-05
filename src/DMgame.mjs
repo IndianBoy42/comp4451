@@ -1,4 +1,4 @@
-import { askIntInput, DEBUG_RNG_INPUT } from "./input.mjs";
+import { chooseOpponent, chooseShieldOf } from "./controls.js";
 
 export class DungeonMayhem {
     constructor() {
@@ -94,22 +94,7 @@ export class DungeonMayhem {
             let overflowCount = 0;
             while (!finish) {
                 let input = 0;
-                let opp = null;
-                if (DEBUG_RNG_INPUT) {
-                    input = await askIntInput(
-                        "Choose target: ",
-                        0,
-                        allOpps.length - 1
-                    );
-                    opp = allOpps[input];
-                } else {
-                    input = await askIntInput(
-                        "Choose target from 1 to 6: ",
-                        1,
-                        6
-                    );
-                    opp = this.players[input - 1];
-                }
+                const opp = await chooseOpponent(allOps);
                 if (
                     this.isValidOpponent(
                         player,
@@ -166,14 +151,11 @@ export class DungeonMayhem {
             }
 
             if (opps.length === 2) {
-                const input = await askIntInput(
-                    "Choose 0 to target left, 1 to target right: ",
-                    0,
-                    1
-                );
+                const input = await chooseOpponent(opps);
                 return [opps[input]];
-            } else if (opps.length === 1 || opps.length === 0) return opps;
-            else {
+            } else if (opps.length === 1 || opps.length === 0) {
+                return opps;
+            } else {
                 throw new Error("WHAT\n\n\nHOW");
             }
         }
@@ -183,18 +165,13 @@ export class DungeonMayhem {
     }
 
     async chooseShield(player, targetSelf = false) {
-        //TODO
         const t = await this.choosePlayer(player, true, targetSelf);
         if (t.length === 0) return [null, -1];
         const target = t[0];
         let ishield = -1;
-        if (target.character.shields.length > 0)
-            ishield = await askIntInput(
-                "Choose shield index: ",
-                0,
-                target.character.shields.length - 1
-            );
-        //target.character.shields[Math.floor(Math.random() * target.character.shields.length)];
+        if (target.character.shields.length == 1) ishield = 0;
+        else if (target.character.shields.length > 0)
+            ishield = await chooseShieldOf(target.character.shields);
         return [target, ishield];
     }
 
