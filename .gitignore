@@ -1,4 +1,6 @@
-<html><body>You are being <a href="https://raw.githubusercontent.com/github/gitignore/master/Node.gitignore">redirected</a>.</body></html># Logs
+package-lock.json
+dist/
+
 logs
 *.log
 npm-debug.log*
@@ -36,6 +38,7 @@ bower_components
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+lib/
 
 # Dependency directories
 node_modules/
