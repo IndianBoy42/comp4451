@@ -4,6 +4,7 @@ import * as THREE from "three";
 import * as Stats from "stats.js";
 import { createTestScene } from "./gfx.js";
 import { initControls } from "./controls.js";
+import { createGui } from "./hud";
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -24,6 +25,10 @@ function newCamera() {
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
 const renderer = new THREE.WebGLRenderer({ canvas });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.autoClear = false;
+renderer.setClearColor(0xff0000, 0);
 
 const camera = newCamera();
 function resizeCanvasToDisplaySize() {
@@ -42,22 +47,25 @@ function resizeCanvasToDisplaySize() {
     }
 }
 
-const [scene, models] = createTestScene();
+const [scene, movables] = createTestScene();
+const [hudScene, hudCamera, hudUpdate] = createGui();
 
-const [orbitControls, dragControls] = initControls(models, camera, renderer);
+const [orbitControls, dragControls] = initControls(movables, camera, renderer);
 
 function render(time) {
-    requestAnimationFrame(render);
     stats.begin();
+
+    requestAnimationFrame(render);
+
     resizeCanvasToDisplaySize();
     orbitControls.update();
 
     time *= 0.001; // convert time to seconds
 
-    // cube1.rotation.x = time;
-    // cube1.rotation.y = time;
-
     renderer.render(scene, camera);
+    renderer.clearDepth();
+    hudUpdate(renderer);
+
     stats.end();
 }
 requestAnimationFrame(render);

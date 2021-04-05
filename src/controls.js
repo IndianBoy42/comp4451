@@ -6,37 +6,44 @@ export function initControls(objects, camera, renderer) {
     // OrbitControls for moving cmaera
     const orbitControls = new OrbitControls(camera, renderer.domElement);
     orbitControls.update();
-    // orbitControls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-    // orbitControls.dampingFactor = 0.15;
-    // orbitControls.screenSpacePanning = false;
+    orbitControls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+    orbitControls.dampingFactor = 0.15;
+    // orbitControls.screenSpacePanning = true;
     // orbitControls.minDistance = 50;
     // orbitControls.maxDistance = 200;
-    // orbitControls.maxPolarAngle = Math.PI / 2;
+    orbitControls.maxPolarAngle = Math.PI / 2;
+    orbitControls.minPolarAngle = 0;
 
     // DragControls for moving objects
     const dragControls = new DragControls(objects, camera, renderer.domElement);
+    dragControls.addEventListener("drag", function (event) {
+        orbitControls.enabled = false;
+        if (event.object.drag) {
+            event.object.drag(event);
+        }
+    });
     dragControls.addEventListener("dragstart", function (event) {
         orbitControls.enabled = false;
-        console.log("event.object.dragstart");
+        // console.log("event.object.dragstart");
         if (event.object.dragstart) {
             event.object.dragstart(event);
         }
     });
     dragControls.addEventListener("dragend", function (event) {
         orbitControls.enabled = true;
-        console.log("event.object.dragend");
+        // console.log("event.object.dragend");
         if (event.object.dragend) {
             event.object.dragend(event);
         }
     });
     dragControls.addEventListener("hoveron", function (event) {
-        console.log("event.object.hoveron");
+        // console.log("event.object.hoveron");
         if (event.object.hoveron) {
             event.object.hoveron(event);
         }
     });
     dragControls.addEventListener("hoveroff", function (event) {
-        console.log("event.object.hoveroff");
+        // console.log("event.object.hoveroff");
         if (event.object.hoveroff) {
             event.object.hoveroff(event);
         }
