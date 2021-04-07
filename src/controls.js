@@ -105,6 +105,29 @@ export function initControls(objects, camera, renderer) {
 
     const controlUpdate = () => {
         orbitControls.update();
+
+        if (objectChoices.length > 0) {
+            const intersects = mouseIntersection(objectChoicesIntersectables);
+
+            // for (const inte of intersects) {
+            //     console.log("intersected");
+            //     console.log(inte);
+            // }
+            let intersectionIndex = -1;
+            if (intersects.length != 0) {
+                intersectionIndex = objectChoicesIntersectables.findIndex(
+                    e =>
+                        e == intersects[0].object ||
+                        e == intersects[0].object.parent
+                );
+            }
+            for (let i = 0; i < objectChoices.length; i++) {
+                objectChoices[i].selectionLight.color =
+                    i == intersectionIndex
+                        ? new THREE.Color(0x0000ff)
+                        : new THREE.Color(0xff0000);
+            }
+        }
     };
 
     return [orbitControls, dragControls, controlUpdate];

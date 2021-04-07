@@ -1,4 +1,4 @@
-const maxHealth = 10;
+export const maxHealth = 10;
 
 //TODO put all special powers related stuff in start/endTurnCallbacks?
 
