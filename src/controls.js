@@ -157,8 +157,6 @@ export async function chooseOpponent(opponents) {
         opponents.length - 1,
         opponents
     );
-    console.log(input);
-    console.log(opponents[input]);
     return opponents[input];
 }
 export async function chooseShieldOf(character) {

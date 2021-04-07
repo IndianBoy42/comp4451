@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { DungeonMayhem } from "./DMgame.mjs";
 import { Player } from "./DMplayer.mjs";
 import * as Characters from "./characters/characters.mjs";
-import { initRenderPlayer, loadModel } from "./gfx.js";
+import { initRenderPlayer, loadModel, updatePlayerToken } from "./gfx.js";
 import { chooseFromObjects, chooseFromPlayerHand } from "./controls";
 
 export async function gameLoop(game) {
@@ -57,6 +57,10 @@ export async function gameLoop(game) {
             );
         }
         if (game.gameEnded()) break;
+
+        for (const pl of game.players) {
+            updatePlayerToken(pl);
+        }
     }
 
     console.log("==============GAME END==============");

@@ -43,6 +43,7 @@ export class Player {
     disCard(card) {
         this.discardPile.push(card);
         GFX.moveCardToDiscard(card, this, this.discardPile.length - 1);
+        this.hand.forEach((card, i) => GFX.moveCardToHand(card, this, i));
     }
     addShield(card) {
         this.character.addShield(card);
