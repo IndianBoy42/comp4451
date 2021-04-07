@@ -14,20 +14,12 @@
 ## Our goals for the project
 
 - The Base Game 
-- 3D tabletop with tokens and simple 3d effects 
+- 3D tabletop 
 - Local Multiplayer
 - AI
 - Custom Cards
 
 # Our Progress 
-
-## Game Logic
-
-We have written and tested the game logic
-
-We used the nodejs console to run randomized games and check the rules and implemented correctly
-
-The game logic is also already integrated with the 3D Tabletop interface
 
 ## The 3D Tabletop
 
@@ -40,6 +32,14 @@ I used a online free collection of 3D printable miniatures for Dungeons and Drag
 Particle Effects and Animations
 
 Proper design of the cards
+
+## Game Logic
+
+We have written and tested the game logic
+
+We used the nodejs console to run randomized games and check the rules and implemented correctly
+
+The game logic is also already integrated with the 3D Tabletop interface
 
 ## AI
 
@@ -58,3 +58,5 @@ The bulk of the work is left to do, but will be completed after Graphics is in a
 ## Custom Cards
 
 Not started
+
+But the structure of the game logic code is easily extendable
