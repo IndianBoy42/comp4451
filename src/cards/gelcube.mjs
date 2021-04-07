@@ -5,5 +5,8 @@ function GelCubeDmgShieldCard() {
     // return new DMCard("[GelCubeDmgShieldCard]", 0, 0, 0, 0, [
     //     GelCubeDmgShield(3),
     // ]);
-    return new DMCard.powerCard("[GelCubeDmgShieldCard]", new GelCubeDmgShield(3));
+    return new DMCard.powerCard(
+        "[GelCubeDmgShieldCard]",
+        new GelCubeDmgShield(3)
+    );
 }

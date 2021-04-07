@@ -56,6 +56,9 @@ export class Character {
             "Called defaultDeck() on abstract Character, You have to use a subclass of Character"
         );
     }
+    modelPath(i = 0) {
+        return null;
+    }
 
     /**
      * Check if player can be targetted, or has used Rogue's disguise
@@ -95,7 +98,7 @@ export class Character {
      * @returns remaining unreceived damage
      */
     directDamage(amt, by) {
-        console.log("" + this.player.name + " took " + amt +  " damage");
+        console.log("" + this.player.name + " took " + amt + " damage");
         if (this.health > amt) {
             this.health -= amt;
             return 0;
@@ -125,7 +128,7 @@ export class Character {
         this.directDamage(amt, by);
     }
     heal(amt) {
-        console.log("" + this.player.name + " healed " + amt +  " hp");
+        console.log("" + this.player.name + " healed " + amt + " hp");
         this.health = Math.min(this.health + amt, maxHealth);
     }
     addShield(shield) {

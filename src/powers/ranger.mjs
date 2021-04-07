@@ -1,4 +1,4 @@
-import { MightyPower } from '../DMpower.mjs';
+import { MightyPower } from "../DMpower.mjs";
 
 // Each player gives their hit point total to the player on their right
 export class RangerRotateHP extends MightyPower {

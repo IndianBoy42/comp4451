@@ -1,3 +1,5 @@
+import { chooseOpponent, chooseShieldOf } from "./controls.js";
+
 export class DungeonMayhem {
     constructor() {
         this.players = [];
@@ -12,23 +14,55 @@ export class DungeonMayhem {
         }
         return opp;
     }
-    allAliveOpponents(player, targetSelf = false, targetDisguise = false, isGhostPing = false) {
+    allAliveOpponents(
+        player,
+        targetSelf = false,
+        targetDisguise = false,
+        isGhostPing = false
+    ) {
         let opps = [];
         for (const opp of this.players) {
-            if (!this.isValidOpponent(player, opp, targetSelf, targetDisguise, isGhostPing)) continue;
+            if (
+                !this.isValidOpponent(
+                    player,
+                    opp,
+                    targetSelf,
+                    targetDisguise,
+                    isGhostPing
+                )
+            )
+                continue;
             opps.push(opp);
         }
         return opps;
     }
-    isValidOpponent(player, opp, targetSelf = false, targetDisguise = false, isGhostPing = false) {
-        let valid = (opp.character.health > (isGhostPing ? 1 : 0));
+    isValidOpponent(
+        player,
+        opp,
+        targetSelf = false,
+        targetDisguise = false,
+        isGhostPing = false
+    ) {
+        let valid = opp.character.health > (isGhostPing ? 1 : 0);
         if (!targetSelf) valid = valid && !(opp === player);
         if (!targetDisguise) valid = valid && opp.character.targetable();
         return valid;
     }
-    isValidOpponentIndex(player, oppIndex, targetSelf = false, targetDisguise = false, isGhostPing = false) {
+    isValidOpponentIndex(
+        player,
+        oppIndex,
+        targetSelf = false,
+        targetDisguise = false,
+        isGhostPing = false
+    ) {
         const opp = this.players[oppIndex];
-        return this.isValidOpponent(player, opp, targetSelf, targetDisguise, isGhostPing);
+        return this.isValidOpponent(
+            player,
+            opp,
+            targetSelf,
+            targetDisguise,
+            isGhostPing
+        );
     }
 
     /**
@@ -41,15 +75,50 @@ export class DungeonMayhem {
      * @param isGhostPing if true, choose players with hp > 1 for ghost ping
      * @returns an array containing 1 player (if chosen) or 0 (if no one can be chosen)
      */
-    async choosePlayer(player, chooseAnyone = false, 
-                    targetSelf = false, targetDisguise = false, isGhostPing = false) 
-    {
+    async choosePlayer(
+        player,
+        chooseAnyone = false,
+        targetSelf = false,
+        targetDisguise = false,
+        isGhostPing = false
+    ) {
         // TODO: pop up GUI for choosing the target
         let opps = [];
         if (chooseAnyone) {
-            opps = this.allAliveOpponents(player, targetSelf, targetDisguise, isGhostPing);
-        }
-        else {
+            let allOpps = this.allAliveOpponents(
+                player,
+                targetSelf,
+                targetDisguise,
+                isGhostPing
+            );
+            let finish = allOpps.length === 0;
+            let overflowCount = 0;
+            while (!finish) {
+                let input = 0;
+                const opp = await chooseOpponent(allOpps);
+                if (
+                    this.isValidOpponent(
+                        player,
+                        opp,
+                        targetSelf,
+                        targetDisguise,
+                        isGhostPing
+                    )
+                ) {
+                    //finish = true;
+                    console.log(
+                        "Target player " + (DEBUG_RNG_INPUT ? opp.name : input)
+                    );
+                    return [opp];
+                }
+                ++overflowCount;
+                if (overflowCount > 100)
+                    throw new Error(
+                        "Infinite loop in choosePlayer(), " + allOpps.length
+                    );
+                console.log("Invalid target!");
+            }
+        } else {
             const allPlayers = this.allAliveOpponents(player, true); //ghostPing doesnt care about left/right
             //TODO can rewrite this part using ID
             let thisIndex = 0;
@@ -59,15 +128,37 @@ export class DungeonMayhem {
                     break;
                 }
             }
-            const leftOppIndex = (thisIndex - 1 + allPlayers.length) % allPlayers.length;
+            let opps = [];
+            const leftOppIndex =
+                (thisIndex - 1 + allPlayers.length) % allPlayers.length;
             const leftOpp = allPlayers[leftOppIndex];
-            if (this.isValidOpponent(player, leftOpp, targetSelf, targetDisguise, isGhostPing)) {
+            if (
+                this.isValidOpponent(
+                    player,
+                    leftOpp,
+                    targetSelf,
+                    targetDisguise,
+                    isGhostPing
+                )
+            ) {
                 opps.push(leftOpp);
             }
             const rightOppIndex = (+thisIndex + 1) % allPlayers.length; //oh my god i hate javascript
             const rightOpp = allPlayers[rightOppIndex];
-            if (rightOppIndex != leftOppIndex && this.isValidOpponent(player, rightOpp, targetSelf)) {
+            if (
+                rightOppIndex != leftOppIndex &&
+                this.isValidOpponent(player, rightOpp, targetSelf)
+            ) {
                 opps.push(rightOpp);
+            }
+
+            if (opps.length === 2) {
+                const opp = await chooseOpponent(opps);
+                return [opp];
+            } else if (opps.length === 1 || opps.length === 0) {
+                return opps;
+            } else {
+                throw new Error("WHAT\n\n\nHOW");
             }
         }
 
@@ -85,17 +176,18 @@ export class DungeonMayhem {
      * @returns array of the targetted player and the index of the chosen shield (to be used in stealShield())
      */
     async chooseShield(player, targetSelf = false) {
-        //TODO
         const t = await this.choosePlayer(player, true, targetSelf);
         if (t.length === 0) return [null, -1];
         const target = t[0];
         let ishield = -1;
-        if (target.character.shields.length > 0)
-            ishield = await player.selectShield(target.character.shields);
+        if (target.character.shields.length == 1) ishield = 0;
+        else if (target.character.shields.length > 0)
+            ishield = await chooseShieldOf(target.character.shields);
         return [target, ishield];
     }
 
     makeAnimalNoise() {
+        // TODO: Fun UI for this
         return true;
     }
 
@@ -104,6 +196,6 @@ export class DungeonMayhem {
         for (const player of this.players) {
             if (player.character.health === 0) ++playerDead;
         }
-        return (playerDead + 1 >= this.players.length);
+        return playerDead + 1 >= this.players.length;
     }
 }

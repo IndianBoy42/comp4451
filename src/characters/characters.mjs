@@ -1,6 +1,9 @@
-import { Character } from '../DMchars.mjs';
-import * as Cards from '../cards/cards.mjs';
-import * as Powers from '../powers/powers.mjs'
+import { Character } from "../DMchars.mjs";
+import * as Cards from "../cards/cards.mjs";
+import * as Powers from "../powers/powers.mjs";
+
+import evokerWizard from "../assets/evoker_wizard.glb";
+import tieflingRogue from "../assets/tiefling_rogue.glb";
 
 export class Wizard extends Character {
     constructor() {
@@ -16,6 +19,10 @@ export class Wizard extends Character {
     defaultDeck() {
         return Cards.getWizardDeck();
     }
+    modelPath(i = 0) {
+        if (i == 0) return evokerWizard;
+        else return null;
+    }
 }
 
 export class Paladin extends Character {
@@ -23,13 +30,14 @@ export class Paladin extends Character {
         super("Lia");
     }
     mightyPowers() {
-        return [
-            Powers.PaladinGetDiscard,
-            Powers.PaladinDestroyShields,
-        ];
+        return [Powers.PaladinGetDiscard, Powers.PaladinDestroyShields];
     }
     defaultDeck() {
         return Cards.getPaladinDeck();
+    }
+    modelPath(i = 0) {
+        if (i == 0) return tieflingRogue;
+        else return null;
     }
 }
 
@@ -47,6 +55,10 @@ export class Barbarian extends Character {
     defaultDeck() {
         return Cards.getBarbarianDeck();
     }
+    modelPath(i = 0) {
+        if (i == 0) return tieflingRogue;
+        else return null;
+    }
 }
 
 export class Rogue extends Character {
@@ -62,6 +74,10 @@ export class Rogue extends Character {
     }
     defaultDeck() {
         return Cards.getRogueDeck();
+    }
+    modelPath(i = 0) {
+        if (i == 0) return tieflingRogue;
+        else return null;
     }
 }
 
@@ -79,6 +95,10 @@ export class Druid extends Character {
     defaultDeck() {
         return Cards.getDruidDeck();
     }
+    modelPath(i = 0) {
+        if (i == 0) return tieflingRogue;
+        else return null;
+    }
 }
 
 export class Ranger extends Character {
@@ -90,10 +110,14 @@ export class Ranger extends Character {
             Powers.RangerRotateHP,
             Powers.RangerStealCards,
             Powers.RangerBonusDamage,
-        ]; 
+        ];
     }
     defaultDeck() {
         return Cards.getRangerDeck();
+    }
+    modelPath(i = 0) {
+        if (i == 0) return tieflingRogue;
+        else return null;
     }
 }
 
@@ -107,9 +131,9 @@ export class GelatinousCube extends Character {
     defaultDeck() {
         return []; // TOOD: Add defaultDeck
     }
-
-    endTurn() {
-        super.endTurn();
+    modelPath(i = 0) {
+        if (i == 0) return tieflingRogue;
+        else return null;
     }
 }
 
@@ -123,8 +147,8 @@ export class OwlBear extends Character {
     defaultDeck() {
         return []; // TOOD: Add defaultDeck
     }
-
-    endTurn() {
-        super.endTurn();
+    modelPath(i = 0) {
+        if (i == 0) return tieflingRogue;
+        else return null;
     }
 }

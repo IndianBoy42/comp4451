@@ -1,4 +1,5 @@
 import { Shield } from "./DMshields.mjs";
+import * as THREE from "three";
 
 export class DMCard {
     constructor(
@@ -18,6 +19,10 @@ export class DMCard {
         this.drawCards = drawCards;
         this.extraPowers = extraPowers;
         this.animation = {}; //TODO: figure out how to handle animations
+    }
+
+    makeThreeObject() {
+        return makeCardObject(this.name);
     }
 
     static shieldCard(name, amount) {
@@ -80,7 +85,7 @@ export class DMCard {
         player.character.actionsLeft -= 1;
         if (this.shieldValue != 0) {
             this.shieldObj = new Shield(this.shieldValue);
-            player.character.addShield(this);
+            player.addShield(this);
             discard = false;
         }
         if (this.healValue != 0) {
@@ -93,11 +98,10 @@ export class DMCard {
             let targets = [];
             if (player.multiAttack) {
                 targets = context.allAliveOpponents(player);
-            }
-            else {
+            } else {
                 targets = await context.choosePlayer(player);
             }
-            player.character.doDamage(targets, this.dmgValue);   
+            player.character.doDamage(targets, this.dmgValue);
         }
         if (this.drawCards != 0) {
             player.drawCards(this.drawCards);

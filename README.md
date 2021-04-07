@@ -2,6 +2,8 @@
 
 by **Anshuman Medhi** and **Dung Dinh Anh**
 
+## Playing the game
+
 ```sh
 npm install
 npm run build # pack all the sources into dist/
@@ -14,8 +16,9 @@ Open the page and enjoy the ~~Spinning Cube~~Game
 ## For development
 
 ```sh
-npm run start # will automatically rebuild
+npm run start # will open the page, and also automatically rebuild and reload the webpage
 ```
 
-Use a live reloading server of your choice
+## Models:
 
+https://www.shapeways.com/shops/dmworkshop

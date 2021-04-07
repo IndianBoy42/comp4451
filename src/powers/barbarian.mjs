@@ -1,4 +1,4 @@
-import { MightyPower } from '../DMpower.mjs';
+import { MightyPower } from "../DMpower.mjs";
 
 // everyone discard hand, then draw 3 cards
 export class BarbarianDiscardHand extends MightyPower {
