@@ -29,16 +29,14 @@ function onMouseClick(event) {
         console.log("clicked");
         const intersects = mouseIntersection(objectChoicesIntersectables);
 
-        for (const inte of intersects) {
-            // inte.object.material.color.set(0xff0000);
-            console.log("intersected");
-            console.log(inte);
-        }
+        // for (const inte of intersects) {
+        //     console.log("intersected");
+        //     console.log(inte);
+        // }
         if (intersects.length == 0) return;
         const intersectionIndex = objectChoicesIntersectables.findIndex(
             e => e == intersects[0].object || e == intersects[0].object.parent
         );
-        console.log(intersectionIndex);
         if (intersectionIndex >= 0) {
             objectChoiceResolve(intersectionIndex);
             const len = objectChoices.length;
@@ -107,17 +105,6 @@ export function initControls(objects, camera, renderer) {
 
     const controlUpdate = () => {
         orbitControls.update();
-
-        if (objectChoicesIntersectables.length > 0) {
-            // console.log(objectChoicesIntersectables);
-            const intersects = mouseIntersection(objectChoicesIntersectables);
-
-            for (const inte of intersects) {
-                // inte.object.material.color.set(0xff0000);
-                // console.log("intersected");
-                // console.log(inte);
-            }
-        }
     };
 
     return [orbitControls, dragControls, controlUpdate];
@@ -142,7 +129,7 @@ export function chooseFromObjects(query, min, max, objects) {
                 const i = Math.floor(Math.random() * (max - min + 1)) + min;
                 resolve(i);
             }, 1000);
-        })
+        });
     }
     // TODO: the controls
     console.log(query);
@@ -170,6 +157,8 @@ export async function chooseOpponent(opponents) {
         opponents.length - 1,
         opponents
     );
+    console.log(input);
+    console.log(opponents[input]);
     return opponents[input];
 }
 export async function chooseShieldOf(character) {

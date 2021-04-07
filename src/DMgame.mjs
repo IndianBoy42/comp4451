@@ -94,7 +94,7 @@ export class DungeonMayhem {
             let overflowCount = 0;
             while (!finish) {
                 let input = 0;
-                const opp = await chooseOpponent(allOps);
+                const opp = await chooseOpponent(allOpps);
                 if (
                     this.isValidOpponent(
                         player,
@@ -151,8 +151,8 @@ export class DungeonMayhem {
             }
 
             if (opps.length === 2) {
-                const input = await chooseOpponent(opps);
-                return [opps[input]];
+                const opp = await chooseOpponent(opps);
+                return [opp];
             } else if (opps.length === 1 || opps.length === 0) {
                 return opps;
             } else {
