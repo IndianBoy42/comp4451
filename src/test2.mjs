@@ -5,18 +5,12 @@ import * as Characters from "./characters/characters.mjs";
 import { askIntInput } from "./input.mjs";
 
 const game = new DungeonMayhem();
-const p1 = new Player("P1", new Characters.Rogue());
-game.players.push(p1);
-const p2 = new Player("P2", new Characters.Paladin());
-game.players.push(p2);
-const p3 = new Player("P3", new Characters.Ranger());
-game.players.push(p3);
-const p4 = new Player("P4", new Characters.Wizard());
-game.players.push(p4);
-const p5 = new Player("P5", new Characters.Barbarian());
-game.players.push(p5);
-const p6 = new Player("P6", new Characters.Druid());
-game.players.push(p6);
+const p1 = new Player("P1", new Characters.Rogue(), game);
+const p2 = new Player("P2", new Characters.Paladin(), game);
+const p3 = new Player("P3", new Characters.Ranger(), game);
+const p4 = new Player("P4", new Characters.Wizard(), game);
+const p5 = new Player("P5", new Characters.Barbarian(), game);
+const p6 = new Player("P6", new Characters.Druid(), game);
 const NUM_PLAYERS = game.players.length;
 
 //======testing setups======//
@@ -27,7 +21,7 @@ const NUM_PLAYERS = game.players.length;
 
 function logPlayer(player) {
     const char = player.character;
-    console.log("Player: " + player.name);
+    console.log("Player: " + player.name + ", ID " + player.id);
     console.log("Character: " + char.name + " (" + char.constructor.name + ")");
     console.log("HP: " + char.health);
 
@@ -95,6 +89,20 @@ async function playerPlayCard(player, cardPos) {
     console.log("====================================");
 }
 
+async function playerTurn(player) {
+    player.startTurn();
+    player.drawCards(1);
+    // ok i figured out how to read from console
+    while (player.character.actionsLeft > 0) {
+        //logPlayer(player);
+        const cardPos = await player.selectCard();
+        await playerPlayCard(player, cardPos);
+        if (game.gameEnded()) break;
+    }
+    player.endTurn();
+}
+
+
 //game
 console.log("====================================");
 for (const pl of game.players) {
@@ -147,4 +155,4 @@ for (const pl of game.players) {
     logPlayer(pl);
 }
 
-// rl.close();
+
