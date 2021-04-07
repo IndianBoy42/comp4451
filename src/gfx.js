@@ -134,10 +134,10 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
     };
 };
 
-const DiscardPilePosition = new Vector3(3, -0.49, 0);
+const DiscardPilePosition = new Vector3(2, -0.49, 0);
 const HandPosition = new Vector3(0, 0.49, 1);
-const ShieldsPosition = new Vector3(0, -0.49, -3);
-const DeckPosition = new Vector3(-3, -0.49, 0);
+const ShieldsPosition = new Vector3(0, -0.49, -2);
+const DeckPosition = new Vector3(-2, -0.49, 0);
 const ZeroPosition = new Vector3();
 // TODO: Can be animated
 function setCardPos(card, pos) {
