@@ -15,6 +15,8 @@ export async function gameLoop(game) {
     let round = 1;
     let playerTurn = 1;
 
+    game.start();
+
     while (true) {
         console.log(
             "==========PLAYER " + playerTurn + " TURN " + round + "==========="

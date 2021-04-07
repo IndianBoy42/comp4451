@@ -236,8 +236,9 @@ export class Player {
             GFX.setCardObjectText(
                 card.modelInWorld.canvas,
                 card.modelInWorld.context,
+                card.modelInWorld.texture,
                 card.getCardText(),
-                "#ff0000"
+                "#00ff00"
             );
         }
         this.character.startTurn();
@@ -250,8 +251,9 @@ export class Player {
             GFX.setCardObjectText(
                 card.modelInWorld.canvas,
                 card.modelInWorld.context,
+                card.modelInWorld.texture,
                 card.getCardText(),
-                "#0000ff"
+                "#000000"
             );
         }
         this.character.endTurn();
