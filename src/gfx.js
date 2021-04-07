@@ -124,26 +124,13 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
             onComplete(player, token);
         });
 
-        function getCardData(card) {
-            return card.name +
-                (card.shieldValue > 0 ? ", shield=" + card.shieldValue : "") +
-                (card.healValue > 0 ? ", heal=" + card.healValue : "") +
-                (card.dmgValue > 0 ? ", dmg=" + card.dmgValue : "") +
-                (card.extraActions > 0 ? ", extra=" + card.extraActions : "") +
-                (card.drawCard > 0 ? ", draw=" + card.drawCard : "") +
-                " " +
-                (card.extraPowers.length === 0
-                    ? ""
-                    : card.extraPowers[0].constructor.name);
-        }
-
         player.deck.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(getCardData(card));
+            card.modelInWorld = makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
             moveCardToDeck(card, player, i);
         });
         player.hand.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(getCardData(card));
+            card.modelInWorld = makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
             moveCardToHand(card, player, i);
         });
@@ -292,10 +279,7 @@ function getLines(ctx, text, maxWidth) {
     return lines;
 }
 
-export function makeCardObject(name, w = 1, h = 1.618, otherInfo = [], minLines = 5) {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-
+export function setCardObjectText(canvas, context, text, color, minLines = 5) {
     const HARDCODE_WIDTH = 10;
 
     const textHeight = 400;
@@ -303,8 +287,8 @@ export function makeCardObject(name, w = 1, h = 1.618, otherInfo = [], minLines 
     canvas.height = textHeight;
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.fillStyle = "#00ff00";
-    const text = (textToPrint, i = 0, lines = 1) => {
+    context.fillStyle = color;
+    const drawText = (textToPrint, i = 0, lines = 1) => {
         lines = Math.max(lines, minLines)
         let height = textHeight / lines;
         const textWidth = context.measureText(textToPrint).width;
@@ -314,10 +298,6 @@ export function makeCardObject(name, w = 1, h = 1.618, otherInfo = [], minLines 
         }
         const temp = context.font;
         context.font = "" + height + "px Arial";
-        // width = Math.max(width, textWidth);
-        // console.log("Max width");
-        // console.log(width);
-        // canvas.width = width;
         context.fillText(
             textToPrint,
             canvas.width / 2,
@@ -325,10 +305,17 @@ export function makeCardObject(name, w = 1, h = 1.618, otherInfo = [], minLines 
         );
         context.font = temp;
     };
-    const name_lines = getLines(context, name, HARDCODE_WIDTH);
+    const name_lines = getLines(context, text, HARDCODE_WIDTH);
     for (const i in name_lines) {
-        text(name_lines[i], i, name_lines.length);
+        drawText(name_lines[i], i, name_lines.length);
     }
+}
+
+export function makeCardObject(name, w = 1, h = 1.618, otherInfo = []) {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    setCardObjectText(canvas, context, name, "#00ff00");
 
     const texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
@@ -350,6 +337,8 @@ export function makeCardObject(name, w = 1, h = 1.618, otherInfo = [], minLines 
     card.add(new THREE.Mesh(back, materialBack));
 
     card.lookAt(new Vector3(0, 10000, 0));
+    card.canvas = canvas;
+    card.context = context;
 
     return card;
 }

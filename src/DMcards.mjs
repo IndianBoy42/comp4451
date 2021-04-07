@@ -69,6 +69,19 @@ export class DMCard {
         return this;
     }
 
+    getCardText() {
+        return this.name +
+            (this.shieldValue > 0 ? ", shield=" + this.shieldValue : "") +
+            (this.healValue > 0 ? ", heal=" + this.healValue : "") +
+            (this.dmgValue > 0 ? ", dmg=" + this.dmgValue : "") +
+            (this.extraActions > 0 ? ", extra=" + this.extraActions : "") +
+            (this.drawCards > 0 ? ", draw=" + this.drawCards : "") +
+            " " +
+            (this.extraPowers.length === 0
+                ? ""
+                : this.extraPowers[0].constructor.name);
+    }
+
     /**
      * Play the card
      *
