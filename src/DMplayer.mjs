@@ -1,5 +1,11 @@
 import { shuffle } from "./shuffle.mjs";
-import { chooseFromDiscardPile, chooseFromPlayerHand, chooseOpponent, chooseShieldOf } from "./controls.js";
+import {
+    chooseFromDiscardPile,
+    chooseFromPlayerHand,
+    chooseOpponent,
+    chooseShieldOf,
+    DEBUG_RNG_INPUT,
+} from "./controls.js";
 import * as GFX from "./gfx.js";
 
 let id = 1;
@@ -23,7 +29,7 @@ export class Player {
         if (!isClone) {
             this.id = id;
             ++id;
-            
+
             //init player deck
             this.discardPile = [];
             this.deck = this.character.defaultDeck();
@@ -156,6 +162,7 @@ export class Player {
      * Log the player info in console
      */
     debugLogMe() {
+        if (DEBUG_RNG_INPUT) return;
         const char = this.character;
         console.log("Player: " + this.name);
         console.log(
@@ -166,25 +173,25 @@ export class Player {
         function logCard(card, verbose = false, cardNo = "") {
             console.log(
                 "Card " +
-                    cardNo +
-                    ": " +
-                    card.name.padEnd(30) +
-                    (verbose
-                        ? ", shield = " +
-                          card.shieldValue +
-                          ", heal = " +
-                          card.healValue +
-                          ", dmg = " +
-                          card.dmgValue +
-                          ", extra = " +
-                          card.extraActions +
-                          ", draw = " +
-                          card.drawCards +
-                          ", super = " +
-                          (card.extraPowers.length === 0
-                              ? "None"
-                              : card.extraPowers[0].constructor.name)
-                        : "")
+                cardNo +
+                ": " +
+                card.name.padEnd(30) +
+                (verbose
+                    ? ", shield = " +
+                    card.shieldValue +
+                    ", heal = " +
+                    card.healValue +
+                    ", dmg = " +
+                    card.dmgValue +
+                    ", extra = " +
+                    card.extraActions +
+                    ", draw = " +
+                    card.drawCards +
+                    ", super = " +
+                    (card.extraPowers.length === 0
+                        ? "None"
+                        : card.extraPowers[0].constructor.name)
+                    : "")
             );
         }
 
@@ -198,11 +205,11 @@ export class Player {
         function logShield(shield) {
             console.log(
                 "Shield: " +
-                    shield.name +
-                    "-" +
-                    shield.shieldObj.current +
-                    "/" +
-                    shield.shieldObj.max
+                shield.name +
+                "-" +
+                shield.shieldObj.current +
+                "/" +
+                shield.shieldObj.max
             );
         }
 
@@ -225,12 +232,28 @@ export class Player {
      * Call the character's start turn sequence
      */
     startTurn() {
+        for (const card of this.hand) {
+            GFX.setCardObjectText(
+                card.modelInWorld.canvas,
+                card.modelInWorld.context,
+                card.getCardText(),
+                "#ff0000"
+            );
+        }
         this.character.startTurn();
     }
     /**
      * Call the character's end turn sequence
      */
     endTurn() {
+        for (const card of this.hand) {
+            GFX.setCardObjectText(
+                card.modelInWorld.canvas,
+                card.modelInWorld.context,
+                card.getCardText(),
+                "#0000ff"
+            );
+        }
         this.character.endTurn();
     }
 
@@ -273,7 +296,7 @@ export class Player {
      * Selects a card to pick from discard pile
      * @returns index of chosen card
      */
-     async selectDiscardedCard(player) {
+    async selectDiscardedCard(player) {
         return await chooseFromDiscardPile(player);
     }
 

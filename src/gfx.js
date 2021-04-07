@@ -122,12 +122,12 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
         }
 
         player.deck.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.name);
+            card.modelInWorld = makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
             moveCardToDeck(card, player, i);
         });
         player.hand.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.name);
+            card.modelInWorld = makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
             moveCardToHand(card, player, i);
         });
@@ -248,22 +248,72 @@ export function createTestScene() {
     return [scene, movables];
 }
 
+/**
+* Divide an entire phrase in an array of phrases, all with the max pixel length given.
+* The words are initially separated by the space char.
+* From https://stackoverflow.com/questions/2936112/text-wrap-in-a-canvas-element
+* @param phrase
+* @param length
+* @return
+*/
+function getLines(ctx, text, maxWidth) {
+    var words = text.split(" ");
+    var lines = [];
+    var currentLine = words[0];
+
+    ctx.font = "2px Arial";
+
+    for (var i = 1; i < words.length; i++) {
+        var word = words[i];
+        var width = ctx.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+            currentLine += " " + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    lines.push(currentLine);
+    return lines;
+}
+
+export function setCardObjectText(canvas, context, text, color, minLines = 5) {
+    const HARDCODE_WIDTH = 10;
+
+    const textHeight = 400;
+    canvas.width = textHeight;
+    canvas.height = textHeight;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = color;
+    const drawText = (textToPrint, i = 0, lines = 1) => {
+        lines = Math.max(lines, minLines)
+        let height = textHeight / lines;
+        const textWidth = context.measureText(textToPrint).width;
+        const tempHeight = height;
+        if (textWidth > HARDCODE_WIDTH) {
+            height = height / (textWidth / HARDCODE_WIDTH);
+        }
+        const temp = context.font;
+        context.font = "" + height + "px Arial";
+        context.fillText(
+            textToPrint,
+            canvas.width / 2,
+            textHeight - (tempHeight * (lines - 1 - i) + tempHeight / 2)
+        );
+        context.font = temp;
+    };
+    const name_lines = getLines(context, text, HARDCODE_WIDTH);
+    for (const i in name_lines) {
+        drawText(name_lines[i], i, name_lines.length);
+    }
+}
+
 export function makeCardObject(name, w = 1, h = 1.618, otherInfo = []) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
 
-    const textHeight = 100;
-    const actualFontSize = 2;
-    context.font = "normal " + textHeight + "px Arial";
-    const metrics = context.measureText(name);
-    const textWidth = metrics.width;
-    canvas.width = textWidth;
-    canvas.height = textHeight;
-    context.font = "normal " + textHeight + "px Arial";
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillStyle = "#00ff00";
-    context.fillText(name, textWidth / 2, textHeight / 2);
+    setCardObjectText(canvas, context, name, "#00ff00");
 
     const texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
@@ -285,6 +335,8 @@ export function makeCardObject(name, w = 1, h = 1.618, otherInfo = []) {
     card.add(new THREE.Mesh(back, materialBack));
 
     card.lookAt(new Vector3(0, 10000, 0));
+    card.canvas = canvas;
+    card.context = context;
 
     return card;
 }
