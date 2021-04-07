@@ -323,7 +323,7 @@ export function makeCardObject(name, w = 1, h = 1.618, minLines = 5) {
     const context = canvas.getContext("2d");
     const texture = new THREE.Texture(canvas);
 
-    setCardObjectText(canvas, context, texture, name, "#00ff00");
+    setCardObjectText(canvas, context, texture, name, "#00ff00", minLines);
 
     const materialFront = new THREE.MeshPhongMaterial({
         color: 0xffffff,
