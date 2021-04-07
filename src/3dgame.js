@@ -68,18 +68,12 @@ export async function gameLoop(game) {
 export function startGame(scene, movables) {
     const game = new DungeonMayhem();
 
-    const p1 = new Player("P1", new Characters.Rogue());
-    game.players.push(p1);
-    const p2 = new Player("P2", new Characters.Paladin());
-    game.players.push(p2);
-    // const p3 = new Player("P3", new Characters.Ranger());
-    // game.players.push(p3);
-    const p4 = new Player("P4", new Characters.Wizard());
-    game.players.push(p4);
-    // const p5 = new Player("P5", new Characters.Barbarian());
-    // game.players.push(p5);
-    // const p6 = new Player("P6", new Characters.Druid());
-    // game.players.push(p6);
+    const p1 = new Player("P1", new Characters.Rogue(), game);
+    const p2 = new Player("P2", new Characters.Paladin(), game);
+    // const p3 = new Player("P3", new Characters.Ranger(), game);
+    const p4 = new Player("P4", new Characters.Wizard(), game);
+    // const p5 = new Player("P5", new Characters.Barbarian(), game);
+    // const p6 = new Player("P6", new Characters.Druid(), game);
 
     const NUM_PLAYERS = game.players.length;
 

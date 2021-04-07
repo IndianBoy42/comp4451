@@ -2,8 +2,8 @@ import { shuffle } from "./shuffle.mjs";
 import { chooseFromDiscardPile } from "./controls.js";
 import * as GFX from "./gfx.js";
 
+let id = 1;
 export class Player {
-    static id = 1;
 
     /**
      * Player constructor
@@ -25,8 +25,8 @@ export class Player {
 
         this.isClone = isClone;
         if (!isClone) {
-            this.id = Player.id;
-            ++Player.id;
+            this.id = id;
+            ++id;
             
             //init player deck
             this.discardPile = [];
@@ -244,77 +244,77 @@ export class Player {
      * =================================================================================
      */
 
-    /**
-     * Selects a card to play from hand
-     * @returns index of chosen card
-     */
-    async selectCard() {
-        if (this.isAI) {
-            //TODO
-        }
-        else {
-            const input = await askIntInput("Choose card to play: ", 0, this.hand.length - 1);
-            return input;
-        }
-    }
+    // /**
+    //  * Selects a card to play from hand
+    //  * @returns index of chosen card
+    //  */
+    // async selectCard() {
+    //     if (this.isAI) {
+    //         //TODO
+    //     }
+    //     else {
+    //         const input = await askIntInput("Choose card to play: ", 0, this.hand.length - 1);
+    //         return input;
+    //     }
+    // }
 
-    /**
-     * Selects a player from an array of players
-     * @param players array of selectable players
-     * @returns 1 chosen player
-     */
-    async selectPlayer(players) {
-        if (this.isAI) {
-            //TODO
-        }
-        else {
-            if (DEBUG_RNG_INPUT) {
-                const input = await askIntInput("Choose player to target: ", 0, players.length - 1);
-                return players[input];
-            }
-            else {
-                let overflowCount = 0;
-                while (true) {
-                    const input = await askIntInput("Choose player ID to target: ", 1, this.context.players.length);
-                    for (const opp of players) {
-                        if (opp.id === input) return opp;
-                    }
+    // /**
+    //  * Selects a player from an array of players
+    //  * @param players array of selectable players
+    //  * @returns 1 chosen player
+    //  */
+    // async selectPlayer(players) {
+    //     if (this.isAI) {
+    //         //TODO
+    //     }
+    //     else {
+    //         if (DEBUG_RNG_INPUT) {
+    //             const input = await askIntInput("Choose player to target: ", 0, players.length - 1);
+    //             return players[input];
+    //         }
+    //         else {
+    //             let overflowCount = 0;
+    //             while (true) {
+    //                 const input = await askIntInput("Choose player ID to target: ", 1, this.context.players.length);
+    //                 for (const opp of players) {
+    //                     if (opp.id === input) return opp;
+    //                 }
                     
-                    ++overflowCount;
-                    if (overflowCount > 100) throw new Error("Infinite loop in choosePlayer()");
-                    console.log("Invalid target!");
-                }
-            }
-        }
-    }
+    //                 ++overflowCount;
+    //                 if (overflowCount > 100) throw new Error("Infinite loop in choosePlayer()");
+    //                 console.log("Invalid target!");
+    //             }
+    //         }
+    //     }
+    // }
 
-    /**
-     * Selects a shield from array of shields
-     * @param shields array of selectable shields
-     * @returns index of chosen shield
-     */
-    async selectShield(shields) {
-        if (this.isAI) {
-            //TODO
-        }
-        else {
-            const input = await askIntInput("Choose shield index: ", 0, shields.length-1);
-            return input;
-        }
-    }
+    // /**
+    //  * Selects a shield from array of shields
+    //  * @param shields array of selectable shields
+    //  * @returns index of chosen shield
+    //  */
+    // async selectShield(shields) {
+    //     if (this.isAI) {
+    //         //TODO
+    //     }
+    //     else {
+    //         const input = await askIntInput("Choose shield index: ", 0, shields.length-1);
+    //         return input;
+    //     }
+    // }
 
-    /**
-     * Selects a card to pick from discard pile
-     * @returns index of chosen card
-     */
-     async selectDiscardedCard() {
-        if (this.isAI) {
-            //TODO
-        }
-        else {
-            const input = await askIntInput("Choose discarded card: ", 0, this.discardPile.length-1);
-            return input;
-        }
-    }
+    // /**
+    //  * Selects a card to pick from discard pile
+    //  * @returns index of chosen card
+    //  */
+    //  async selectDiscardedCard() {
+    //     if (this.isAI) {
+    //         //TODO
+    //     }
+    //     else {
+    //         const input = await askIntInput("Choose discarded card: ", 0, this.discardPile.length-1);
+    //         return input;
+    //     }
+    // }
 
 }
