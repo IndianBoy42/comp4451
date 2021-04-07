@@ -4,6 +4,10 @@ import * as Powers from "../powers/powers.mjs";
 
 import evokerWizard from "../assets/evoker_wizard.glb";
 import tieflingRogue from "../assets/tiefling_rogue.glb";
+import sunPaladin from "../assets/sun_paladin.glb";
+import halflingDruid from "../assets/halfling_druid.glb";
+import orcBarbarian from "../assets/orc_barbarian.glb";
+import crossbowRanger from "../assets/crossbow_ranger.glb";
 
 export class Wizard extends Character {
     constructor() {
@@ -36,7 +40,7 @@ export class Paladin extends Character {
         return Cards.getPaladinDeck();
     }
     modelPath(i = 0) {
-        if (i == 0) return tieflingRogue;
+        if (i == 0) return sunPaladin;
         else return null;
     }
 }
@@ -56,7 +60,7 @@ export class Barbarian extends Character {
         return Cards.getBarbarianDeck();
     }
     modelPath(i = 0) {
-        if (i == 0) return tieflingRogue;
+        if (i == 0) return orcBarbarian;
         else return null;
     }
 }
@@ -96,7 +100,7 @@ export class Druid extends Character {
         return Cards.getDruidDeck();
     }
     modelPath(i = 0) {
-        if (i == 0) return tieflingRogue;
+        if (i == 0) return halflingDruid;
         else return null;
     }
 }
@@ -116,7 +120,7 @@ export class Ranger extends Character {
         return Cards.getRangerDeck();
     }
     modelPath(i = 0) {
-        if (i == 0) return tieflingRogue;
+        if (i == 0) return crossbowRanger;
         else return null;
     }
 }
