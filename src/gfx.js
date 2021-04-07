@@ -60,15 +60,39 @@ function dir_light(scene) {
 }
 
 export function addSpotLightTo(obj) {
-    obj.selectionLight = new THREE.SpotLight(0xff0000, 10000);
+    obj.selectionLight = new THREE.SpotLight(0xff0000, 1);
     obj.selectionLight.angle = Math.PI / 6;
     obj.selectionLight.penumbra = 0;
-    obj.selectionLight.position.set(0, 1, 0);
+    obj.selectionLight.position.set(0, 2 / obj.modelInWorld.scale.length(), 0);
     obj.selectionLight.target = obj.modelInWorld;
     obj.modelInWorld.add(obj.selectionLight);
     return obj;
 }
 
+function circlePos(angle, dist = 1) {
+    return new Vector3(dist * Math.cos(angle), 0, dist * Math.sin(angle));
+}
+const positionFromHealthArray = [
+    circlePos(0 * ((Math.PI * 2) / 11)),
+    circlePos(1 * ((Math.PI * 2) / 11)),
+    circlePos(2 * ((Math.PI * 2) / 11)),
+    circlePos(3 * ((Math.PI * 2) / 11)),
+    circlePos(4 * ((Math.PI * 2) / 11)),
+    circlePos(5 * ((Math.PI * 2) / 11)),
+    circlePos(6 * ((Math.PI * 2) / 11)),
+    circlePos(7 * ((Math.PI * 2) / 11)),
+    circlePos(8 * ((Math.PI * 2) / 11)),
+    circlePos(9 * ((Math.PI * 2) / 11)),
+    circlePos(10 * ((Math.PI * 2) / 11)),
+];
+function positionFromHealth(health) {
+    return positionFromHealthArray[health];
+}
+export function updatePlayerToken(player) {
+    player.modelInWorld.position.copy(
+        positionFromHealth(player.character.health)
+    );
+}
 export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
     return (player, i) => {
         const angle = ((2 * Math.PI) / NUM_PLAYERS) * i;
@@ -81,6 +105,7 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
         const group = new THREE.Object3D();
         group.position.set(pos.x, pos.y, pos.z);
         group.rotateY(-angle + Math.PI / 2);
+        scene.add(group);
 
         loadModel(player.character.modelPath(), gltf => {
             const token = gltf.scene.children[0];
@@ -95,10 +120,9 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
             group.add(token);
             player.character.modelInWorld = token;
             player.modelInWorld = token;
-
+            updatePlayerToken(player);
             onComplete(player, token);
         });
-        scene.add(group);
 
         player.deck.forEach((card, i) => {
             card.modelInWorld = makeCardObject(card.name);
@@ -113,10 +137,10 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
     };
 };
 
-const DiscardPilePosition = new Vector3(1.5, -0.49, 0);
-const HandPosition = new Vector3(0, 0.49, 1.5);
-const ShieldsPosition = new Vector3(0, -0.49, -1.5);
-const DeckPosition = new Vector3(-1.5, -0.49, 0);
+const DiscardPilePosition = new Vector3(3, -0.49, 0);
+const HandPosition = new Vector3(0, 0.49, 0);
+const ShieldsPosition = new Vector3(0, -0.49, -3);
+const DeckPosition = new Vector3(-3, -0.49, 0);
 const ZeroPosition = new Vector3();
 // TODO: Can be animated
 function setCardPos(card, pos) {
@@ -137,7 +161,7 @@ export function moveCardToHand(card, player, i = 0) {
         const offs = Math.round(i / 2);
         setCardPos(card, HandPosition);
         card.modelInWorld.position.x += 2 * offs * sign;
-        card.modelInWorld.rotateX(Math.PI / 4);
+        card.modelInWorld.rotateX(Math.PI / 2);
     }
 }
 export function moveCardToShields(card, player, i = 0) {
@@ -167,21 +191,6 @@ export function createTestScene() {
         gltf.scene.position.y -= 0.35 * scale + 0.5;
         scene.add(gltf.scene);
     });
-    const loadToken = (path, onComplete) => {
-        loadModel(path, gltf => {
-            const token = gltf.scene.children[0];
-            token.scale.multiplyScalar(0.03);
-            token.drag = clipFloor(token);
-            scene.add(token);
-            onComplete(gltf, token);
-        });
-    };
-    const makeCard = (texPath, onComplete) => {
-        const cube = cube(scene, { color: 0x44aa88 });
-        movables.push(cube);
-        cube.scale.multiply(new Vector3(1.618, 0.01, 1));
-        cube.drag = clipFloor(cube);
-    };
 
     // let cube1 = cube(scene, { color: 0x44aa88 });
     // movables.push(cube1);
@@ -195,26 +204,26 @@ export function createTestScene() {
 
     const game = startGame(scene, movables);
 
-    const cube2 = cube(scene, { color: 0x44aa88 });
-    movables.push(cube2);
-    cube2.position.x -= 2;
-    cube2.scale.multiply(new Vector3(1.618, 0.01, 1));
-    cube2.drag = clipFloor(cube2);
+    // const cube2 = cube(scene, { color: 0x44aa88 });
+    // movables.push(cube2);
+    // cube2.position.x -= 2;
+    // cube2.scale.multiply(new Vector3(1.618, 0.01, 1));
+    // cube2.drag = clipFloor(cube2);
 
-    const cube3 = cube(scene, { color: 0x44aa88 });
-    movables.push(cube3);
-    cube3.position.x += 2;
-    cube3.drag = clipFloor(cube3);
-    cube3.dragend = event => {
-        cube3.material.color.setHex("0xFF0000");
-        console.log(game.players);
-        chooseFromObjects(
-            "Choose a Player",
-            0,
-            game.players.length,
-            game.players
-        ).then(i => gameLoop(game));
-    };
+    // const cube3 = cube(scene, { color: 0x44aa88 });
+    // movables.push(cube3);
+    // cube3.position.x += 2;
+    // cube3.drag = clipFloor(cube3);
+    // cube3.dragend = event => {
+    //     cube3.material.color.setHex("0xFF0000");
+    //     console.log(game.players);
+    //     chooseFromObjects(
+    //         "Choose a Player",
+    //         0,
+    //         game.players.length,
+    //         game.players
+    //     ).then(i => gameLoop(game));
+    // };
 
     // loadToken(tieflingRogue, (gltf, token) => {
     //     movables.push(token);
@@ -241,22 +250,34 @@ export function createTestScene() {
     return [scene, movables];
 }
 
-export function makeCardObject(name, w = 1.618, h = 1) {
+export function makeCardObject(name, w = 1, h = 1.618, otherInfo = []) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
 
-    const textHeight = 100;
-    const actualFontSize = 2;
-    context.font = "normal " + textHeight + "px Arial";
-    const metrics = context.measureText(name);
-    const textWidth = metrics.width;
-    canvas.width = textWidth;
+    const lines = 5;
+    const textHeight = 400;
+    let width = textHeight;
     canvas.height = textHeight;
-    context.font = "normal " + textHeight + "px Arial";
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillStyle = "#00ff00";
-    context.fillText(name, textWidth / 2, textHeight / 2);
+    const text = (textToPrint, i = 0) => {
+        const height = textHeight / lines;
+        context.font = "normal " + height + "px Arial";
+        const metrics = context.measureText(textToPrint);
+        const textWidth = metrics.width;
+        // width = Math.max(width, textWidth);
+        // console.log("Max width");
+        // console.log(width);
+        // canvas.width = width;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillStyle = "#00ff00";
+        context.fillText(
+            textToPrint,
+            width / 2,
+            textHeight - (height * (lines - 1 - i) + height / 2)
+        );
+    };
+    text(name);
+    text(name, 1);
 
     const texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
