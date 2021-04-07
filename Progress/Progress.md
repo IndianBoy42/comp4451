@@ -43,7 +43,11 @@ Proper design of the cards
 
 ## AI
 
-Started progress, and refactored the internal game logic to support cloning the game state for simulating
+Started implementation
+
+refactored the internal game logic to support cloning the game state for simulating
+
+refactored the UI functions to allow simulating games
 
 ## Local Multiplayer
 
