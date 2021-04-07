@@ -124,13 +124,26 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
             onComplete(player, token);
         });
 
+        function getCardData(card) {
+            return card.name +
+                (card.shieldValue > 0 ? ", shield=" + card.shieldValue : "") +
+                (card.healValue > 0 ? ", heal=" + card.healValue : "") +
+                (card.dmgValue > 0 ? ", dmg=" + card.dmgValue : "") +
+                (card.extraActions > 0 ? ", extra=" + card.extraActions : "") +
+                (card.drawCard > 0 ? ", draw=" + card.drawCard : "") +
+                " " +
+                (card.extraPowers.length === 0
+                    ? ""
+                    : card.extraPowers[0].constructor.name);
+        }
+
         player.deck.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.name);
+            card.modelInWorld = makeCardObject(getCardData(card));
             group.add(card.modelInWorld);
             moveCardToDeck(card, player, i);
         });
         player.hand.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.name);
+            card.modelInWorld = makeCardObject(getCardData(card));
             group.add(card.modelInWorld);
             moveCardToHand(card, player, i);
         });
@@ -250,34 +263,72 @@ export function createTestScene() {
     return [scene, movables];
 }
 
-export function makeCardObject(name, w = 1, h = 1.618, otherInfo = []) {
+/**
+* Divide an entire phrase in an array of phrases, all with the max pixel length given.
+* The words are initially separated by the space char.
+* From https://stackoverflow.com/questions/2936112/text-wrap-in-a-canvas-element
+* @param phrase
+* @param length
+* @return
+*/
+function getLines(ctx, text, maxWidth) {
+    var words = text.split(" ");
+    var lines = [];
+    var currentLine = words[0];
+
+    ctx.font = "2px Arial";
+
+    for (var i = 1; i < words.length; i++) {
+        var word = words[i];
+        var width = ctx.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+            currentLine += " " + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    lines.push(currentLine);
+    return lines;
+}
+
+export function makeCardObject(name, w = 1, h = 1.618, otherInfo = [], minLines = 5) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
 
-    const lines = 5;
+    const HARDCODE_WIDTH = 10;
+
     const textHeight = 400;
-    let width = textHeight;
+    canvas.width = textHeight;
     canvas.height = textHeight;
-    const text = (textToPrint, i = 0) => {
-        const height = textHeight / lines;
-        context.font = "normal " + height + "px Arial";
-        const metrics = context.measureText(textToPrint);
-        const textWidth = metrics.width;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = "#00ff00";
+    const text = (textToPrint, i = 0, lines = 1) => {
+        lines = Math.max(lines, minLines)
+        let height = textHeight / lines;
+        const textWidth = context.measureText(textToPrint).width;
+        const tempHeight = height;
+        if (textWidth > HARDCODE_WIDTH) {
+            height = height / (textWidth / HARDCODE_WIDTH);
+        }
+        const temp = context.font;
+        context.font = "" + height + "px Arial";
         // width = Math.max(width, textWidth);
         // console.log("Max width");
         // console.log(width);
         // canvas.width = width;
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillStyle = "#00ff00";
         context.fillText(
             textToPrint,
-            width / 2,
-            textHeight - (height * (lines - 1 - i) + height / 2)
+            canvas.width / 2,
+            textHeight - (tempHeight * (lines - 1 - i) + tempHeight / 2)
         );
+        context.font = temp;
     };
-    text(name);
-    text(name, 1);
+    const name_lines = getLines(context, name, HARDCODE_WIDTH);
+    for (const i in name_lines) {
+        text(name_lines[i], i, name_lines.length);
+    }
 
     const texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
