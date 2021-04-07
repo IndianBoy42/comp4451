@@ -5,6 +5,12 @@ export class DungeonMayhem {
         //this.shields = [];
     }
 
+    start() {
+        for (const player of this.players) {
+            player.endTurn();
+        }
+    }
+
     allOpponents(player) {
         let opp = [];
         for (const other of this.players) {

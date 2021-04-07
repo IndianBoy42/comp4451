@@ -279,7 +279,7 @@ function getLines(ctx, text, maxWidth) {
     return lines;
 }
 
-export function setCardObjectText(canvas, context, text, color, minLines = 5) {
+export function setCardObjectText(canvas, context, texture, text, color, minLines = 5) {
     const HARDCODE_WIDTH = 10;
 
     const textHeight = 400;
@@ -309,16 +309,16 @@ export function setCardObjectText(canvas, context, text, color, minLines = 5) {
     for (const i in name_lines) {
         drawText(name_lines[i], i, name_lines.length);
     }
+
+    texture.needsUpdate = true;
 }
 
 export function makeCardObject(name, w = 1, h = 1.618, otherInfo = []) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-
-    setCardObjectText(canvas, context, name, "#00ff00");
-
     const texture = new THREE.Texture(canvas);
-    texture.needsUpdate = true;
+
+    setCardObjectText(canvas, context, texture, name, "#00ff00");
 
     const materialFront = new THREE.MeshPhongMaterial({
         color: 0xffffff,
@@ -339,6 +339,7 @@ export function makeCardObject(name, w = 1, h = 1.618, otherInfo = []) {
     card.lookAt(new Vector3(0, 10000, 0));
     card.canvas = canvas;
     card.context = context;
+    card.texture = texture;
 
     return card;
 }
