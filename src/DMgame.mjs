@@ -1,4 +1,3 @@
-import { chooseOpponent, chooseShieldOf } from "./controls.js";
 
 export class DungeonMayhem {
     constructor() {
@@ -82,42 +81,14 @@ export class DungeonMayhem {
         targetDisguise = false,
         isGhostPing = false
     ) {
-        // TODO: pop up GUI for choosing the target
         let opps = [];
         if (chooseAnyone) {
-            let allOpps = this.allAliveOpponents(
+            opps = this.allAliveOpponents(
                 player,
                 targetSelf,
                 targetDisguise,
                 isGhostPing
             );
-            let finish = allOpps.length === 0;
-            let overflowCount = 0;
-            while (!finish) {
-                let input = 0;
-                const opp = await chooseOpponent(allOpps);
-                if (
-                    this.isValidOpponent(
-                        player,
-                        opp,
-                        targetSelf,
-                        targetDisguise,
-                        isGhostPing
-                    )
-                ) {
-                    //finish = true;
-                    console.log(
-                        "Target player " + (DEBUG_RNG_INPUT ? opp.name : input)
-                    );
-                    return [opp];
-                }
-                ++overflowCount;
-                if (overflowCount > 100)
-                    throw new Error(
-                        "Infinite loop in choosePlayer(), " + allOpps.length
-                    );
-                console.log("Invalid target!");
-            }
         } else {
             const allPlayers = this.allAliveOpponents(player, true); //ghostPing doesnt care about left/right
             //TODO can rewrite this part using ID
@@ -128,7 +99,6 @@ export class DungeonMayhem {
                     break;
                 }
             }
-            let opps = [];
             const leftOppIndex =
                 (thisIndex - 1 + allPlayers.length) % allPlayers.length;
             const leftOpp = allPlayers[leftOppIndex];
@@ -151,15 +121,6 @@ export class DungeonMayhem {
             ) {
                 opps.push(rightOpp);
             }
-
-            if (opps.length === 2) {
-                const opp = await chooseOpponent(opps);
-                return [opp];
-            } else if (opps.length === 1 || opps.length === 0) {
-                return opps;
-            } else {
-                throw new Error("WHAT\n\n\nHOW");
-            }
         }
 
         if (opps.length === 0 || opps.length === 1) return opps;
@@ -181,8 +142,8 @@ export class DungeonMayhem {
         const target = t[0];
         let ishield = -1;
         if (target.character.shields.length == 1) ishield = 0;
-        else if (target.character.shields.length > 0)
-            ishield = await chooseShieldOf(target.character.shields);
+        else if (target.character.shields.length > 1)
+            ishield = await player.selectShield(target);
         return [target, ishield];
     }
 

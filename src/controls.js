@@ -161,12 +161,12 @@ export async function chooseOpponent(opponents) {
     console.log(opponents[input]);
     return opponents[input];
 }
-export async function chooseShieldOf(character) {
+export async function chooseShieldOf(player) {
     ishield = await chooseFromObjects(
         "Choose shield index: ",
         0,
-        target.character.shields.length - 1,
-        this.character.shields
+        player.character.shields.length - 1,
+        player.character.shields
     );
     return ishield;
 }

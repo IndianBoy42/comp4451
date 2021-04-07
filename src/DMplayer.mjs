@@ -1,5 +1,5 @@
 import { shuffle } from "./shuffle.mjs";
-import { chooseFromDiscardPile } from "./controls.js";
+import { chooseFromDiscardPile, chooseFromPlayerHand, chooseOpponent, chooseShieldOf } from "./controls.js";
 import * as GFX from "./gfx.js";
 
 let id = 1;
@@ -10,18 +10,14 @@ export class Player {
      * @param name Player's name
      * @param character The character played as
      * @param context The game context
-     * @param isAI set to true if the player is an AI
      * @param isClone set to true if this is a cloned player
      */
-    constructor(name, character, context, isAI = false, isClone = false) {
+    constructor(name, character, context, isClone = false) {
         this.name = name;
         this.character = character;
         this.character.player = this;
         this.context = context;
         this.context.players.push(this);
-
-        this.isAI = isAI;
-        if (this.isAI) this.AI = new AI(this);
 
         this.isClone = isClone;
         if (!isClone) {
@@ -44,10 +40,9 @@ export class Player {
      * @returns the clone
      */
     clone(context, isOpponent) {
-        let clone = new Player(this.name, this.character.clone(), context, this.isAI, true);
+        let clone = new Player(this.name, this.character.clone(), context, true);
         //copy attributes
         clone.id = this.id;
-        clone.AI = this.AI;
         clone.discardPile = this.discardPile.slice(0);
         if (isOpponent) {
             //randomize the deck + hand to simulate not knowing opponent's hand
@@ -144,7 +139,7 @@ export class Player {
         if (top) {
             return this.discardPile.pop();
         } else {
-            const i = chooseFromDiscardPile(this);
+            const i = await this.selectDiscardedCard(this);
             return this.discardPile.splice(i, 1)[0];
         }
     }
@@ -156,6 +151,9 @@ export class Player {
         this.character.actionsLeft += numExtraActions;
     }
 
+    /**
+     * Log the player info in console
+     */
     debugLogMe() {
         const char = this.character;
         console.log("Player: " + this.name);
@@ -244,77 +242,38 @@ export class Player {
      * =================================================================================
      */
 
-    // /**
-    //  * Selects a card to play from hand
-    //  * @returns index of chosen card
-    //  */
-    // async selectCard() {
-    //     if (this.isAI) {
-    //         //TODO
-    //     }
-    //     else {
-    //         const input = await askIntInput("Choose card to play: ", 0, this.hand.length - 1);
-    //         return input;
-    //     }
-    // }
+    /**
+     * Selects a card to play from hand
+     * @returns index of chosen card
+     */
+    async selectCard() {
+        return await chooseFromPlayerHand(this);
+    }
 
-    // /**
-    //  * Selects a player from an array of players
-    //  * @param players array of selectable players
-    //  * @returns 1 chosen player
-    //  */
-    // async selectPlayer(players) {
-    //     if (this.isAI) {
-    //         //TODO
-    //     }
-    //     else {
-    //         if (DEBUG_RNG_INPUT) {
-    //             const input = await askIntInput("Choose player to target: ", 0, players.length - 1);
-    //             return players[input];
-    //         }
-    //         else {
-    //             let overflowCount = 0;
-    //             while (true) {
-    //                 const input = await askIntInput("Choose player ID to target: ", 1, this.context.players.length);
-    //                 for (const opp of players) {
-    //                     if (opp.id === input) return opp;
-    //                 }
-                    
-    //                 ++overflowCount;
-    //                 if (overflowCount > 100) throw new Error("Infinite loop in choosePlayer()");
-    //                 console.log("Invalid target!");
-    //             }
-    //         }
-    //     }
-    // }
+    /**
+     * Selects a player from an array of players
+     * @param players array of selectable players
+     * @returns 1 chosen player
+     */
+    async selectPlayer(players) {
+        return await chooseOpponent(players);
+    }
 
-    // /**
-    //  * Selects a shield from array of shields
-    //  * @param shields array of selectable shields
-    //  * @returns index of chosen shield
-    //  */
-    // async selectShield(shields) {
-    //     if (this.isAI) {
-    //         //TODO
-    //     }
-    //     else {
-    //         const input = await askIntInput("Choose shield index: ", 0, shields.length-1);
-    //         return input;
-    //     }
-    // }
+    /**
+     * Selects a shield from array of shields
+     * @param player player whose shields is chosen
+     * @returns index of chosen shield
+     */
+    async selectShield(player) {
+        return await chooseShieldOf(player);
+    }
 
-    // /**
-    //  * Selects a card to pick from discard pile
-    //  * @returns index of chosen card
-    //  */
-    //  async selectDiscardedCard() {
-    //     if (this.isAI) {
-    //         //TODO
-    //     }
-    //     else {
-    //         const input = await askIntInput("Choose discarded card: ", 0, this.discardPile.length-1);
-    //         return input;
-    //     }
-    // }
+    /**
+     * Selects a card to pick from discard pile
+     * @returns index of chosen card
+     */
+     async selectDiscardedCard(player) {
+        return await chooseFromDiscardPile(player);
+    }
 
 }

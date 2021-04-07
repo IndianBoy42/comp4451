@@ -29,7 +29,7 @@ export async function gameLoop(game) {
             // ok i figured out how to read from console
             while (player.character.actionsLeft > 0) {
                 player.debugLogMe();
-                const cardPos = await chooseFromPlayerHand(player);
+                const cardPos = await player.selectCard();
                 await player.playCard(cardPos, game);
                 if (game.gameEnded()) break;
             }
