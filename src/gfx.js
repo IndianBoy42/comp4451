@@ -116,7 +116,7 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
 
         for (let j = 1; j <= DMChars.maxHealth; j++) {
             console.log(j);
-            let card = makeCardObject(j, 0.3, 0.3);
+            let card = makeCardObject(`${j}`, 0.3, 0.3, 1);
             card.position.copy(positionFromHealth(j));
             group.add(card);
         }
@@ -249,13 +249,13 @@ export function createTestScene() {
 }
 
 /**
-* Divide an entire phrase in an array of phrases, all with the max pixel length given.
-* The words are initially separated by the space char.
-* From https://stackoverflow.com/questions/2936112/text-wrap-in-a-canvas-element
-* @param phrase
-* @param length
-* @return
-*/
+ * Divide an entire phrase in an array of phrases, all with the max pixel length given.
+ * The words are initially separated by the space char.
+ * From https://stackoverflow.com/questions/2936112/text-wrap-in-a-canvas-element
+ * @param phrase
+ * @param length
+ * @return
+ */
 function getLines(ctx, text, maxWidth) {
     var words = text.split(" ");
     var lines = [];
@@ -287,7 +287,7 @@ export function setCardObjectText(canvas, context, text, color, minLines = 5) {
     context.textBaseline = "middle";
     context.fillStyle = color;
     const drawText = (textToPrint, i = 0, lines = 1) => {
-        lines = Math.max(lines, minLines)
+        lines = Math.max(lines, minLines);
         let height = textHeight / lines;
         const textWidth = context.measureText(textToPrint).width;
         const tempHeight = height;
@@ -309,11 +309,11 @@ export function setCardObjectText(canvas, context, text, color, minLines = 5) {
     }
 }
 
-export function makeCardObject(name, w = 1, h = 1.618, otherInfo = []) {
+export function makeCardObject(name, w = 1, h = 1.618, minLines = 5) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
 
-    setCardObjectText(canvas, context, name, "#00ff00");
+    setCardObjectText(canvas, context, name, "#00ff00", minLines);
 
     const texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
