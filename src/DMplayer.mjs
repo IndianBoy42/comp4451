@@ -1,5 +1,11 @@
 import { shuffle } from "./shuffle.mjs";
-import { chooseFromDiscardPile, chooseFromPlayerHand, chooseOpponent, chooseShieldOf } from "./controls.js";
+import { 
+    chooseFromDiscardPile, 
+    chooseFromPlayerHand, 
+    chooseOpponent, 
+    chooseShieldOf,
+    DEBUG_RNG_INPUT,
+} from "./controls.js";
 import * as GFX from "./gfx.js";
 
 let id = 1;
@@ -155,6 +161,7 @@ export class Player {
      * Log the player info in console
      */
     debugLogMe() {
+        if (DEBUG_RNG_INPUT) return;
         const char = this.character;
         console.log("Player: " + this.name);
         console.log(
