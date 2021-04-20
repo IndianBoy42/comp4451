@@ -22,3 +22,8 @@ npm run start # will open the page, and also automatically rebuild and reload th
 ## Models:
 
 https://www.shapeways.com/shops/dmworkshop
+
+## Networking:
+
+https://github.com/feross/simple-peer
+https://peerjs.com/
