@@ -1,3 +1,5 @@
+import { updatePlayerToken } from "./gfx.js";
+
 export const maxHealth = 10;
 
 //TODO put all special powers related stuff in start/endTurnCallbacks?
@@ -36,7 +38,7 @@ export class Character {
         clone.health = this.health;
         clone.shields = this.shields.slice(0);
         clone.actionsLeft = this.actionsLeft;
-        clone.bonus = this.bonus; 
+        clone.bonus = this.bonus;
         clone.disguised = this.disguised;
         clone.forme = this.forme;
         clone.ignoringShields = this.ignoringShields;
@@ -81,7 +83,8 @@ export class Character {
      * @param others Array of targetted *players*
      * @param amt Amount of damage
      */
-    doDamage(others, amt) { //others are PLAYERS not CHARACTERS
+    doDamage(others, amt) {
+        //others are PLAYERS not CHARACTERS
         for (const oth of others) {
             if (oth === undefined) continue; //prevent passing no one into others
             if (this.ignoringShields) {
@@ -107,6 +110,7 @@ export class Character {
             this.health = 0;
             return amt;
         }
+        updatePlayerToken(this.player);
     }
     /**
      * Receive damage (including shield)

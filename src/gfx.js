@@ -30,9 +30,10 @@ function loaderError(error) {
     console.error(error);
 }
 
+import museum from "./assets/skycubes/museum.jpg";
 function loadBackground(scene) {
     textureLoader.load(
-        require("./assets/skycubes/museum.jpg"),
+        museum,
         texture => {
             const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
             rt.fromEquirectangularTexture(renderer, texture);
@@ -187,9 +188,12 @@ export function moveCardToHand(card, player, i = 0) {
         card.modelGroup.remove(card);
         card.modelGroup = player.modelGroup.add(card.modelInWorld);
         const sign = i % 2 == 0 ? +1 : -1;
-        const offs = Math.round(i / 2);
+        const cardsPerRow = 5;
+        const offy = Math.floor(i / cardsPerRow);
+        const offx = Math.ceil((i % cardsPerRow) / 2);
         setCardPos(card, HandPosition);
-        card.modelInWorld.position.x += 2 * offs * sign;
+        card.modelInWorld.position.x += 1.2 * offx * sign;
+        card.modelInWorld.position.y += 1.6 * offy;
         card.modelInWorld.rotateX(Math.PI / 2);
     }
 }
