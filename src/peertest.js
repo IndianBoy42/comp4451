@@ -1,5 +1,6 @@
 import Peer from "simple-peer";
 import { createPeer } from "./p2p";
+import { Base64 } from "js-base64";
 
 const body = `
     <p>From the Host click Copy Token, and then paste somewhere to send the token to your friend</p>
@@ -29,10 +30,17 @@ const { peer, signalOut, connected } = createPeer(
     new Promise(resolve => {
         document.querySelector("#connect #in").addEventListener("click", ev => {
             ev.preventDefault();
-            navigator.clipboard.readText().then(signal => {
-                document.querySelector("#incoming").value = signal;
+            if (document.querySelector("#incoming").value) {
+                const code = document.querySelector("#incoming").value;
+                const signal = Base64.decode(code);
                 resolve(signal);
-            });
+            } else {
+                navigator.clipboard.readText().then(code => {
+                    document.querySelector("#incoming").value = code;
+                    const signal = Base64.decode(signal);
+                    resolve(signal);
+                });
+            }
         });
     }),
     initiator
@@ -41,7 +49,13 @@ connected.then(peer => {
     document.querySelector("#outgoing").textContent = "connected";
 });
 signalOut.then(signal => {
-    document.querySelector("#outgoing").textContent = signal;
+    const code = Base64.encode(signal);
+    document.querySelector("#outgoing").textContent = code;
+    navigator.clipboard.writeText(code);
+});
+document.querySelector("#connect #out").addEventListener("click", ev => {
+    ev.preventDefault();
+    const signal = document.querySelector("#outgoing").textContent;
     navigator.clipboard.writeText(signal);
 });
 peer.on("data", data => {
