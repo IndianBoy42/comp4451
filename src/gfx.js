@@ -9,10 +9,42 @@ import { startGame, gameLoop } from "./3dgame";
 import { chooseFromObjects, clipFloor } from "./controls";
 import * as DMChars from "./DMchars.mjs";
 
-const loader = new GLTFLoader();
+export const textureLoader = new THREE.TextureLoader();
+export const modelLoader = new GLTFLoader();
+
+export const canvas = document.createElement("canvas");
+document.body.appendChild(canvas);
+
+export const renderer = new THREE.WebGLRenderer({ canvas });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.autoClear = false;
+renderer.setClearColor(0xff0000, 0);
+
+function loaderProgress(name) {
+    return xhr => {
+        console.log((xhr.loaded / xhr.total) * 100 + `% loaded for ${name}`);
+    };
+}
+function loaderError(error) {
+    console.error(error);
+}
+
+function loadBackground(scene) {
+    textureLoader.load(
+        require("./assets/skycubes/museum.jpg"),
+        texture => {
+            const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
+            rt.fromEquirectangularTexture(renderer, texture);
+            scene.background = rt.texture;
+        },
+        loaderProgress("backgroundTexture"),
+        loaderError
+    );
+}
 
 export function loadModel(modelpath, onComplete) {
-    loader.load(
+    modelLoader.load(
         modelpath,
         function (gltf) {
             onComplete(gltf);
@@ -22,14 +54,8 @@ export function loadModel(modelpath, onComplete) {
             // gltf.cameras; // Array<THREE.Camera>
             // gltf.asset; // Object
         },
-        function (xhr) {
-            console.log(
-                (xhr.loaded / xhr.total) * 100 + `% loaded for ${modelpath}`
-            );
-        },
-        function (error) {
-            console.error(error);
-        }
+        loaderProgress(modelpath),
+        loaderError
     );
 }
 
@@ -100,6 +126,7 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
         group.position.set(pos.x, pos.y, pos.z);
         group.rotateY(-angle + Math.PI / 2);
         scene.add(group);
+        player.modelGroup = group;
 
         loadModel(player.character.modelPath(), gltf => {
             const token = gltf.scene.children[0];
@@ -119,16 +146,19 @@ export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
             let card = makeCardObject(`${j}`, 0.3, 0.3, 1);
             card.position.copy(positionFromHealth(j));
             group.add(card);
+            card.modelGroup = group;
         }
 
         player.deck.forEach((card, i) => {
             card.modelInWorld = makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
+            card.modelGroup = group;
             moveCardToDeck(card, player, i);
         });
         player.hand.forEach((card, i) => {
             card.modelInWorld = makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
+            card.modelGroup = group;
             moveCardToHand(card, player, i);
         });
     };
@@ -154,6 +184,8 @@ export function moveCardToDiscard(card, player, i = 0) {
 }
 export function moveCardToHand(card, player, i = 0) {
     if (card.modelInWorld) {
+        card.modelGroup.remove(card);
+        card.modelGroup = player.modelGroup.add(card.modelInWorld);
         const sign = i % 2 == 0 ? +1 : -1;
         const offs = Math.round(i / 2);
         setCardPos(card, HandPosition);
@@ -178,9 +210,11 @@ export function moveCardToDeck(card, player, i = 0) {
     }
 }
 
-export function createTestScene() {
+export function createGameScene() {
     const scene = new THREE.Scene();
     const movables = [];
+
+    loadBackground(scene);
 
     loadModel(table, gltf => {
         const scale = 20;

@@ -2,7 +2,7 @@ import "./css/style.css";
 
 import * as THREE from "three";
 import * as Stats from "stats.js";
-import { createTestScene } from "./gfx.js";
+import { createGameScene, renderer, canvas } from "./gfx.js";
 import { initControls } from "./controls.js";
 import { createGui } from "./hud";
 
@@ -22,13 +22,6 @@ function newCamera() {
     return newCamera;
 }
 
-const canvas = document.createElement("canvas");
-document.body.appendChild(canvas);
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.autoClear = false;
-renderer.setClearColor(0xff0000, 0);
 
 const camera = newCamera();
 function resizeCanvasToDisplaySize() {
@@ -47,10 +40,14 @@ function resizeCanvasToDisplaySize() {
     }
 }
 
-const [scene, movables] = createTestScene();
+const [scene, movables] = createGameScene();
 const [hudScene, hudCamera, hudUpdate] = createGui();
 
-const [orbitControls, dragControls, controlUpdate] = initControls(movables, camera, renderer);
+const [orbitControls, dragControls, controlUpdate] = initControls(
+    movables,
+    camera,
+    renderer
+);
 
 function render(time) {
     stats.begin();

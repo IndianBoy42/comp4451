@@ -147,7 +147,7 @@ export const clipFloor = (obj, offset = 0) => {
  * Game selection functions
  * set DEBUG_RNG_INPUT to true to play a fully randomized automatic game
  */
-export const DEBUG_RNG_INPUT = true;
+export const DEBUG_RNG_INPUT = false;
 
 export function chooseFromObjects(query, min, max, objects) {
     if (DEBUG_RNG_INPUT) {
@@ -161,7 +161,8 @@ export function chooseFromObjects(query, min, max, objects) {
     // TODO: the controls
     console.log(query);
     return new Promise(resolve => {
-        // TODO: outline the selectable objects // https://stackoverflow.com/questions/26341396/outline-a-3d-object-in-three-js
+        // TODO: outline the selectable objects
+        // https://stackoverflow.com/questions/26341396/outline-a-3d-object-in-three-js
         objectChoices = objects.map(obj => addSpotLightTo(obj));
         objectChoicesIntersectables = objects.map(obj => obj.modelInWorld);
         objectChoiceResolve = resolve;
