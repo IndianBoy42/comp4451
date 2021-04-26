@@ -1,65 +1,101 @@
-import SimplePeer from "simple-peer";
-var peer1 = new SimplePeer({ initiator: true });
-var peer2 = new SimplePeer();
+import Peer from "simple-peer";
+import { createPeer } from "./p2p";
 
-peer1.on("signal", data => {
-    // when peer1 has signaling data, give it to peer2 somehow
-    peer2.signal(data);
+const body = `
+    <p>From the Host click Copy Token, and then paste somewhere to send the token to your friend</p>
+    <p>From the received, click Enter Token after having copied the token from your friend, this writes your reply token to your clipboard, send it back</p>
+    <p>The Host should enter token with the reply token from the receiver</p>
+    <p>After the page says connected you should be able to send and receive messages throuhg the textbox (use submit)</p>
+    <style>
+        #outgoing {
+            width: 600px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+    </style>
+    <form id="connect">
+        <textarea id="incoming"></textarea>
+        <button  id="in">Enter Token</button>
+        <button  id="out">Copy Token</button>
+        <button type="submit"  id="send">Send</button>
+    </form>
+    <pre id="outgoing"></pre>
+`;
+document.body.innerHTML = body;
+
+const initiator = location.hash === "#1";
+
+const { peer, signalOut, connected } = createPeer(
+    new Promise(resolve => {
+        document.querySelector("#connect #in").addEventListener("click", ev => {
+            ev.preventDefault();
+            navigator.clipboard.readText().then(signal => {
+                document.querySelector("#incoming").value = signal;
+                resolve(signal);
+            });
+        });
+    }),
+    initiator
+);
+connected.then(peer => {
+    document.querySelector("#outgoing").textContent = "connected";
+});
+signalOut.then(signal => {
+    document.querySelector("#outgoing").textContent = signal;
+    navigator.clipboard.writeText(signal);
+});
+peer.on("data", data => {
+    document.querySelector("#outgoing").textContent = data;
+});
+document.querySelector("#connect").addEventListener("submit", ev => {
+    ev.preventDefault();
+    const text = document.querySelector("#incoming").value;
+    console.log("sending message");
+    console.log(text);
+    peer.send(text);
 });
 
-peer2.on("signal", data => {
-    // when peer2 has signaling data, give it to peer1 somehow
-    peer1.signal(data);
-});
+function demo() {
+    const p = new Peer({
+        initiator: location.hash === "#1",
+        trickle: false,
+    });
 
-peer1.on("connect", () => {
-    // wait for 'connect' event before using the data channel
-    peer1.send("hey peer2, how is it going?");
-});
+    p.on("error", err => console.log("error", err));
 
-peer2.on("data", data => {
-    // got a data channel message
-    console.log("got a message from peer1: " + data);
-});
+    p.on("signal", data => {
+        const signal = JSON.stringify(data);
+        console.log("SIGNAL", signal);
+        document.querySelector("#outgoing").textContent = signal;
+        navigator.clipboard.writeText(signal);
+    });
 
-// const body = `
-//     <style>
-//         #outgoing {
-//             width: 600px;
-//             word-wrap: break-word;
-//             white-space: normal;
-//         }
-//     </style>
-//     <form>
-//         <textarea id="incoming"></textarea>
-//         <button type="submit">submit</button>
-//     </form>
-//     <pre id="outgoing"></pre>
-// `;
-// document.body.innerHTML = body;
+    document.querySelector("#connect #in").addEventListener("click", ev => {
+        ev.preventDefault();
+        navigator.clipboard.readText().then(signal => {
+            document.querySelector("#incoming").value = signal;
+            p.signal(JSON.parse(signal));
+        });
+    });
+    document.querySelector("#connect #out").addEventListener("click", ev => {
+        ev.preventDefault();
+        const signal = document.querySelector("#outgoing").textContent;
+        navigator.clipboard.writeText(signal);
+    });
+    document.querySelector("#connect").addEventListener("submit", ev => {
+        ev.preventDefault();
+        const text = document.querySelector("#incoming").value;
+        console.log("sending message");
+        console.log(text);
+        p.send(text);
+    });
 
-// const p = new SimplePeer({
-//     initiator: location.hash === "#1",
-//     trickle: false,
-// });
+    p.on("connect", () => {
+        console.log("CONNECT");
+        p.send("whatever" + Math.random());
+    });
 
-// p.on("error", err => console.log("error", err));
-
-// p.on("signal", data => {
-//     console.log("SIGNAL", JSON.stringify(data));
-//     document.querySelector("#outgoing").textContent = JSON.stringify(data);
-// });
-
-// document.querySelector("form").addEventListener("submit", ev => {
-//     ev.preventDefault();
-//     p.signal(JSON.parse(document.querySelector("#incoming").value));
-// });
-
-// p.on("connect", () => {
-//     console.log("CONNECT");
-//     p.send("whatever" + Math.random());
-// });
-
-// p.on("data", data => {
-//     console.log("data: " + data);
-// });
+    p.on("data", data => {
+        document.querySelector("#outgoing").textContent = data;
+    });
+}
