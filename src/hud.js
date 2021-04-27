@@ -95,7 +95,6 @@ export function createGui() {
         values.playerCount += 1;
         const folder = gui.addFolder(`Player ${i + 1}`);
         values.players.push({});
-        gui.remove(addPlayerBtn);
         gui.remove(joinGameBtn);
         addPeer(values.players[i], folder, true);
     });
