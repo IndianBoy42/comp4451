@@ -5,6 +5,7 @@
     "private": true,
     "mode": "development",
     "dependencies": {
+        "dat.gui": "^0.7.7",
         "js-base64": "^3.6.0",
         "pastebin-api": "^1.0.3",
         "process": "^0.11.10",

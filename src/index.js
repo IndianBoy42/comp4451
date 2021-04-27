@@ -4,7 +4,7 @@ import * as THREE from "three";
 import * as Stats from "stats.js";
 import { createGameScene, renderer, canvas } from "./gfx.js";
 import { initControls } from "./controls.js";
-import { createGui } from "./hud";
+import { createGui, createHud } from "./hud";
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -21,9 +21,8 @@ function newCamera() {
 
     return newCamera;
 }
-
-
 const camera = newCamera();
+
 function resizeCanvasToDisplaySize() {
     // look up the size the canvas is being displayed
     const width = canvas.clientWidth;
@@ -41,7 +40,8 @@ function resizeCanvasToDisplaySize() {
 }
 
 const [scene, movables] = createGameScene();
-const [hudScene, hudCamera, hudUpdate] = createGui();
+const [gui, guiValues] = createGui();
+const [hudScene, hudCamera, hudUpdate] = createHud();
 
 const [orbitControls, dragControls, controlUpdate] = initControls(
     movables,

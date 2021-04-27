@@ -37,7 +37,7 @@ const { peer, signalOut, connected } = createPeer(
             } else {
                 navigator.clipboard.readText().then(code => {
                     document.querySelector("#incoming").value = code;
-                    const signal = Base64.decode(signal);
+                    const signal = Base64.decode(code);
                     resolve(signal);
                 });
             }
