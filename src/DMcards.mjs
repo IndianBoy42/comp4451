@@ -1,5 +1,6 @@
 import { Shield } from "./DMshields.mjs";
 import * as THREE from "three";
+import { addToAllCards } from "./cards/cards.mjs";
 
 export class DMCard {
     constructor(
@@ -18,7 +19,35 @@ export class DMCard {
         this.extraActions = extraActions;
         this.drawCards = drawCards;
         this.extraPowers = extraPowers;
-        this.animation = {}; //TODO: figure out how to handle animations
+        addToAllCards(this);
+    }
+
+    // encode() {
+    //     return {
+    //         name: this.name,
+    //         shieldValue: this.shieldValue,
+    //         healValue: this.healValue,
+    //         dmgValue: this.dmgValue,
+    //         extraActions: this.extraActions,
+    //         drawCards: this.drawCards,
+    //         extraPowers: this.extraPowers.map(power => power.encode()),
+    //     };
+    // }
+    // decode(obj) {
+    //     this.name = obj.name;
+    //     this.shieldValue = obj.shieldValue;
+    //     this.healValue = obj.healValue;
+    //     this.dmgValue = obj.dmgValue;
+    //     this.extraActions = obj.extraActions;
+    //     this.drawCards = obj.drawCards;
+    //     this.extraPowers.push(
+    //         ...obj.extraPowers.map(pow => new allPowers[pow.id](pow.amount))
+    //     );
+    // }
+    encode() {
+        return {
+            indexInAllCards: this.indexInAllCards,
+        };
     }
 
     makeThreeObject() {
@@ -70,7 +99,8 @@ export class DMCard {
     }
 
     getCardText() {
-        return this.name +
+        return (
+            this.name +
             (this.shieldValue > 0 ? ", shield=" + this.shieldValue : "") +
             (this.healValue > 0 ? ", heal=" + this.healValue : "") +
             (this.dmgValue > 0 ? ", dmg=" + this.dmgValue : "") +
@@ -79,7 +109,8 @@ export class DMCard {
             " " +
             (this.extraPowers.length === 0
                 ? ""
-                : this.extraPowers[0].constructor.name);
+                : this.extraPowers[0].constructor.name)
+        );
     }
 
     /**

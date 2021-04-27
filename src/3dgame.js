@@ -71,7 +71,9 @@ export async function gameLoop(game) {
     }
 }
 
-export function startGame(scene, movables) {
+export let NUM_PLAYERS;
+
+export function startLocalGame(scene, movables) {
     const game = new DungeonMayhem();
 
     const p3 = new Player("P3", new Characters.Ranger(), game);
@@ -81,13 +83,23 @@ export function startGame(scene, movables) {
     // const p5 = new Player("P5", new Characters.Barbarian(), game);
     // const p6 = new Player("P6", new Characters.Druid(), game);
 
-    const NUM_PLAYERS = game.players.length;
+    NUM_PLAYERS = game.players.length;
 
     game.players.forEach(
         initRenderPlayer(scene, movables, NUM_PLAYERS, (player, token) => {
             movables.push(token);
         })
     );
+
+    return game;
+}
+
+export function startMultiplayerGame(scene, movables) {
+    const game = new DungeonMayhem();
+
+    let me = new Player("Me", Characters.chooseCharacter(), game);
+
+    // Dont render players until start game
 
     return game;
 }

@@ -1,8 +1,15 @@
-import { DamagingShield } from "./DMshields.mjs";
+export const allPowers = {};
 
 export class MightyPower {
     constructor(n = 1) {
         this.amount = n;
+    }
+
+    encode() {
+        return {
+            id: this.constructor.name,
+            amount: this.amount,
+        };
     }
 
     async play(player, context) {

@@ -35,25 +35,30 @@ export function createGui() {
             return folder.add(subValues, name);
         }
 
-        addp("status", "Please Wait");
+        addp("status", "Please Wait").listen();
         const { peer, signalOut, connected } = createPeer(
             new Promise(resolve => {
-                addp("token", "Token").onFinishChange(() => {
-                    const code = subValues.token;
-                    const signal = Base64.decode(code);
-                    resolve(signal);
-                });
-                addp("paste", () => {
+                subValues.resolver = resolve;
+                subValues.tokenField = addp("token", "Token").onFinishChange(
+                    () => {
+                        const code = subValues.token;
+                        const signal = Base64.decode(code);
+                        subValues.resolver(signal);
+                        folder.remove(subValues.copyBtn);
+                    }
+                );
+                subValues.pasteBtn = addp("paste", () => {
                     navigator.clipboard.readText().then(code => {
                         subValues.token = code;
-                        gui.updateDisplay();
                         const signal = Base64.decode(code);
-                        resolve(signal);
+                        subValues.resolver(signal);
+                        folder.remove(subValues.copyBtn);
                     });
                 });
             }),
             initiator // joining a game is a different part of the GUI, this guy is always the initiator
         );
+        subValues.peer = peer;
         signalOut.then(signal => {
             console.log(signal);
             subValues.signalOut = signal;
@@ -64,33 +69,39 @@ export function createGui() {
                 const code = Base64.encode(subValues.signalOut);
                 navigator.clipboard.writeText(code);
             }
-            gui.updateDisplay();
         });
         connected.then(() => {
             subValues.status = "Connected";
-            gui.updateDisplay();
+            if (values.onConnect) values.onConnect(player);
+            folder.remove(subValues.pasteBtn);
+            folder.remove(subValues.tokenField);
         });
         if (initiator) {
-            addp("copy", () => {
+            subValues.copyBtn = addp("copy", () => {
                 subValues.status = "Paste Answer";
-                gui.updateDisplay();
                 const code = Base64.encode(subValues.signalOut);
                 navigator.clipboard.writeText(code);
             });
         } else {
             subValues.status = "Paste Offer";
-            gui.updateDisplay();
         }
         peer.on("data", data => {
             subValues.msg = data;
-            gui.updateDisplay();
+            console.log(data);
+
+            if (values.onData) values.onData(data);
         });
+
+        // Just for Debugging
         addp("ping", () => {
             peer.send("hello world");
         });
-        addp("msg", "<Blank>");
+        addp("msg", "<Blank>").listen();
     }
     const addPlayerBtn = add("Add Player", () => {
+        if (values.playerCount == 0) {
+            add("startGame", () => {}).name("Start Game");
+        }
         const i = values.playerCount;
         values.playerCount += 1;
         const folder = gui.addFolder(`Player ${i + 1}`);
@@ -106,7 +117,6 @@ export function createGui() {
         gui.remove(joinGameBtn);
         addPeer(values.joinedGame, folder, false);
     });
-    add("hello", 10.0);
 
     return [gui, values];
 }

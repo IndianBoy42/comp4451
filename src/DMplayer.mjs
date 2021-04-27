@@ -7,10 +7,10 @@ import {
     DEBUG_RNG_INPUT,
 } from "./controls.js";
 import * as GFX from "./gfx.js";
+import { allCards } from "./cards/cards.mjs";
 
-let id = 1;
+let globalPlayerIdCounter = 1;
 export class Player {
-
     /**
      * Player constructor
      * @param name Player's name
@@ -27,8 +27,8 @@ export class Player {
 
         this.isClone = isClone;
         if (!isClone) {
-            this.id = id;
-            ++id;
+            this.id = globalPlayerIdCounter;
+            ++globalPlayerIdCounter;
 
             //init player deck
             this.discardPile = [];
@@ -39,6 +39,54 @@ export class Player {
         }
     }
 
+    encode() {
+        return {
+            name: this.name,
+            character: this.character.encode(),
+            discardPile: this.discardPile.map(card => card.encode()),
+            deck: this.deck.map(card => card.encode()),
+            hand: this.hand.map(card => card.encode()),
+        };
+    }
+    decode(obj) {
+        this.name = obj.name;
+        this.character.decode(obj.character);
+        this.discardPile.length = 0;
+        this.deck.length = 0;
+        this.hand.length = 0;
+        this.character.shields.push(
+            ...obj.character.shields.map((cardObj, i) => {
+                let card = allCards[cardObj.indexInAllCards];
+                GFX.moveCardToShields(card, this, i);
+                return card;
+            })
+        );
+        this.discardPile.push(
+            ...obj.discardPile.map((cardObj, i) => {
+                let card = allCards[cardObj.indexInAllCards];
+                GFX.moveCardToDiscard(card, this, i);
+                return card;
+            })
+        );
+        this.deck.push(
+            ...obj.deck.map((cardObj, i) => {
+                let card = allCards[cardObj.indexInAllCards];
+                GFX.moveCardToDeck(card, this, i);
+                return card;
+            })
+        );
+        this.hand.push(
+            ...obj.hand.map((cardObj, i) => {
+                let card = allCards[cardObj.indexInAllCards];
+                GFX.moveCardToHand(card, this, i);
+                return card;
+            })
+        );
+        // this.discardPile.map((card, i) => card.decode(obj.discardPile[i]));
+        // this.deck.map((card, i) => card.decode(obj.deck[i]));
+        // this.hand.map((card, i) => card.decode(obj.hand[i]));
+    }
+
     /**
      * Clone the player
      * @param context the cloned (actually new) game context
@@ -46,7 +94,12 @@ export class Player {
      * @returns the clone
      */
     clone(context, isOpponent) {
-        let clone = new Player(this.name, this.character.clone(), context, true);
+        let clone = new Player(
+            this.name,
+            this.character.clone(),
+            context,
+            true
+        );
         //copy attributes
         clone.id = this.id;
         clone.discardPile = this.discardPile.slice(0);
@@ -57,8 +110,7 @@ export class Player {
             shuffle(deckhand);
             clone.hand = deckhand.splice(0, this.hand.length);
             clone.deck = deckhand;
-        }
-        else {
+        } else {
             clone.hand = this.hand.slice(0);
             clone.deck = this.deck.slice(0);
             shuffle(clone.deck);
@@ -173,25 +225,25 @@ export class Player {
         function logCard(card, verbose = false, cardNo = "") {
             console.log(
                 "Card " +
-                cardNo +
-                ": " +
-                card.name.padEnd(30) +
-                (verbose
-                    ? ", shield = " +
-                    card.shieldValue +
-                    ", heal = " +
-                    card.healValue +
-                    ", dmg = " +
-                    card.dmgValue +
-                    ", extra = " +
-                    card.extraActions +
-                    ", draw = " +
-                    card.drawCards +
-                    ", super = " +
-                    (card.extraPowers.length === 0
-                        ? "None"
-                        : card.extraPowers[0].constructor.name)
-                    : "")
+                    cardNo +
+                    ": " +
+                    card.name.padEnd(30) +
+                    (verbose
+                        ? ", shield = " +
+                          card.shieldValue +
+                          ", heal = " +
+                          card.healValue +
+                          ", dmg = " +
+                          card.dmgValue +
+                          ", extra = " +
+                          card.extraActions +
+                          ", draw = " +
+                          card.drawCards +
+                          ", super = " +
+                          (card.extraPowers.length === 0
+                              ? "None"
+                              : card.extraPowers[0].constructor.name)
+                        : "")
             );
         }
 
@@ -205,11 +257,11 @@ export class Player {
         function logShield(shield) {
             console.log(
                 "Shield: " +
-                shield.name +
-                "-" +
-                shield.shieldObj.current +
-                "/" +
-                shield.shieldObj.max
+                    shield.name +
+                    "-" +
+                    shield.shieldObj.current +
+                    "/" +
+                    shield.shieldObj.max
             );
         }
 
@@ -263,7 +315,7 @@ export class Player {
      * =================================================================================
      * Selection functions
      * Call this function to let the player or AI decide what card/target/etc to select
-     * 
+     *
      * TODO implement player selection with GUI
      * =================================================================================
      */
@@ -301,5 +353,4 @@ export class Player {
     async selectDiscardedCard(player) {
         return await chooseFromDiscardPile(player);
     }
-
 }

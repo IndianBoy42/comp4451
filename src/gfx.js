@@ -5,7 +5,7 @@ import evokerWizard from "./assets/evoker_wizard.glb";
 import tieflingRogue from "./assets/tiefling_rogue.glb";
 import table from "./assets/table.glb";
 import { Vector3 } from "three";
-import { startGame, gameLoop } from "./3dgame";
+import { startLocalGame, gameLoop } from "./3dgame";
 import { chooseFromObjects, clipFloor } from "./controls";
 import * as DMChars from "./DMchars.mjs";
 
@@ -179,14 +179,20 @@ function setCardPos(card, pos) {
 }
 export function moveCardToDiscard(card, player, i = 0) {
     if (card.modelInWorld) {
+        if (card.modelGroup != player.modelGroup) {
+            card.modelGroup.remove(card);
+            card.modelGroup = player.modelGroup.add(card.modelInWorld);
+        }
         setCardPos(card, DiscardPilePosition);
         card.modelInWorld.position.y += i * 0.01;
     }
 }
 export function moveCardToHand(card, player, i = 0) {
     if (card.modelInWorld) {
-        card.modelGroup.remove(card);
-        card.modelGroup = player.modelGroup.add(card.modelInWorld);
+        if (card.modelGroup != player.modelGroup) {
+            card.modelGroup.remove(card);
+            card.modelGroup = player.modelGroup.add(card.modelInWorld);
+        }
         const sign = i % 2 == 0 ? +1 : -1;
         const cardsPerRow = 5;
         const offy = Math.floor(i / cardsPerRow);
@@ -199,6 +205,10 @@ export function moveCardToHand(card, player, i = 0) {
 }
 export function moveCardToShields(card, player, i = 0) {
     if (card.modelInWorld) {
+        if (card.modelGroup != player.modelGroup) {
+            card.modelGroup.remove(card);
+            card.modelGroup = player.modelGroup.add(card.modelInWorld);
+        }
         const sign = i % 2 == 0 ? +1 : -1;
         const offs = Math.round(i / 2);
         setCardPos(card, ShieldsPosition);
@@ -208,6 +218,10 @@ export function moveCardToShields(card, player, i = 0) {
 }
 export function moveCardToDeck(card, player, i = 0) {
     if (card.modelInWorld) {
+        if (card.modelGroup != player.modelGroup) {
+            card.modelGroup.remove(card);
+            card.modelGroup = player.modelGroup.add(card.modelInWorld);
+        }
         setCardPos(card, DeckPosition);
         card.modelInWorld.position.y += i * 0.01;
         card.modelInWorld.rotateX(Math.PI);
@@ -237,7 +251,7 @@ export function createGameScene() {
     //     cube1.material.color.setHex("0x00FF00");
     // };
 
-    const game = startGame(scene, movables);
+    const game = startLocalGame(scene, movables);
 
     // const cube2 = cube(scene, { color: 0x44aa88 });
     // movables.push(cube2);

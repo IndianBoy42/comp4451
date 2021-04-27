@@ -27,6 +27,31 @@ export class Character {
         this.endTurnCallbacks = [];
     }
 
+    encode() {
+        return {
+            name: this.name,
+            health: this.health,
+            shields: this.shields.map(shield => shield.encode()),
+            actionsLeft: this.actionsLeft,
+            bonus: this.bonus,
+            disguised: this.disguised,
+            forme: this.forme,
+            ignoringShields: this.ignoringShields,
+            multiAttack: this.multiAttack,
+        };
+    }
+    decode(obj) {
+        this.name = obj.name;
+        this.health = obj.health;
+        // this.shields: handled by player because....
+        this.actionsLeft = obj.actionsLeft;
+        this.bonus = obj.bonus;
+        this.disguised = obj.disguised;
+        this.forme = obj.forme;
+        this.ignoringShields = obj.ignoringShields;
+        this.multiAttack = obj.multiAttack;
+    }
+
     /**
      * Create a clone of the character
      * NOTE: the type of the clone is Character, may need to change if needs to be specific classes
