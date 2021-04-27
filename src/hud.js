@@ -11,6 +11,7 @@ export function createGui() {
     const values = {
         playerCount: 0,
         players: [],
+        host: true,
     };
     const gui = new dat.GUI({
         hidable: true,
@@ -27,62 +28,84 @@ export function createGui() {
     }
 
     // var folderLMP = gui.addFolder("Local Multiplayer");
-    add("Add Player", () => {
-        const i = values.playerCount;
-        values.playerCount += 1;
-        const folder = gui.addFolder(`Player ${i + 1}`);
-        values.players.push({});
-        const player = values.players[i];
-
+    function addPeer(subValues, folder, initiator) {
         function addp(name, value) {
-            player[name] = value;
-            console.log(player);
-            return folder.add(player, name);
+            subValues[name] = value;
+            console.log(subValues);
+            return folder.add(subValues, name);
         }
 
         addp("status", "Please Wait");
         const { peer, signalOut, connected } = createPeer(
             new Promise(resolve => {
                 addp("token", "Token").onFinishChange(() => {
-                    const code = player.token;
+                    const code = subValues.token;
                     const signal = Base64.decode(code);
                     resolve(signal);
                 });
                 addp("paste", () => {
                     navigator.clipboard.readText().then(code => {
-                        player.token = code;
+                        subValues.token = code;
                         gui.updateDisplay();
                         const signal = Base64.decode(code);
                         resolve(signal);
                     });
                 });
             }),
-            true // joining a game is a different part of the GUI, this guy is always the initiator
+            initiator // joining a game is a different part of the GUI, this guy is always the initiator
         );
         signalOut.then(signal => {
             console.log(signal);
-            player.signalOut = signal;
-            player.status = "Please Copy";
+            subValues.signalOut = signal;
+            if (initiator) {
+                subValues.status = "Please Copy";
+            } else {
+                subValues.status = "Answer Copied";
+                const code = Base64.encode(subValues.signalOut);
+                navigator.clipboard.writeText(code);
+            }
             gui.updateDisplay();
         });
         connected.then(() => {
-            player.status = "Connected";
+            subValues.status = "Connected";
             gui.updateDisplay();
         });
-        addp("copy", () => {
-            player.status = "Paste Answer";
+        if (initiator) {
+            addp("copy", () => {
+                subValues.status = "Paste Answer";
+                gui.updateDisplay();
+                const code = Base64.encode(subValues.signalOut);
+                navigator.clipboard.writeText(code);
+            });
+        } else {
+            subValues.status = "Paste Offer";
             gui.updateDisplay();
-            const code = Base64.encode(player.signalOut);
-            navigator.clipboard.writeText(code);
-        });
+        }
         peer.on("data", data => {
-            player.msg = data;
+            subValues.msg = data;
             gui.updateDisplay();
         });
         addp("ping", () => {
             peer.send("hello world");
         });
         addp("msg", "<Blank>");
+    }
+    const addPlayerBtn = add("Add Player", () => {
+        const i = values.playerCount;
+        values.playerCount += 1;
+        const folder = gui.addFolder(`Player ${i + 1}`);
+        values.players.push({});
+        gui.remove(addPlayerBtn);
+        gui.remove(joinGameBtn);
+        addPeer(values.players[i], folder, true);
+    });
+    const joinGameBtn = add("Join Game", () => {
+        let folder = gui.addFolder("Game");
+        values.joinedGame = {};
+        values.host = false;
+        gui.remove(addPlayerBtn);
+        gui.remove(joinGameBtn);
+        addPeer(values.joinedGame, folder, false);
     });
     add("hello", 10.0);
 
