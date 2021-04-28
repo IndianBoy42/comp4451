@@ -8,7 +8,7 @@ import {
 } from "./controls.js";
 import * as GFX from "./gfx.js";
 
-let id = 1;
+//let id = 1;
 export class Player {
 
     /**
@@ -27,8 +27,8 @@ export class Player {
 
         this.isClone = isClone;
         if (!isClone) {
-            this.id = id;
-            ++id;
+            //this.id = id;
+            //++id;
 
             //init player deck
             this.discardPile = [];
@@ -48,7 +48,7 @@ export class Player {
     clone(context, isOpponent) {
         let clone = new Player(this.name, this.character.clone(), context, true);
         //copy attributes
-        clone.id = this.id;
+        //clone.id = this.id;
         clone.discardPile = this.discardPile.slice(0);
         if (isOpponent) {
             //randomize the deck + hand to simulate not knowing opponent's hand
@@ -263,8 +263,6 @@ export class Player {
      * =================================================================================
      * Selection functions
      * Call this function to let the player or AI decide what card/target/etc to select
-     * 
-     * TODO implement player selection with GUI
      * =================================================================================
      */
 
