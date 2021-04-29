@@ -1,6 +1,7 @@
 import { shuffle } from "./shuffle.mjs";
 import {
     chooseFromDiscardPile,
+    chooseFromObjects,
     chooseFromPlayerHand,
     chooseOpponent,
     chooseShieldOf,
@@ -116,6 +117,15 @@ export class Player {
             shuffle(clone.deck);
         }
         return clone;
+    }
+
+    updatePlayerRender() {
+        GFX.renderPlayer(this, this.id);
+    }
+    newGameStart() {}
+    updateGameState() {
+        this.updatePlayerRender();
+        return [];
     }
 
     /**
@@ -325,7 +335,13 @@ export class Player {
      * @returns index of chosen card
      */
     async selectCard() {
-        return await chooseFromPlayerHand(this);
+        await this.context.updateGameState();
+        return await chooseFromObjects(
+            "Choose discarded card: ",
+            0,
+            this.discardPile.length - 1,
+            this.discardPile
+        );
     }
 
     /**
@@ -333,8 +349,14 @@ export class Player {
      * @param players array of selectable players
      * @returns 1 chosen player
      */
-    async selectPlayer(players) {
-        return await chooseOpponent(players);
+    async selectPlayer(opponents) {
+        await this.context.updateGameState();
+        return await chooseFromObjects(
+            "Choose target: ",
+            0,
+            opponents.length - 1,
+            opponents
+        );
     }
 
     /**
@@ -343,7 +365,13 @@ export class Player {
      * @returns index of chosen shield
      */
     async selectShield(player) {
-        return await chooseShieldOf(player);
+        await this.context.updateGameState();
+        return await chooseFromObjects(
+            "Choose shield index: ",
+            0,
+            player.character.shields.length - 1,
+            player.character.shields
+        );
     }
 
     /**
@@ -351,6 +379,12 @@ export class Player {
      * @returns index of chosen card
      */
     async selectDiscardedCard(player) {
-        return await chooseFromDiscardPile(player);
+        await this.context.updateGameState();
+        return await chooseFromObjects(
+            "Choose card to play: ",
+            0,
+            player.hand.length - 1,
+            player.hand
+        );
     }
 }

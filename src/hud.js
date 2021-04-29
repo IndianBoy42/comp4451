@@ -2,7 +2,9 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import { createPeer } from "./p2p";
 import { Base64 } from "js-base64";
-import { GeometryUtils } from "three";
+import { addRemotePlayer } from "./3dgame";
+import { remotePlayerConnect, remotePlayerData } from "./DMRemotePlayer.mjs";
+import { remoteGameConnect, remoteGameData } from "./remoteGame.mjs";
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -38,12 +40,12 @@ export function createGui() {
         addp("status", "Please Wait").listen();
         const { peer, signalOut, connected } = createPeer(
             new Promise(resolve => {
-                subValues.resolver = resolve;
+                subValues.signalResolver = resolve;
                 subValues.tokenField = addp("token", "Token").onFinishChange(
                     () => {
                         const code = subValues.token;
                         const signal = Base64.decode(code);
-                        subValues.resolver(signal);
+                        subValues.signalResolver(signal);
                         folder.remove(subValues.copyBtn);
                     }
                 );
@@ -51,7 +53,7 @@ export function createGui() {
                     navigator.clipboard.readText().then(code => {
                         subValues.token = code;
                         const signal = Base64.decode(code);
-                        subValues.resolver(signal);
+                        subValues.signalResolver(signal);
                         folder.remove(subValues.copyBtn);
                     });
                 });
@@ -70,9 +72,8 @@ export function createGui() {
                 navigator.clipboard.writeText(code);
             }
         });
-        connected.then(() => {
+        let conn = connected.then(() => {
             subValues.status = "Connected";
-            if (values.onConnect) values.onConnect(player);
             folder.remove(subValues.pasteBtn);
             folder.remove(subValues.tokenField);
         });
@@ -85,18 +86,14 @@ export function createGui() {
         } else {
             subValues.status = "Paste Offer";
         }
-        peer.on("data", data => {
-            subValues.msg = data;
-            console.log(data);
-
-            if (values.onData) values.onData(data);
-        });
 
         // Just for Debugging
         addp("ping", () => {
             peer.send("hello world");
         });
         addp("msg", "<Blank>").listen();
+
+        return conn;
     }
     const addPlayerBtn = add("Add Player", () => {
         if (values.playerCount == 0) {
@@ -107,7 +104,15 @@ export function createGui() {
         const folder = gui.addFolder(`Player ${i + 1}`);
         values.players.push({});
         gui.remove(joinGameBtn);
-        addPeer(values.players[i], folder, true);
+        let connected = addPeer(values.players[i], folder, true);
+
+        addRemotePlayer(values.players[i]);
+        connected.then(() => remotePlayerConnect(values.players[i]));
+        player.peer.on("data", data => {
+            subValues.msg = data;
+            console.log(data);
+            remotePlayerData(values.players[i], data);
+        });
     });
     const joinGameBtn = add("Join Game", () => {
         let folder = gui.addFolder("Game");
@@ -116,6 +121,11 @@ export function createGui() {
         gui.remove(addPlayerBtn);
         gui.remove(joinGameBtn);
         addPeer(values.joinedGame, folder, false);
+
+        joinedGame.peer.on("data", data =>
+            remoteGameData(values.joinedGame, data)
+        );
+        connected.then(() => remoteGameConnect(values.joinedGamed));
     });
 
     return [gui, values];

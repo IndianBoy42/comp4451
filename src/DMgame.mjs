@@ -1,14 +1,25 @@
-
 export class DungeonMayhem {
     constructor() {
         this.players = [];
-        //this.shields = [];
+        this.playerTurn = 0;
+    }
+
+    encode() {
+        return {
+            players: this.players.map(p => p.encode()),
+            turn: this.playerTurn,
+        };
+    }
+    decode(obj) {
+        this.players.forEach((p, i) => p.decode(obj.players[i]));
+        this.turn = this.playerTurn;
     }
 
     start() {
         for (const player of this.players) {
             player.endTurn();
         }
+        this.players.forEach(p => p.newGameStart())
     }
 
     allOpponents(player) {
@@ -164,5 +175,9 @@ export class DungeonMayhem {
             if (player.character.health === 0) ++playerDead;
         }
         return playerDead + 1 >= this.players.length;
+    }
+
+    updateGameState() {
+        return Promise.all(this.players.flatMap(p => p.updateGameState()));
     }
 }

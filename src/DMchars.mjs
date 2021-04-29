@@ -1,8 +1,4 @@
-import { updatePlayerToken } from "./gfx.js";
-
 export const maxHealth = 10;
-
-//TODO put all special powers related stuff in start/endTurnCallbacks?
 
 export class Character {
     /**
@@ -135,7 +131,6 @@ export class Character {
             this.health = 0;
             return amt;
         }
-        updatePlayerToken(this.player);
     }
     /**
      * Receive damage (including shield)

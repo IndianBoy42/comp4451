@@ -114,9 +114,105 @@ export function updatePlayerToken(player) {
         positionFromHealth(player.character.health)
     );
 }
+export const renderPlayer = (
+    player,
+    i,
+    first = false,
+    scene = null,
+    movables = null,
+    NUM_PLAYERS = null,
+    onComplete = null
+) => {
+    if (first) {
+        player.modelGroup = new THREE.Object3D();
+        scene.add(player.modelGroup);
+    }
+    const group = player.modelGroup;
+
+    if (first) {
+        const angle = ((2 * Math.PI) / NUM_PLAYERS) * player.id;
+        const dist = 5;
+        const pos = new Vector3(
+            dist * Math.cos(angle),
+            0,
+            dist * Math.sin(angle)
+        );
+        group.position.set(pos.x, pos.y, pos.z);
+        group.rotateY(-angle + Math.PI / 2);
+        // group.rotation.set(0, -angle + Math.PI / 2, 0);
+    }
+
+    if (first) {
+        loadModel(player.character.modelPath(), gltf => {
+            const token = gltf.scene.children[0];
+            group.add(token);
+            player.character.modelInWorld = token;
+            player.modelInWorld = token;
+
+            token.scale.multiplyScalar(0.03);
+            token.rotateY(Math.PI);
+            updatePlayerToken(player);
+            token.dragend = clipFloor(token);
+            onComplete(player, token);
+        });
+    } else {
+        updatePlayerToken(player);
+    }
+
+    if (first) {
+        for (let j = 1; j <= DMChars.maxHealth; j++) {
+            console.log(j);
+            let card = makeCardObject(`${j}`, 0.3, 0.3, 1);
+            card.position.copy(positionFromHealth(j));
+            group.add(card);
+            card.modelGroup = group;
+        }
+    }
+
+    if (first) {
+        player.discardPile.forEach((card, i) => {
+            card.modelInWorld = makeCardObject(card.getCardText());
+            group.add(card.modelInWorld);
+            card.modelGroup = group;
+            moveCardToDiscard(card, player, i);
+        });
+        player.deck.forEach((card, i) => {
+            card.modelInWorld = makeCardObject(card.getCardText());
+            group.add(card.modelInWorld);
+            card.modelGroup = group;
+            moveCardToDeck(card, player, i);
+        });
+        player.hand.forEach((card, i) => {
+            card.modelInWorld = makeCardObject(card.getCardText());
+            group.add(card.modelInWorld);
+            card.modelGroup = group;
+            moveCardToHand(card, player, i);
+        });
+    } else {
+        player.discardPile.forEach((card, i) => {
+            moveCardToDiscard(card, player, i);
+        });
+        player.deck.forEach((card, i) => {
+            moveCardToDeck(card, player, i);
+        });
+        player.hand.forEach((card, i) => {
+            moveCardToHand(card, player, i);
+        });
+    }
+};
 export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
     return (player, i) => {
-        const angle = ((2 * Math.PI) / NUM_PLAYERS) * i;
+        renderPlayer(player, i, true, scene, movables, NUM_PLAYERS, onComplete);
+    };
+};
+export const initRenderPlayerOld = (
+    scene,
+    movables,
+    NUM_PLAYERS,
+    onComplete
+) => {
+    return player => {
+        const angle = ((2 * Math.PI) / NUM_PLAYERS) * player.id;
         const dist = 5;
         const pos = new Vector3(
             dist * Math.cos(angle),
