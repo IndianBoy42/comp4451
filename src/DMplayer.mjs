@@ -294,6 +294,14 @@ export class Player {
      */
 
     /**
+     * Selects a card to play from a specific set of cards
+     * @returns index of chosen card
+     */
+     async selectCardCustom(cards, message = "") {
+        return await chooseFromObjects(message, 0, cards.length-1, cards);
+    }
+
+    /**
      * Selects a card to play from hand
      * @returns index of chosen card
      */

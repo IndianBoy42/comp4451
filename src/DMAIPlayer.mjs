@@ -208,6 +208,25 @@ export class AIPlayer extends Player {
     }
 
     /**
+     * Selects a card to play from a specific set of cards
+     * @returns index of chosen card
+     */
+    async selectCardCustom(cards) {
+        //TODO
+        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING CARD CUSTOM");
+        let decisions = [];
+        for (const cardIndex in cards) {
+            // if (this.hand[cardIndex].name === "Dummy Card") {
+            //     // don't put dummy cards in the decision pool
+            //     continue;
+            // }
+            decisions.push(new Decision('Card', cardIndex));
+        }
+        const decision = await this.makeDecision(decisions);
+        return decision.playNum;
+    }
+
+    /**
      * Selects a card to play from hand
      * @returns index of chosen card
      */

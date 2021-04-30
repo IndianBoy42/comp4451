@@ -96,7 +96,12 @@ export class GameState {
      */
     getScore() {
         //TODO
-        return this.player.character.health;
+        let score = this.player.character.health;
+        for (const p of this.allPlayers) {
+            if (p === this.player) continue;
+            score -= p.character.health;
+        }
+        return score;
     }
 
 }

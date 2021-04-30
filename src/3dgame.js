@@ -72,9 +72,9 @@ export function startGame(scene, movables) {
     const p1 = new AIPlayer("P1", new Characters.Rogue(), game);
     const p2 = new AIPlayer("P2", new Characters.Paladin(), game);
     const p3 = new AIPlayer("P3", new Characters.Ranger(), game);
-    // const p4 = new Player("P4", new Characters.Wizard(), game);
-    // const p5 = new Player("P5", new Characters.Barbarian(), game);
-    // const p6 = new Player("P6", new Characters.Druid(), game);
+    const p4 = new AIPlayer("P4", new Characters.Wizard(), game);
+    const p5 = new AIPlayer("P5", new Characters.Barbarian(), game);
+    const p6 = new AIPlayer("P6", new Characters.Druid(), game);
 
     const NUM_PLAYERS = game.players.length;
 

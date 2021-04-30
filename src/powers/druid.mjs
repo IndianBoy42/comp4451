@@ -52,17 +52,18 @@ export class DruidFreeShapeshift extends MightyPower {
                     console.log("Playable card " + j + ": " + card.name);
                     ++j;
                     shapeshiftCardsIndex.push(i);
-                    shapeshiftCards.push(i);
+                    shapeshiftCards.push(card);
                 }
             }
         }
         if (j > 0) {
-            const k = await chooseFromObjects(
-                "Choose shapeshift card to play for free: ",
-                0,
-                j - 1,
-                shapeshiftCards
-            );
+            // const k = await chooseFromObjects(
+            //     "Choose shapeshift card to play for free: ",
+            //     0,
+            //     j - 1,
+            //     shapeshiftCards
+            // );
+            const k = await player.selectCardCustom(shapeshiftCards);
             const cardIndex = shapeshiftCardsIndex[k];
             const card = player.hand.splice(cardIndex, 1)[0];
             card.play(player, context);
