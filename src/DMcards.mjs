@@ -10,7 +10,8 @@ export class DMCard {
         dmgValue = 0,
         extraActions = 0,
         drawCards = 0,
-        extraPowers = []
+        extraPowers = [],
+        dummyCard = false
     ) {
         this.name = name;
         this.shieldValue = shieldValue;
@@ -19,7 +20,7 @@ export class DMCard {
         this.extraActions = extraActions;
         this.drawCards = drawCards;
         this.extraPowers = extraPowers;
-        addToAllCards(this);
+        if (dummyCard) addToAllCards(this);
     }
 
     hideShow(hidden) {
@@ -133,7 +134,13 @@ export class DMCard {
      */
     async play(player, context) {
         //debug
-        console.log("" + player.name + " plays " + this.name);
+        console.log(
+            "" +
+                player.name +
+                (player.isClone ? " (clone)" : "") +
+                " plays " +
+                this.name
+        );
 
         let discard = true;
         player.character.actionsLeft -= 1;

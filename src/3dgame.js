@@ -1,6 +1,7 @@
 import { DungeonMayhem } from "./DMgame.mjs";
 import { Player } from "./DMplayer.mjs";
 import { RemotePlayer } from "./DMRemotePlayer.mjs";
+import { AIPlayer } from "./DMAIPlayer.mjs";
 import * as Characters from "./characters/characters.mjs";
 import { initRenderPlayer, renderPlayer, updatePlayerToken } from "./gfx.js";
 
@@ -37,13 +38,7 @@ export async function gameLoop(game) {
         if (player.character.health > 0) {
             player.startTurn(!(hostPlayer && hostPlayer.id == player.id));
             player.drawCards(1);
-            // ok i figured out how to read from console
-            while (player.character.actionsLeft > 0) {
-                player.debugLogMe();
-                const cardPos = await player.selectCard();
-                await player.playCard(cardPos, game);
-                if (game.gameEnded()) break;
-            }
+            await player.playerTurn();
             player.endTurn(!(hostPlayer && hostPlayer.id == player.id));
         } else {
             // ghost ping
