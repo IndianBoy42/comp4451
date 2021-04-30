@@ -1,4 +1,6 @@
-import { Player } from './DMPlayer.mjs';
+import { Player } from './DMplayer.mjs';
+import { shuffle } from "./shuffle.mjs";
+import { DummyCard } from "./cards/cards.mjs";
 import { GameState, Decision } from './DMAI.mjs';
 
 export class AIPlayer extends Player {
@@ -7,11 +9,40 @@ export class AIPlayer extends Player {
         this.resetDecisions();
     }
 
-    clone(context, isClone) {
-        let clone = super(context, isClone);
+    /**
+     * Clone the player
+     * Copied from DMplayer because the constructor needed to be changed to AIPlayer
+     * @param context the cloned (actually new) game context
+     * @param isOpponent if the clone is an opponent, shuffle deck *and* hand
+     * @returns the clone
+     */
+     clone(context, isOpponent) {
+        let clone = new AIPlayer(this.name, this.character.clone(), context, true);
+        //copy attributes
+        //clone.id = this.id;
+        clone.discardPile = this.discardPile.slice(0);
         clone.rootGameState = this.rootGameState;
+        if (isOpponent) {
+            //randomize the deck + hand to simulate not knowing opponent's hand
+            let deckhand = this.deck.slice(0);
+            deckhand.push(this.hand.slice(0));
+            shuffle(deckhand);
+            clone.hand = deckhand.splice(0, this.hand.length);
+            clone.deck = deckhand;
+        }
+        else {
+            clone.hand = this.hand.slice(0);
+            // (nvm no need, gonna need deck for random sim) replace deck with a deck full of dummy cards for AI simulations
+            clone.deck = this.deck.slice(0);
+            shuffle(clone.deck);
+            // clone.deck = [];
+            // for (const i in this.deck) {
+            //     clone.deck.push(DummyCard());
+            // }
+        }
         return clone;
     }
+
 
     /**
      * Reset decision related variables
@@ -19,24 +50,40 @@ export class AIPlayer extends Player {
      * - cloneParentDecisions: Used by clones. 
      *                  Take decisions from here to get to its parent's position + the testing decision
      * - cloneDecisionIndex: Used by clones. Index of cloneParentDecisions to take from
+     * - cloneBestChildDecisions: Used by clones. Set to decisions made by the child with best score after simulation
      */
     resetDecisions() {
         this.finalDecisions = [];
         this.cloneParentDecisions = [];
         this.cloneDecisionIndex = 0;
+        this.cloneBestChildDecisions = [];
     }
 
     /**
-     * Return -1 if cloneDecisionIndex = cloneParentDecisions.length
+     * Return null if cloneDecisionIndex = cloneParentDecisions.length
      * Otherwise, return the next parent decision and increment cloneDecisionIndex
      */
     getNextParentDecision() {
         if (this.cloneDecisionIndex === this.cloneParentDecisions.length) {
-            return -1;
+            return null;
         }
         const decision = this.cloneParentDecisions[this.cloneDecisionIndex];
         ++this.cloneDecisionIndex;
         return decision;
+    }
+
+    /**
+     * Perform AIPlayer's turn
+     * While the player still has turns or has cards left, 
+     */
+     async playerTurn() {
+        while (this.character.actionsLeft > 0) {
+            this.debugLogMe();
+            const cardPos = await this.selectCard();
+            await this.playCard(cardPos, this.context);
+            if (this.context.gameEnded()) break;
+        }
+        this.endTurn();
     }
 
     /**
@@ -65,14 +112,23 @@ export class AIPlayer extends Player {
     async generateChildrenStates(parentDecisions, newDecisions) {
         let maxScore = -100; //TODO: -inf?
         let bestDecision = null;
-        this.resetDecisions();
-        for (const decision in newDecisions) {
-            const newParentDecisions = parentDecisions.push(decision);
-            let child = this.rootGameState.clone(newParentDecisions);
+        for (const decision of newDecisions) {
+            // generate new parent decisions
+            let newParentDecisions = parentDecisions.slice(0);
+            console.log("PARENT DECISIONS");
+            console.log(newParentDecisions);
+            newParentDecisions.push(decision);
+            // create child node
+            let child = this.rootGameState.makeClone(newParentDecisions);
+            // let it progress until end
             await child.progress();
+            console.log("CHILD FINISHED PROGRESS");
+            // calculate optimal play
             if (child.getScore() > maxScore) {
                 maxScore = child.getScore();
                 bestDecision = decision;
+                this.cloneBestChildDecisions = [decision]
+                this.cloneBestChildDecisions = this.cloneBestChildDecisions.concat(child.player.cloneBestChildDecisions);
             }
         }
         return bestDecision;
@@ -84,27 +140,41 @@ export class AIPlayer extends Player {
      * @returns Decision representing chosen option
      */
     async makeDecision(decisions) {
+        console.log("MAKING DECISION");
+        //simple case
+        // if (decisions.length === 1) {
+        //     return decisions[0];
+        // }
         /**
          * If this is a clone:
-         * - Use getParentNextDecision() to get the next decision
+         * - Use getParentNextDecision() to get the next decision (need to keep cloneParentDecisions unchanged)
          * - If it is not -1, just use it as the decision
-         * - Else, create new children nodes
-         *      //TODO
-         *   When finished, store the finalDecisions of the best node in this one.
-         *   Append cloneParentDecisions[last] at the beginning
-         *   Calculate score (//TODO?)
+         * - Else if cloneBestChildDecision is not empty,
+         *      use it as decision because that means this clone has finished simulation
+         * - Else, start simulation
          */
         if (this.isClone) {
             const nextDecision = this.getNextParentDecision();
-            if (nextDecision != -1) {
+            if (nextDecision != null) {
+                if (this.cloneDecisionIndex === this.cloneParentDecisions.length) {
+                    console.log("CLONE USING CURRENT DECISION");
+                }
+                else {
+                    console.log("CLONE USING PARENT DECISION");
+                }
                 return nextDecision;
             }
+            else if (this.cloneBestChildDecisions.length > 0) {
+                console.log("CLONE USING CHILD DECISION");
+                return this.cloneBestChildDecisions.splice(0, 1)[0];
+            }
             else {
-                const bestDecisions = await this.generateChildrenStates(
+                console.log("CLONE GENERATING TREE");
+                const bestDecision = await this.generateChildrenStates(
                     this.cloneParentDecisions.slice(0),
                     decisions
                 );
-                return bestDecisions;
+                return bestDecision;
             }
         }
         /**
@@ -117,15 +187,23 @@ export class AIPlayer extends Player {
          */
         else {
             if (this.finalDecisions.length > 0) {
-                return this.finalDecisions.splice(0, 1);
+                //do nothing, splice later
+                console.log("ORIGINAL USING FINAL DECISION");
             }
             else {
+                console.log("ORIGINAL GENERATING TREE");
+                this.resetDecisions();
+                this.createSimulationTree();
                 const bestDecisions = await this.generateChildrenStates(
                     [],
                     decisions
                 );
-                return bestDecisions;
+                console.log("FINAL DECISIONS");
+                console.log(this.cloneBestChildDecisions);
+                this.finalDecisions = this.cloneBestChildDecisions;
             }
+            console.log("DECISION TAKEN: " + this.finalDecisions[0].playType + " " + this.finalDecisions[0].playNum);
+            return this.finalDecisions.splice(0, 1)[0];
         }
     }
 
@@ -135,12 +213,17 @@ export class AIPlayer extends Player {
      */
     async selectCard() {
         //TODO
+        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING CARD");
         let decisions = [];
         for (const cardIndex in this.hand) {
+            // if (this.hand[cardIndex].name === "Dummy Card") {
+            //     // don't put dummy cards in the decision pool
+            //     continue;
+            // }
             decisions.push(new Decision('Card', cardIndex));
         }
         const decision = await this.makeDecision(decisions);
-        return decision.decision;
+        return decision.playNum;
     }
 
     /**
@@ -150,12 +233,14 @@ export class AIPlayer extends Player {
      */
     async selectPlayer(players) {
         //TODO
+        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING PLAYER");
         let decisions = [];
         for (const playerIndex in players) {
             decisions.push(new Decision('Player', playerIndex));
         }
         const decision = await this.makeDecision(decisions);
-        return players[decision.decision];
+        const player = players[decision.playNum];
+        return player;
     }
 
     /**
@@ -165,16 +250,16 @@ export class AIPlayer extends Player {
      */
     async selectShield(player) {
         //TODO
+        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING SHIELD");
         //special cases
         if (player.character.shields.length < 1) return -1;
-        else if (player.character.shields.length === 1) return 0;
 
         let decisions = [];
         for (const shieldIndex in player.character.shields) {
             decisions.push(new Decision('Shield', shieldIndex));
         }
         const decision = await this.makeDecision(decisions);
-        return decision.decision;
+        return decision.playNum;
     }
 
     /**
@@ -183,15 +268,15 @@ export class AIPlayer extends Player {
      */
     async selectDiscardedCard(player) {
         //TODO
+        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING DISCARD");
         //special cases
         if (player.discardPile.length < 1) return -1;
-        else if (player.discardPile.length === 1) return 0;
 
         let decisions = [];
         for (const discardIndex in player.discardPile) {
             decisions.push(new Decision('Discard', discardIndex));
         }
         const decision = await this.makeDecision(decisions);
-        return decision.decision;
+        return decision.playNum;
     }
 }

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { DungeonMayhem } from "./DMgame.mjs";
 import { Player } from "./DMplayer.mjs";
+import { AIPlayer } from "./DMAIPlayer.mjs";
 import * as Characters from "./characters/characters.mjs";
 import { initRenderPlayer, loadModel, updatePlayerToken } from "./gfx.js";
 import { chooseFromObjects, chooseFromPlayerHand } from "./controls";
@@ -28,13 +29,7 @@ export async function gameLoop(game) {
         if (player.character.health > 0) {
             player.startTurn();
             player.drawCards(1);
-            // ok i figured out how to read from console
-            while (player.character.actionsLeft > 0) {
-                player.debugLogMe();
-                const cardPos = await player.selectCard();
-                await player.playCard(cardPos, game);
-                if (game.gameEnded()) break;
-            }
+            await player.playerTurn();
             player.endTurn();
         } else {
             // ghost ping
@@ -74,9 +69,9 @@ export async function gameLoop(game) {
 export function startGame(scene, movables) {
     const game = new DungeonMayhem();
 
-    const p3 = new Player("P3", new Characters.Ranger(), game);
-    // const p1 = new Player("P1", new Characters.Rogue(), game);
-    // const p2 = new Player("P2", new Characters.Paladin(), game);
+    const p1 = new AIPlayer("P1", new Characters.Rogue(), game);
+    const p2 = new AIPlayer("P2", new Characters.Paladin(), game);
+    const p3 = new AIPlayer("P3", new Characters.Ranger(), game);
     // const p4 = new Player("P4", new Characters.Wizard(), game);
     // const p5 = new Player("P5", new Characters.Barbarian(), game);
     // const p6 = new Player("P6", new Characters.Druid(), game);

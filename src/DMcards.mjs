@@ -92,7 +92,7 @@ export class DMCard {
      */
     async play(player, context) {
         //debug
-        console.log("" + player.name + " plays " + this.name);
+        console.log("" + player.name + (player.isClone ? " (clone)" : "") + " plays " + this.name);
 
         let discard = true;
         player.character.actionsLeft -= 1;

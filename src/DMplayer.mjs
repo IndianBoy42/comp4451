@@ -6,6 +6,7 @@ import {
     chooseShieldOf,
     DEBUG_RNG_INPUT,
 } from "./controls.js";
+import { DummyCard } from "./cards/cards.mjs";
 import * as GFX from "./gfx.js";
 
 //let id = 1;
@@ -60,8 +61,13 @@ export class Player {
         }
         else {
             clone.hand = this.hand.slice(0);
-            clone.deck = this.deck.slice(0);
-            shuffle(clone.deck);
+            //replace deck with a deck full of dummy cards for AI simulations
+            // clone.deck = this.deck.slice(0);
+            // shuffle(clone.deck);
+            clone.deck = [];
+            for (const i in this.deck) {
+                clone.deck.push(DummyCard());
+            }
         }
         return clone;
     }
@@ -78,7 +84,7 @@ export class Player {
             const len = this.discardPile.length;
             for (let i = 0; i < len; i++) {
                 const card = this.discardPile.pop();
-                GFX.moveCardToDeck(card, this, i);
+                if (!this.isClone) GFX.moveCardToDeck(card, this, i);
                 this.deck.push(card);
             }
             // this.deck = this.discardPile.slice();
@@ -104,7 +110,7 @@ export class Player {
     addCardToHand(card) {
         if (card === null) return;
         this.hand.push(card);
-        this.hand.forEach((card, i) => GFX.moveCardToHand(card, this, i));
+        if (!this.isClone) this.hand.forEach((card, i) => GFX.moveCardToHand(card, this, i));
     }
     /**
      * Discard a card (put it in player's discard pile)
@@ -112,14 +118,18 @@ export class Player {
      */
     disCard(card) {
         this.discardPile.push(card);
-        GFX.moveCardToDiscard(card, this, this.discardPile.length - 1);
-        this.hand.forEach((card, i) => GFX.moveCardToHand(card, this, i));
+        if (!this.isClone) {
+            GFX.moveCardToDiscard(card, this, this.discardPile.length - 1);
+            this.hand.forEach((card, i) => GFX.moveCardToHand(card, this, i));
+        }
     }
     addShield(card) {
         this.character.addShield(card);
-        this.character.shields.forEach((card, i) =>
-            GFX.moveCardToShields(card, this, i)
-        );
+        if (!this.isClone) {
+            this.character.shields.forEach((card, i) =>
+                GFX.moveCardToShields(card, this, i)
+            );
+        }
     }
     async playCard(index, game) {
         const playCard = this.hand.splice(index, 1)[0];
@@ -161,7 +171,7 @@ export class Player {
     /**
      * Log the player info in console
      */
-    debugLogMe() {
+    debugLogMe(verboseCard = false) {
         if (DEBUG_RNG_INPUT) return;
         const char = this.character;
         console.log("Player: " + this.name);
@@ -198,7 +208,7 @@ export class Player {
         console.log("Hand:");
         let i = 0;
         for (const card of this.hand) {
-            logCard(card, true, i);
+            logCard(card, verboseCard, i);
             ++i;
         }
 
@@ -232,14 +242,16 @@ export class Player {
      * Call the character's start turn sequence
      */
     startTurn() {
-        for (const card of this.hand) {
-            GFX.setCardObjectText(
-                card.modelInWorld.canvas,
-                card.modelInWorld.context,
-                card.modelInWorld.texture,
-                card.getCardText(),
-                "#00ff00"
-            );
+        if (!this.isClone) {
+            for (const card of this.hand) {
+                GFX.setCardObjectText(
+                    card.modelInWorld.canvas,
+                    card.modelInWorld.context,
+                    card.modelInWorld.texture,
+                    card.getCardText(),
+                    "#00ff00"
+                );
+            }
         }
         this.character.startTurn();
     }
@@ -247,16 +259,31 @@ export class Player {
      * Call the character's end turn sequence
      */
     endTurn() {
-        for (const card of this.hand) {
-            GFX.setCardObjectText(
-                card.modelInWorld.canvas,
-                card.modelInWorld.context,
-                card.modelInWorld.texture,
-                card.getCardText(),
-                "#000000"
-            );
+        if (!this.isClone) {
+            for (const card of this.hand) {
+                GFX.setCardObjectText(
+                    card.modelInWorld.canvas,
+                    card.modelInWorld.context,
+                    card.modelInWorld.texture,
+                    card.getCardText(),
+                    "#000000"
+                );
+            }
         }
         this.character.endTurn();
+    }
+
+    /**
+     * Perform player's turn
+     * To be overridden by AI
+     */
+    async playerTurn() {
+        while (this.character.actionsLeft > 0) {
+            this.debugLogMe();
+            const cardPos = await this.selectCard();
+            await this.playCard(cardPos, this.context);
+            if (this.context.gameEnded()) break;
+        }
     }
 
     /**

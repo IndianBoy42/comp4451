@@ -5,11 +5,11 @@ export class Decision {
     /**
      * Object containing AI decision
      * @param playType String of what type of decision: 'Card', 'Player', 'Shield', 'Discard'
-     * @param decision Int index of selected card/player/shield
+     * @param playNum Int index of selected card/player/shield
      */
-    constructor(playType, decision) {
+    constructor(playType, playNum) {
         this.playType = playType;
-        this.decision = decision;
+        this.playNum = playNum;
     }
 }
 
@@ -28,7 +28,7 @@ export class GameState {
      */
     addPlayerClones(player, allPlayers) {
         for (const p of allPlayers) {
-            const c = p.clone(this.context, (p === player));
+            const c = p.clone(this.context, !(p === player));
             if (p === player) this.player = c;
             this.allPlayers.push(c);
         }
@@ -39,7 +39,7 @@ export class GameState {
      * @param parentDecisions 
      * @returns 
      */
-    clone(parentDecisions) {
+    makeClone(parentDecisions) {
         let cloneState = new GameState();
         cloneState.addPlayerClones(this.player, this.allPlayers);
         cloneState.player.cloneParentDecisions = parentDecisions;
@@ -59,26 +59,35 @@ export class GameState {
      * Maybe handle those cases separately idk, reserve this for decision making in player's turn
      */
     async progress() {
-        const nextPlay = player.cloneParentDecisions[0].playType;
+        console.log(this.player);
+        const nextPlay = this.player.cloneParentDecisions[0].playType;
         switch (nextPlay) {
             case 'Card':
-                const cardPos = await player.selectCard();
-                await player.playCard(cardPos, game);
+                const cardPos = await this.player.selectCard();
+                await this.player.playCard(cardPos, this.context);
                 break;
             case 'Player':
-                //TODO
-                throw new Error("Unsupported.");
+                const opp = await this.context.choosePlayer(
+                    this.player,
+                    true,
+                    false,
+                    false,
+                    true
+                );
+                if (opp.length > 0) this.player.character.doDamage(opp, 1);
                 break;
             case 'Shield':
                 //TODO
+                console.log(this.player.cloneParentDecisions);
                 throw new Error("Unsupported.");
                 break;
             case 'Discard':
                 //TODO
+                console.log(this.player.cloneParentDecisions);
                 throw new Error("Unsupported.");
                 break;
             default:
-                throw new Error("Invalid playType.");
+                throw new Error("Invalid playType: " + nextPlay);
         }
     }
 
@@ -87,8 +96,9 @@ export class GameState {
      */
     getScore() {
         //TODO
-        return 0;
+        return this.player.character.health;
     }
+
 }
 
 // export class AI {
