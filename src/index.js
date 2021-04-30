@@ -6,6 +6,8 @@ import { createGameScene, renderer, canvas } from "./gfx.js";
 import { initControls } from "./controls.js";
 import { createGui, createHud } from "./hud";
 
+THREE.Cache.enabled = true;
+
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);

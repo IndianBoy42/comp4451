@@ -9,6 +9,7 @@ import {
 } from "./controls.js";
 import * as GFX from "./gfx.js";
 import { allCards } from "./cards/cards.mjs";
+import { characterMap } from "./characters/characters.mjs";
 
 let globalPlayerIdCounter = 1;
 export class Player {
@@ -49,6 +50,12 @@ export class Player {
             deck: this.deck.map(card => card.encode()),
             hand: this.hand.map(card => card.encode()),
         };
+    }
+    static newFrom(obj, game) {
+        const char = characterMap[obj.character.class];
+        const p = new Player(obj.name, new char(), game);
+        p.decode(obj);
+        return p;
     }
     decode(obj) {
         this.name = obj.name;
@@ -123,7 +130,9 @@ export class Player {
     updatePlayerRender() {
         GFX.renderPlayer(this, this.id);
     }
-    newGameStart() {}
+    newGameStart() {
+        return [];
+    }
     updateGameState() {
         this.updatePlayerRender();
         return [];

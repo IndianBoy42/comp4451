@@ -1,12 +1,10 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-import evokerWizard from "./assets/evoker_wizard.glb";
-import tieflingRogue from "./assets/tiefling_rogue.glb";
 import table from "./assets/table.glb";
 import { Vector3 } from "three";
-import { startLocalGame, gameLoop } from "./3dgame";
-import { chooseFromObjects, clipFloor } from "./controls";
+import { startLocalGame } from "./3dgame";
+import { clipFloor } from "./controls";
 import * as DMChars from "./DMchars.mjs";
 
 export const textureLoader = new THREE.TextureLoader();
@@ -120,17 +118,10 @@ export function updatePlayerToken(player) {
 }
 
 let gameScene, gameMovables;
-export const renderPlayer = (
-    player,
-    i,
-    first = false, // parameters after this only needed on init
-    scene = null,
-    movables = null,
-    numPlayers = null
-) => {
-    if (numPlayers == null) numPlayers = player.context.players.length;
-    if (scene == null) scene = gameScene;
-    if (movables == null) movables = gameMovables;
+export const renderPlayer = (player, i, first = false) => {
+    const numPlayers = player.context.players.length;
+    const scene = gameScene;
+    const movables = gameMovables;
     console.log(`Rendering ${player.id} ${first ? "init" : ""}`);
     if (first) {
         player.modelGroup = new THREE.Object3D();
@@ -210,12 +201,9 @@ export const renderPlayer = (
         });
     }
 };
-export const initRenderPlayer = (scene, movables, numPlayers) => {
-    return (player, i) => {
-        renderPlayer(player, i, true, scene, movables, numPlayers);
-    };
+export const initRenderPlayer = (player, i) => {
+    renderPlayer(player, i, true);
 };
-
 const DiscardPilePosition = new Vector3(2, -0.49, 0);
 const HandPosition = new Vector3(0, 0.49, 1.2);
 const ShieldsPosition = new Vector3(0, -0.49, -2);
@@ -247,10 +235,10 @@ export function moveCardToHand(card, player, i = 0) {
         const sign = i % 2 == 0 ? +1 : -1;
         const cardsPerRow = 5;
         const offy = Math.floor(i / cardsPerRow);
-        const offx = Math.ceil((i % cardsPerRow) / 2);
+        const offx = sign * Math.ceil((i % cardsPerRow) / 2);
         setCardPos(card, HandPosition);
-        card.modelInWorld.position.x += 1.2 * offx * sign;
-        card.modelInWorld.position.y += 1.6 * offy;
+        card.modelInWorld.position.x += 1.2 * offx;
+        card.modelInWorld.position.y += 1.8 * offy;
         card.modelInWorld.rotateX(Math.PI / 2);
     }
 }

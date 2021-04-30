@@ -1,3 +1,6 @@
+import { Player } from "./DMplayer.mjs";
+import { initRenderPlayer } from "./gfx.js";
+
 export class DungeonMayhem {
     constructor() {
         this.players = [];
@@ -12,14 +15,19 @@ export class DungeonMayhem {
     }
     decode(obj) {
         this.players.forEach((p, i) => p.decode(obj.players[i]));
+        for (let i = this.players.length; i < obj.players.length; i++) {
+            const newPlayerData = obj.players[i];
+            const player = Player.newFrom(newPlayerData, this);
+            initRenderPlayer(player);
+        }
         this.turn = this.playerTurn;
     }
 
-    start() {
+    async start() {
         for (const player of this.players) {
             player.endTurn();
         }
-        this.players.forEach(p => p.newGameStart());
+        await Promise.all(this.players.flatMap(p => p.newGameStart()));
     }
 
     allOpponents(player) {

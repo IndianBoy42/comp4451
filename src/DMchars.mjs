@@ -26,6 +26,7 @@ export class Character {
     encode() {
         return {
             name: this.name,
+            class: this.constructor.name,
             health: this.health,
             shields: this.shields.map(shield => shield.encode()),
             actionsLeft: this.actionsLeft,

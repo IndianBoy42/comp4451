@@ -1,21 +1,46 @@
+import { addRemotePlayer } from "./3dgame.js";
 import { Player } from "./DMplayer.mjs";
+import { characterMap } from "./characters/characters.mjs";
 
 let MSG_COUNTER = 0;
-const MSG_ACK = MSG_COUNTER++;
-const MSG_NEW_GAME_START = MSG_COUNTER++;
-const MSG_GAME_STATE = MSG_COUNTER++;
-const MSG_PLAYER_ID = MSG_COUNTER++;
-const MSG_SEL_CARD = MSG_COUNTER++;
-const MSG_SEL_PLAYER = MSG_COUNTER++;
-const MSG_SEL_SHIELD = MSG_COUNTER++;
-const MSG_SEL_DISCARD = MSG_COUNTER++;
+export const MSG_ACK = MSG_COUNTER++;
+export const MSG_NEW_GAME_START = MSG_COUNTER++;
+export const MSG_GAME_STATE = MSG_COUNTER++;
+export const MSG_PLAYER_ID = MSG_COUNTER++;
+export const MSG_SEL_CARD = MSG_COUNTER++;
+export const MSG_SEL_PLAYER = MSG_COUNTER++;
+export const MSG_SEL_SHIELD = MSG_COUNTER++;
+export const MSG_SEL_DISCARD = MSG_COUNTER++;
+export const MSG_CHAR_CONNECT = MSG_COUNTER++;
+export const MSG_ERROR_SEL = MSG_COUNTER++;
+export const MSG_CHOSEN = MSG_COUNTER++;
 
-export function remotePlayerData(playerValues, data) {
+export function remotePlayerData(playerValues, datau8) {
     // Some messages intercept here (the initialize)
-    playerValues.dataResolve(data);
+    const data = JSON.parse(datau8);
+    console.log("remotePlayerData", data);
+    switch (data.id) {
+        case MSG_CHAR_CONNECT:
+            {
+                const char = characterMap[data.class];
+                addRemotePlayer(playerValues, data.name, new char());
+            }
+            break;
+
+        case MSG_ERROR_SEL:
+            console.error(
+                "Error in selection, sent a choose cards msg to the wrong peer/player"
+            );
+            break;
+
+        default:
+            if (playerValues.dataResolve) playerValues.dataResolve(data);
+            break;
+    }
 }
 export function remotePlayerConnect(playerValues) {
-    playerValues.playerObject.callAndResponse();
+    // playerValues.playerObject.callAndResponse();
+    // addRemotePlayer(player, "Joining...", chooseCharacter());
 }
 
 // The host uses this
@@ -28,12 +53,20 @@ export class RemotePlayer extends Player {
     }
 
     callAndResponse(msg) {
-        this.peer.send(JSON.stringify(msg));
-        const prom = new Promise(resolve => {
-            this.player.guiValues.dataResolve = resolve;
-        });
-        // TODO: check if the promise is an ACK? what would I even do? IDK
-        return prom;
+        try {
+            console.log("callAndResponse", msg);
+            this.peer.send(JSON.stringify(msg));
+            const prom = new Promise(resolve => {
+                this.guiValues.dataResolve = resolve;
+            });
+            // TODO: check if the promise is an ACK? what would I even do? IDK
+            return prom;
+        } catch (error) {
+            // Probably peer not connected yet, just ignore it
+            console.error(error);
+            // IDK what I should return
+            return new Promise(resolve => resolve(null));
+        }
     }
     sendPlayerID() {
         return this.callAndResponse({
@@ -58,10 +91,15 @@ export class RemotePlayer extends Player {
      */
     async selectCard() {
         await this.context.updateGameState();
-        return await this.callAndResponse({
+        let resp = await this.callAndResponse({
             id: MSG_SEL_CARD,
             player: this.id,
         });
+        if (resp.id != MSG_CHOSEN) {
+            console.error("Received an invalid reply to select()");
+            return null;
+        }
+        return resp.chosen;
     }
 
     /**
@@ -71,10 +109,15 @@ export class RemotePlayer extends Player {
      */
     async selectPlayer(opponents) {
         await this.context.updateGameState();
-        return await this.callAndResponse({
+        let resp = await this.callAndResponse({
             id: MSG_SEL_PLAYER,
             opponents: opponents.map(p => p.id),
         });
+        if (resp.id != MSG_CHOSEN) {
+            console.error("Received an invalid reply to select()");
+            return null;
+        }
+        return resp.chosen;
     }
 
     /**
@@ -84,10 +127,15 @@ export class RemotePlayer extends Player {
      */
     async selectShield(player) {
         await this.context.updateGameState();
-        return await this.callAndResponse({
+        let resp = await this.callAndResponse({
             id: MSG_SEL_SHIELD,
             player: player.id,
         });
+        if (resp.id != MSG_CHOSEN) {
+            console.error("Received an invalid reply to select()");
+            return null;
+        }
+        return resp.chosen;
     }
 
     /**
@@ -96,9 +144,14 @@ export class RemotePlayer extends Player {
      */
     async selectDiscardedCard(player) {
         await this.context.updateGameState();
-        return await this.callAndResponse({
+        let resp = await this.callAndResponse({
             id: MSG_SEL_DISCARD,
             player: player.id,
         });
+        if (resp.id != MSG_CHOSEN) {
+            console.error("Received an invalid reply to select()");
+            return null;
+        }
+        return resp.chosen;
     }
 }

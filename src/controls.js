@@ -149,7 +149,11 @@ export const clipFloor = (obj, offset = 0) => {
  * Game selection functions
  * set DEBUG_RNG_INPUT to true to play a fully randomized automatic game
  */
-export const DEBUG_RNG_INPUT = false;
+export let DEBUG_RNG_INPUT = false;
+export function setDebugRngInput(v) {
+    DEBUG_RNG_INPUT = v;
+    console.log("DEBUG_RNG_INPUT " + DEBUG_RNG_INPUT);
+}
 
 export function chooseFromObjects(query, min, max, objects) {
     if (DEBUG_RNG_INPUT) {

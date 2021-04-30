@@ -14,7 +14,7 @@ export async function gameLoop(game) {
     let round = 1;
     let playerTurn = 1;
 
-    game.start();
+    await game.start();
 
     while (true) {
         console.log(
@@ -73,16 +73,11 @@ export async function gameLoop(game) {
 }
 
 export let numPlayers;
-let currentGame;
+export let currentGame;
 
 function renderGame(scene, movables) {
-    const game = currentGame;
-
-    numPlayers = game.players.length;
-
-    game.players.forEach(initRenderPlayer(scene, movables, numPlayers));
-
-    return game;
+    currentGame.players.forEach(initRenderPlayer);
+    return currentGame;
 }
 
 export function startLocalGame(scene, movables) {
@@ -100,28 +95,18 @@ export function startLocalGame(scene, movables) {
     return renderGame(scene, movables);
 }
 
-export function createMPGameMenu(scene, movables) {
-    const game = new DungeonMayhem();
-    currentGame = game;
-
-    let me = new Player("Me", Characters.chooseCharacter(), game);
-
-    renderGame(scene, movables);
-
-    return game;
-}
-
-export function addLocalPlayer(name, character) {
+export async function addLocalPlayer(name, character) {
     const player = new Player(name, character, currentGame);
 
-    initRenderPlayer()(player);
-    currentGame.updateGameState();
+    initRenderPlayer(player);
+    await currentGame.updateGameState();
 }
-export function addRemotePlayer(playerValues, name, character) {
+export async function addRemotePlayer(playerValues, name, character) {
     const player = new RemotePlayer(playerValues, name, character, currentGame);
 
-    initRenderPlayer()(player);
-    currentGame.updateGameState();
+    initRenderPlayer(player);
+    await currentGame.updateGameState();
+    await player.sendPlayerID();
 }
 
 export function startCurrentGame() {
