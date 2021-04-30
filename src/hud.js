@@ -164,7 +164,9 @@ export function createGui() {
         add("name", "", folder, values.joinedGame).name("Name");
         add(
             "class",
-            hashDict.hasOwnProperty("char") ? hashDict.char : "Wizard",
+            "class" in hashDict /* hashDict.hasOwnProperty("char") */
+                ? hashDict["class"]
+                : "Wizard",
             folder,
             values.joinedGame
         )
@@ -202,13 +204,10 @@ export function createGui() {
         const loadingBarMonitor = setInterval(() => {
             let pc = 0;
             let c = 0;
-            for (const loader in loaders) {
-                if (Object.hasOwnProperty.call(loaders, loader)) {
-                    const element = loaders[loader];
-                    pc += element;
-                    c++;
-                }
-            }
+            loaders.forEach(loader => {
+                pc += loader;
+                c++;
+            });
             values.loading = pc / c;
             if (pc >= c * 100) {
                 clearInterval(loadingBarMonitor);
@@ -217,11 +216,11 @@ export function createGui() {
         }, 250);
     }
 
-    if (hashDict.hasOwnProperty("join")) {
+    if ("join" in hashDict) {
         values["Join Game"]();
     }
     ["p1", "p2", "p3", "p4", "p5", "p6"].forEach(p => {
-        if (hashDict.hasOwnProperty(p)) {
+        if ("p" in hashDict) {
             if ("remote".startsWith(hashDict[p].toLowerCase())) {
                 values["addRemotePlayer"]();
             } else {
