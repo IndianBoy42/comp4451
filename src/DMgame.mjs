@@ -161,6 +161,7 @@ export class DungeonMayhem {
      */
     async chooseShield(player, targetSelf = false) {
         const t = await this.choosePlayer(player, true, targetSelf);
+        console.trace(t);
         if (t.length === 0) return [null, -1];
         const target = t[0];
         let ishield = -1;

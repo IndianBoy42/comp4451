@@ -100,6 +100,12 @@ export function startLocalGame(scene, movables) {
     return renderGame(scene, movables);
 }
 
+export async function addAIPlayer(name, character) {
+    const player = new AIPlayer(name, character, currentGame);
+
+    initRenderPlayer(player);
+    await currentGame.updateGameState();
+}
 export async function addLocalPlayer(name, character) {
     const player = new Player(name, character, currentGame);
 

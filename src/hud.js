@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import { createPeer } from "./p2p";
 import { Base64 } from "js-base64";
-import { addLocalPlayer, addRemotePlayer, startCurrentGame } from "./3dgame";
+import { addLocalPlayer, addAIPlayer, startCurrentGame } from "./3dgame";
 import { remotePlayerConnect, remotePlayerData } from "./DMRemotePlayer.mjs";
 import { remoteGameConnect, remoteGameData } from "./remoteGame.mjs";
 import { loaders } from "./gfx";
@@ -32,6 +32,12 @@ export function createGui() {
     function add(name, value, g = gui, vals = values) {
         vals[name] = value;
         return g.add(vals, name);
+    }
+
+    function newPlayerFolder() {
+        const i = values.playerCount;
+        values.playerCount += 1;
+        return gui.addFolder(`Player ${i + 1}`);
     }
 
     function addPeer(subValues, folder, initiator) {
@@ -98,9 +104,7 @@ export function createGui() {
         return conn;
     }
     const addRemotePlayerBtn = add("addRemotePlayer", () => {
-        const i = values.playerCount;
-        values.playerCount += 1;
-        const folder = gui.addFolder(`Player ${i + 1}`);
+        const folder = newPlayerFolder();
         folder.open();
         const player = {};
         values.players.push(player);
@@ -114,25 +118,26 @@ export function createGui() {
         });
     }).name("Add Remote Player");
 
+    const addAIPlayerFolder = gui.addFolder("Add AI Player");
+    add("Name", "Player", addAIPlayerFolder);
+    let newPlayerAI = c => {
+        addAIPlayer(values.Name, new c());
+        const folder = newPlayerFolder();
+        add("Name (AI): " + values.Name, () => {}, folder);
+        add("Class: " + c.name, () => {}, folder);
+    };
     const addLocalPlayerFolder = gui.addFolder("Add Local Player");
     add("Name", "Player", addLocalPlayerFolder);
     let newPlayerLocal = c => {
         addLocalPlayer(values.Name, new c());
-        const i = values.playerCount;
-        values.playerCount += 1;
-        const folder = gui.addFolder(`Player ${i + 1}`);
+        const folder = newPlayerFolder();
         add("Name: " + values.Name, () => {}, folder);
         add("Class: " + c.name, () => {}, folder);
     };
     let charClassesButtons = folder =>
         allCharacters.forEach(c => {
-            add(
-                c.name,
-                () => {
-                    newPlayerLocal(c);
-                },
-                folder
-            );
+            add(c.name, () => newPlayerLocal(c), folder);
+            add(c.name, () => newPlayerAI(c), folder);
         });
     charClassesButtons(addLocalPlayerFolder);
     // const addLocalPlayerBtn = add("Add Local Player", () => {
@@ -157,7 +162,12 @@ export function createGui() {
         gui.remove(joinGameBtn);
         gui.remove(startGameBtn);
         add("name", "", folder, values.joinedGame).name("Name");
-        add("class", "Wizard", folder, values.joinedGame)
+        add(
+            "class",
+            hashDict.hasOwnProperty("char") ? hashDict.char : "Wizard",
+            folder,
+            values.joinedGame
+        )
             .options(allCharacters.map(c => c.name))
             .name("Class");
         const connected = addPeer(values.joinedGame, folder, false);
@@ -187,6 +197,7 @@ export function createGui() {
     add("debug_auto", false).onFinishChange(setDebugRngInput);
 
     if (false) {
+        // FIXME: This is not so reliable as things load on demand now
         const loadingBar = add("loading", 0).name("Loading").listen();
         const loadingBarMonitor = setInterval(() => {
             let pc = 0;
@@ -214,8 +225,12 @@ export function createGui() {
             if ("remote".startsWith(hashDict[p].toLowerCase())) {
                 values["addRemotePlayer"]();
             } else {
-                if (characterMap[hashDict[p]])
-                    newPlayerLocal(characterMap[hashDict[p]]);
+                const newP = (f, cls) => {
+                    if (characterMap[cls]) f(characterMap[cls]);
+                };
+                if (hashDict[p].startsWith("AI"))
+                    newP(newPlayerAI, hashDict[p].substr(2));
+                else newP(newPlayerLocal, hashDict[p]);
             }
         }
     });

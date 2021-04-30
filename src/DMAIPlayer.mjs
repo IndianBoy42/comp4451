@@ -1,7 +1,7 @@
-import { Player } from './DMplayer.mjs';
+import { Player } from "./DMplayer.mjs";
 import { shuffle } from "./shuffle.mjs";
 import { DummyCard } from "./cards/cards.mjs";
-import { GameState, Decision } from './DMAI.mjs';
+import { GameState, Decision } from "./DMAI.mjs";
 
 export class AIPlayer extends Player {
     constructor(name, character, context, isClone = false) {
@@ -16,8 +16,13 @@ export class AIPlayer extends Player {
      * @param isOpponent if the clone is an opponent, shuffle deck *and* hand
      * @returns the clone
      */
-     clone(context, isOpponent) {
-        let clone = new AIPlayer(this.name, this.character.clone(), context, true);
+    clone(context, isOpponent) {
+        let clone = new AIPlayer(
+            this.name,
+            this.character.clone(),
+            context,
+            true
+        );
         //copy attributes
         //clone.id = this.id;
         clone.discardPile = this.discardPile.slice(0);
@@ -29,8 +34,7 @@ export class AIPlayer extends Player {
             shuffle(deckhand);
             clone.hand = deckhand.splice(0, this.hand.length);
             clone.deck = deckhand;
-        }
-        else {
+        } else {
             clone.hand = this.hand.slice(0);
             // (nvm no need, gonna need deck for random sim) replace deck with a deck full of dummy cards for AI simulations
             clone.deck = this.deck.slice(0);
@@ -43,11 +47,10 @@ export class AIPlayer extends Player {
         return clone;
     }
 
-
     /**
      * Reset decision related variables
      * - finalDecisions: Filled with the optimal decisions when tree simulation is finished
-     * - cloneParentDecisions: Used by clones. 
+     * - cloneParentDecisions: Used by clones.
      *                  Take decisions from here to get to its parent's position + the testing decision
      * - cloneDecisionIndex: Used by clones. Index of cloneParentDecisions to take from
      * - cloneBestChildDecisions: Used by clones. Set to decisions made by the child with best score after simulation
@@ -74,9 +77,9 @@ export class AIPlayer extends Player {
 
     /**
      * Perform AIPlayer's turn
-     * While the player still has turns or has cards left, 
+     * While the player still has turns or has cards left,
      */
-     async playerTurn() {
+    async playerTurn() {
         while (this.character.actionsLeft > 0) {
             this.debugLogMe();
             const cardPos = await this.selectCard();
@@ -90,7 +93,7 @@ export class AIPlayer extends Player {
      * =================================================================================
      * Selection functions
      * Call this function to let the player or AI decide what card/target/etc to select
-     * 
+     *
      * TODO implement AI
      * =================================================================================
      */
@@ -127,8 +130,10 @@ export class AIPlayer extends Player {
             if (child.getScore() > maxScore) {
                 maxScore = child.getScore();
                 bestDecision = decision;
-                this.cloneBestChildDecisions = [decision]
-                this.cloneBestChildDecisions = this.cloneBestChildDecisions.concat(child.player.cloneBestChildDecisions);
+                this.cloneBestChildDecisions = [decision];
+                this.cloneBestChildDecisions = this.cloneBestChildDecisions.concat(
+                    child.player.cloneBestChildDecisions
+                );
             }
         }
         return bestDecision;
@@ -136,7 +141,7 @@ export class AIPlayer extends Player {
 
     /**
      * Unified function for AI making decisions
-     * @param decisions array of Decisions representing options that can be chosen 
+     * @param decisions array of Decisions representing options that can be chosen
      * @returns Decision representing chosen option
      */
     async makeDecision(decisions) {
@@ -156,19 +161,18 @@ export class AIPlayer extends Player {
         if (this.isClone) {
             const nextDecision = this.getNextParentDecision();
             if (nextDecision != null) {
-                if (this.cloneDecisionIndex === this.cloneParentDecisions.length) {
+                if (
+                    this.cloneDecisionIndex === this.cloneParentDecisions.length
+                ) {
                     console.log("CLONE USING CURRENT DECISION");
-                }
-                else {
+                } else {
                     console.log("CLONE USING PARENT DECISION");
                 }
                 return nextDecision;
-            }
-            else if (this.cloneBestChildDecisions.length > 0) {
+            } else if (this.cloneBestChildDecisions.length > 0) {
                 console.log("CLONE USING CHILD DECISION");
                 return this.cloneBestChildDecisions.splice(0, 1)[0];
-            }
-            else {
+            } else {
                 console.log("CLONE GENERATING TREE");
                 const bestDecision = await this.generateChildrenStates(
                     this.cloneParentDecisions.slice(0),
@@ -176,21 +180,19 @@ export class AIPlayer extends Player {
                 );
                 return bestDecision;
             }
-        }
+        } else {
         /**
          * Else, this is the original AI player
          * - If finalDecisions is not empty, use it to get the next decision
-         * - Else, 
-         *      + Reset decision params and start the simulation tree 
+         * - Else,
+         *      + Reset decision params and start the simulation tree
          *      + For each decision, clone the root GameState and assign decision in cloneParentDecisions
          *      + Let the GameState progress and get the score for that child node
          */
-        else {
             if (this.finalDecisions.length > 0) {
                 //do nothing, splice later
                 console.log("ORIGINAL USING FINAL DECISION");
-            }
-            else {
+            } else {
                 console.log("ORIGINAL GENERATING TREE");
                 this.resetDecisions();
                 this.createSimulationTree();
@@ -202,7 +204,12 @@ export class AIPlayer extends Player {
                 console.log(this.cloneBestChildDecisions);
                 this.finalDecisions = this.cloneBestChildDecisions;
             }
-            console.log("DECISION TAKEN: " + this.finalDecisions[0].playType + " " + this.finalDecisions[0].playNum);
+            console.log(
+                "DECISION TAKEN: " +
+                    this.finalDecisions[0].playType +
+                    " " +
+                    this.finalDecisions[0].playNum
+            );
             return this.finalDecisions.splice(0, 1)[0];
         }
     }
@@ -213,14 +220,14 @@ export class AIPlayer extends Player {
      */
     async selectCardCustom(cards) {
         //TODO
-        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING CARD CUSTOM");
+        console.log((this.isClone ? "CLONE " : "") + "SELECTING CARD CUSTOM");
         let decisions = [];
         for (const cardIndex in cards) {
             // if (this.hand[cardIndex].name === "Dummy Card") {
             //     // don't put dummy cards in the decision pool
             //     continue;
             // }
-            decisions.push(new Decision('Card', cardIndex));
+            decisions.push(new Decision("Card", cardIndex));
         }
         const decision = await this.makeDecision(decisions);
         return decision.playNum;
@@ -232,14 +239,14 @@ export class AIPlayer extends Player {
      */
     async selectCard() {
         //TODO
-        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING CARD");
+        console.log((this.isClone ? "CLONE " : "") + "SELECTING CARD");
         let decisions = [];
         for (const cardIndex in this.hand) {
             // if (this.hand[cardIndex].name === "Dummy Card") {
             //     // don't put dummy cards in the decision pool
             //     continue;
             // }
-            decisions.push(new Decision('Card', cardIndex));
+            decisions.push(new Decision("Card", cardIndex));
         }
         const decision = await this.makeDecision(decisions);
         return decision.playNum;
@@ -252,14 +259,13 @@ export class AIPlayer extends Player {
      */
     async selectPlayer(players) {
         //TODO
-        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING PLAYER");
+        console.log((this.isClone ? "CLONE " : "") + "SELECTING PLAYER");
         let decisions = [];
         for (const playerIndex in players) {
-            decisions.push(new Decision('Player', playerIndex));
+            decisions.push(new Decision("Player", playerIndex));
         }
         const decision = await this.makeDecision(decisions);
-        const player = players[decision.playNum];
-        return player;
+        return decision.playNum;
     }
 
     /**
@@ -269,13 +275,13 @@ export class AIPlayer extends Player {
      */
     async selectShield(player) {
         //TODO
-        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING SHIELD");
+        console.log((this.isClone ? "CLONE " : "") + "SELECTING SHIELD");
         //special cases
         if (player.character.shields.length < 1) return -1;
 
         let decisions = [];
         for (const shieldIndex in player.character.shields) {
-            decisions.push(new Decision('Shield', shieldIndex));
+            decisions.push(new Decision("Shield", shieldIndex));
         }
         const decision = await this.makeDecision(decisions);
         return decision.playNum;
@@ -287,13 +293,13 @@ export class AIPlayer extends Player {
      */
     async selectDiscardedCard(player) {
         //TODO
-        console.log((this.isClone ? "CLONE " : "" ) + "SELECTING DISCARD");
+        console.log((this.isClone ? "CLONE " : "") + "SELECTING DISCARD");
         //special cases
         if (player.discardPile.length < 1) return -1;
 
         let decisions = [];
         for (const discardIndex in player.discardPile) {
-            decisions.push(new Decision('Discard', discardIndex));
+            decisions.push(new Decision("Discard", discardIndex));
         }
         const decision = await this.makeDecision(decisions);
         return decision.playNum;
