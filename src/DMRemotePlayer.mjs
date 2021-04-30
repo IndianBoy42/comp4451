@@ -11,6 +11,7 @@ const MSG_SEL_SHIELD = MSG_COUNTER++;
 const MSG_SEL_DISCARD = MSG_COUNTER++;
 
 export function remotePlayerData(playerValues, data) {
+    // Some messages intercept here (the initialize)
     playerValues.dataResolve(data);
 }
 export function remotePlayerConnect(playerValues) {

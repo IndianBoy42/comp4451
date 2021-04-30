@@ -197,3 +197,7 @@ export const allCharacters = [
     GelatinousCube,
     OwlBear,
 ];
+export let characterMap = {};
+allCharacters.forEach(c => {
+    characterMap[c.name] = c;
+});

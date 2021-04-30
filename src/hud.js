@@ -2,10 +2,11 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import { createPeer } from "./p2p";
 import { Base64 } from "js-base64";
-import { addRemotePlayer, startCurrentGame } from "./3dgame";
+import { addLocalPlayer, addRemotePlayer, startCurrentGame } from "./3dgame";
 import { remotePlayerConnect, remotePlayerData } from "./DMRemotePlayer.mjs";
 import { remoteGameConnect, remoteGameData } from "./remoteGame.mjs";
 import { loaders } from "./gfx";
+import { allCharacters } from "./characters/characters.mjs";
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -24,35 +25,15 @@ export function createGui() {
     });
     gui.remember(values);
 
-    function add(name, value, g = gui) {
-        values[name] = value;
-        console.log(values);
-        return g.add(values, name);
+    function add(name, value, g = gui, vals = values) {
+        vals[name] = value;
+        return g.add(vals, name);
     }
-
-    const loadingBar = add("loading", 0).name("Loading").listen();
-    const loadingBarMonitor = setInterval(() => {
-        let pc = 0;
-        let c = 0;
-        for (const loader in loaders) {
-            if (Object.hasOwnProperty.call(loaders, loader)) {
-                const element = loaders[loader];
-                pc += element;
-                c++;
-            }
-        }
-        values.loading = pc / c;
-        if (pc >= c * 100) {
-            clearInterval(loadingBarMonitor);
-            gui.remove(loadingBar);
-        }
-    }, 250);
 
     // var folderLMP = gui.addFolder("Local Multiplayer");
     function addPeer(subValues, folder, initiator) {
         function addp(name, value) {
             subValues[name] = value;
-            console.log(subValues);
             return folder.add(subValues, name);
         }
 
@@ -114,7 +95,7 @@ export function createGui() {
 
         return conn;
     }
-    const addPlayerBtn = add("Add Player", () => {
+    const addRemotePlayerBtn = add("Add Remote Player", () => {
         const i = values.playerCount;
         values.playerCount += 1;
         const folder = gui.addFolder(`Player ${i + 1}`);
@@ -122,7 +103,11 @@ export function createGui() {
         gui.remove(joinGameBtn);
         let connected = addPeer(values.players[i], folder, true);
 
-        addRemotePlayer(values.players[i]);
+        addRemotePlayer(
+            "Joining...",
+            values.players[i],
+            Characters.chooseCharacter()
+        );
         connected.then(() => remotePlayerConnect(values.players[i]));
         player.peer.on("data", data => {
             subValues.msg = data;
@@ -130,12 +115,47 @@ export function createGui() {
             remotePlayerData(values.players[i], data);
         });
     });
+    const addLocalPlayerFolder = gui.addFolder("Add Local Player");
+    add("Name", "", addLocalPlayerFolder);
+    let charClassesButtons = folder =>
+        allCharacters.forEach(c => {
+            add(
+                c.name,
+                () => {
+                    addLocalPlayer(values.Name, new c());
+                    const i = values.playerCount;
+                    values.playerCount += 1;
+                    const folder = gui.addFolder(`Player ${i + 1}`);
+                    add("No Options", () => {}, folder);
+                },
+                folder
+            );
+        });
+    charClassesButtons(addLocalPlayerFolder);
+    // const addLocalPlayerBtn = add("Add Local Player", () => {
+    //     const i = values.playerCount;
+    //     values.playerCount += 1;
+    //     const folder = gui.addFolder(`Player ${i + 1}`);
+    //     const subValues = {};
+    //     values.players.push(subValues);
+    //     gui.remove(joinGameBtn);
+    //     add("class", "", folder, subValues)
+    //         .options(allCharacters.map(c => c.name))
+    //         .name("Class");
+    //     add("Confirm", () => {}, folder, subValues);
+    // });
     const joinGameBtn = add("Join Game", () => {
         let folder = gui.addFolder("Game");
         values.joinedGame = {};
         values.host = false;
-        gui.remove(addPlayerBtn);
+        gui.remove(addRemotePlayerBtn);
+        gui.removeFolder(addLocalPlayerFolder);
         gui.remove(joinGameBtn);
+        gui.remove(startGameBtn);
+        add("Name", "", folder);
+        add("class", "", folder)
+            .options(allCharacters.map(c => c.name))
+            .name("Class");
         addPeer(values.joinedGame, folder, false);
 
         joinedGame.peer.on("data", data =>
@@ -145,11 +165,30 @@ export function createGui() {
     });
 
     const startGameBtn = add("start", () => {
-        gui.remove(addPlayerBtn);
+        gui.remove(addRemotePlayerBtn);
         gui.remove(joinGameBtn);
         gui.remove(startGameBtn);
+        gui.removeFolder(addLocalPlayerFolder);
         startCurrentGame();
     }).name("Start Game");
+
+    const loadingBar = add("loading", 0).name("Loading").listen();
+    const loadingBarMonitor = setInterval(() => {
+        let pc = 0;
+        let c = 0;
+        for (const loader in loaders) {
+            if (Object.hasOwnProperty.call(loaders, loader)) {
+                const element = loaders[loader];
+                pc += element;
+                c++;
+            }
+        }
+        values.loading = pc / c;
+        if (pc >= c * 100) {
+            clearInterval(loadingBarMonitor);
+            gui.remove(loadingBar);
+        }
+    }, 250);
 
     return [gui, values];
 }

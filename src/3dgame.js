@@ -88,9 +88,9 @@ function renderGame(scene, movables) {
 export function startLocalGame(scene, movables) {
     const game = new DungeonMayhem();
 
-    const p3 = new Player("P3", new Characters.Ranger(), game);
-    const p1 = new Player("P1", new Characters.Rogue(), game);
-    const p2 = new Player("P2", new Characters.Paladin(), game);
+    // const p3 = new Player("P3", new Characters.Ranger(), game);
+    // const p1 = new Player("P1", new Characters.Rogue(), game);
+    // const p2 = new Player("P2", new Characters.Paladin(), game);
     // const p4 = new Player("P4", new Characters.Wizard(), game);
     // const p5 = new Player("P5", new Characters.Barbarian(), game);
     // const p6 = new Player("P6", new Characters.Druid(), game);
@@ -111,13 +111,14 @@ export function createMPGameMenu(scene, movables) {
     return game;
 }
 
-export function addRemotePlayer(playerValues) {
-    const player = new RemotePlayer(
-        playerValues,
-        "P",
-        Characters.chooseCharacter(),
-        currentGame
-    );
+export function addLocalPlayer(name, character) {
+    const player = new Player(name, character, currentGame);
+
+    initRenderPlayer()(player);
+    currentGame.updateGameState();
+}
+export function addRemotePlayer(playerValues, name, character) {
+    const player = new RemotePlayer(playerValues, name, character, currentGame);
 
     initRenderPlayer()(player);
     currentGame.updateGameState();
