@@ -1,5 +1,5 @@
 import { Shield } from "./DMshields.mjs";
-import * as THREE from "three";
+import * as GFX from "./gfx.js";
 import { addToAllCards } from "./cards/cards.mjs";
 
 export class DMCard {
@@ -20,6 +20,16 @@ export class DMCard {
         this.drawCards = drawCards;
         this.extraPowers = extraPowers;
         addToAllCards(this);
+    }
+
+    hideShow(hidden) {
+        GFX.setCardObjectText(
+            this.modelInWorld.canvas,
+            this.modelInWorld.context,
+            this.modelInWorld.texture,
+            this.getCardText(),
+            hidden ? "#000000" : "#00ff00"
+        );
     }
 
     // encode() {

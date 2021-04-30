@@ -20,7 +20,7 @@ function send(msg) {
 
 let currentPlayer;
 function getPlayer(id) {
-    return currentGame.players[id-1];
+    return currentGame.players[id - 1];
 }
 
 function sendChoice(idx) {
@@ -35,10 +35,19 @@ export async function remoteGameData(gameValues, datau8) {
         case MSG_GAME_STATE:
             currentGame.decode(data.game);
             currentGame.updateGameState();
+            if (currentPlayer) {
+                for (const player of currentGame.players) {
+                    player.handHideShow(player.id != currentPlayer.id);
+                }
+            }
             break;
 
         case MSG_PLAYER_ID:
             currentPlayer = getPlayer(data.player);
+            for (const player of currentGame.players) {
+                player.handHideShow(player.id != currentPlayer.id);
+            }
+            // TODO: Make camera see from this perspective.
             break;
 
         case MSG_SEL_CARD:

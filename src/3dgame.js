@@ -16,6 +16,15 @@ export async function gameLoop(game) {
 
     await game.start();
 
+    const hostPlayer = (() => {
+        let hostPlayers = game.players.filter(p => p.isLocalOnHost());
+        if (hostPlayers.length == 1) {
+            return hostPlayers[0];
+        } else {
+            return null;
+        }
+    })();
+
     while (true) {
         console.log(
             "==========PLAYER " + playerTurn + " TURN " + round + "==========="
@@ -26,7 +35,7 @@ export async function gameLoop(game) {
         player = game.players[playerTurn - 1];
 
         if (player.character.health > 0) {
-            player.startTurn();
+            player.startTurn(!(hostPlayer && hostPlayer.id == player.id));
             player.drawCards(1);
             // ok i figured out how to read from console
             while (player.character.actionsLeft > 0) {
@@ -35,7 +44,7 @@ export async function gameLoop(game) {
                 await player.playCard(cardPos, game);
                 if (game.gameEnded()) break;
             }
-            player.endTurn();
+            player.endTurn(!(hostPlayer && hostPlayer.id == player.id));
         } else {
             // ghost ping
             const opp = await game.choosePlayer(
@@ -66,6 +75,7 @@ export async function gameLoop(game) {
         if (game.gameEnded()) break;
     }
 
+    game.updateGameState();
     console.log("==============GAME END==============");
     for (const pl of game.players) {
         pl.debugLogMe();

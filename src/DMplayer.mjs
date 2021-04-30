@@ -42,6 +42,11 @@ export class Player {
         }
     }
 
+    isLocalOnHost() { // Remember this is only valid on host
+        // On remote use the currentPlayer variable in remoteGame.js
+        return this.constructor.name == "DMplayer";
+    }
+
     encode() {
         return {
             name: this.name,
@@ -300,33 +305,33 @@ export class Player {
         console.log("====================================");
     }
 
-    /**
-     * Call the character's start turn sequence
-     */
-    startTurn() {
+    handHideShow(hidden) {
         for (const card of this.hand) {
             GFX.setCardObjectText(
                 card.modelInWorld.canvas,
                 card.modelInWorld.context,
                 card.modelInWorld.texture,
                 card.getCardText(),
-                "#00ff00"
+                hidden ? "#000000" : "#00ff00"
             );
+        }
+    }
+
+    /**
+     * Call the character's start turn sequence
+     */
+    startTurn(hideCards = true) {
+        if (hideCards) {
+            this.handHideShow(false);
         }
         this.character.startTurn();
     }
     /**
      * Call the character's end turn sequence
      */
-    endTurn() {
-        for (const card of this.hand) {
-            GFX.setCardObjectText(
-                card.modelInWorld.canvas,
-                card.modelInWorld.context,
-                card.modelInWorld.texture,
-                card.getCardText(),
-                "#000000"
-            );
+    endTurn(showCards = true) {
+        if (showCards) {
+            this.handHideShow(true);
         }
         this.character.endTurn();
     }

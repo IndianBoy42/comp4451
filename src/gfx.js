@@ -224,6 +224,7 @@ export function moveCardToDiscard(card, player, i = 0) {
         }
         setCardPos(card, DiscardPilePosition);
         card.modelInWorld.position.y += i * 0.01;
+        card.hideShow(false);
     }
 }
 export function moveCardToHand(card, player, i = 0) {
@@ -255,6 +256,7 @@ export function moveCardToShields(card, player, i = 0) {
         setCardPos(card, ShieldsPosition);
         card.modelInWorld.position.x += 1.2 * offx * sign;
         card.modelInWorld.position.y += 1.6 * offy;
+        card.hideShow(false);
     }
 }
 export function moveCardToDeck(card, player, i = 0) {
@@ -266,6 +268,7 @@ export function moveCardToDeck(card, player, i = 0) {
         setCardPos(card, DeckPosition);
         card.modelInWorld.position.y += i * 0.01;
         card.modelInWorld.rotateX(Math.PI);
+        card.hideShow(false);
     }
 }
 

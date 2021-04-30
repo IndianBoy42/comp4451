@@ -77,6 +77,7 @@ export class RemotePlayer extends Player {
     newGameStart() {
         super.newGameStart();
         const msg = { id: MSG_NEW_GAME_START, game: this.context.encode() };
+        this.handHideShow(true);
         return [this.callAndResponse(msg)];
     }
     updateGameState() {
@@ -153,5 +154,18 @@ export class RemotePlayer extends Player {
             return null;
         }
         return resp.chosen;
+    }
+
+    /**
+     * Call the character's start turn sequence
+     */
+    startTurn(hideCards = false) {
+        super.startTurn(hideCards);
+    }
+    /**
+     * Call the character's end turn sequence
+     */
+    endTurn(showCards = false) {
+        super.endTurn(showCards);
     }
 }

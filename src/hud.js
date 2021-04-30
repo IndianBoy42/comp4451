@@ -211,7 +211,7 @@ export function createGui() {
     }
     ["p1", "p2", "p3", "p4", "p5", "p6"].forEach(p => {
         if (hashDict.hasOwnProperty(p)) {
-            if (hashDict[p] === "remote") {
+            if ("remote".startsWith(hashDict[p].toLowerCase())) {
                 values["addRemotePlayer"]();
             } else {
                 if (characterMap[hashDict[p]])
