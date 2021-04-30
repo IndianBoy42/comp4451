@@ -120,7 +120,7 @@ export function addRemotePlayer(playerValues) {
     );
 
     initRenderPlayer()(player);
-    currentGame.updateState();
+    currentGame.updateGameState();
 }
 
 export function startCurrentGame() {

@@ -23,7 +23,7 @@ export class RemotePlayer extends Player {
         super(name, character, context, isClone);
         this.guiValues = values;
         values.playerObject = this;
-        this.peer = peer;
+        this.peer = values.peer;
     }
 
     callAndResponse(msg) {

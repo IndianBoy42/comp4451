@@ -138,7 +138,7 @@ export const renderPlayer = (
     }
     const group = player.modelGroup;
 
-    if (first) {
+    if (first || 1) {
         const angle =
             Math.PI / 2 + ((2 * Math.PI) / numPlayers) * (player.id - 1);
         const dist = 5;
@@ -148,7 +148,8 @@ export const renderPlayer = (
             dist * Math.sin(angle)
         );
         group.position.copy(pos);
-        group.rotateY(-angle + Math.PI / 2);
+        group.rotation.set(0, -angle + Math.PI / 2, 0);
+        // group.rotateY(-angle + Math.PI / 2);
         // group.rotation.set(0, -angle + Math.PI / 2, 0);
     }
 
