@@ -1,5 +1,5 @@
-import { allPowers } from "../DMpower.mjs";
 import { MightyPower } from "../DMpower.mjs";
+import { allPowers } from "../DMpower.mjs";
 
 // everyone discard hand, then draw 3 cards
 export class BarbarianDiscardHand extends MightyPower {
@@ -32,3 +32,7 @@ export class BarbarianHeal extends MightyPower {
         }
     }
 }
+
+allPowers.BarbarianDiscardHand = BarbarianDiscardHand;
+allPowers.BarbarianDestroyShield = BarbarianDestroyShield;
+allPowers.BarbarianHeal = BarbarianHeal;

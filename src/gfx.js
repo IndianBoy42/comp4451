@@ -21,9 +21,12 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.autoClear = false;
 renderer.setClearColor(0xff0000, 0);
 
+export const loaders = {};
 function loaderProgress(name) {
     return xhr => {
-        console.log((xhr.loaded / xhr.total) * 100 + `% loaded for ${name}`);
+        const pc = (xhr.loaded / xhr.total) * 100;
+        loaders[name] = pc;
+        console.log(`${pc} % loaded for ${name}`);
     };
 }
 function loaderError(error) {
@@ -110,19 +113,25 @@ function positionFromHealth(health) {
     return positionFromHealthArray[health];
 }
 export function updatePlayerToken(player) {
-    player.modelInWorld.position.copy(
-        positionFromHealth(player.character.health)
-    );
+    if (player.modelInWorld)
+        player.modelInWorld.position.copy(
+            positionFromHealth(player.character.health)
+        );
 }
+
+let gameScene, gameMovables;
 export const renderPlayer = (
     player,
     i,
-    first = false,
+    first = false, // parameters after this only needed on init
     scene = null,
     movables = null,
-    NUM_PLAYERS = null,
-    onComplete = null
+    numPlayers = null
 ) => {
+    if (numPlayers == null) numPlayers = player.context.players.length;
+    if (scene == null) scene = gameScene;
+    if (movables == null) movables = gameMovables;
+    console.log(`Rendering ${player.id} ${first ? "init" : ""}`);
     if (first) {
         player.modelGroup = new THREE.Object3D();
         scene.add(player.modelGroup);
@@ -130,14 +139,15 @@ export const renderPlayer = (
     const group = player.modelGroup;
 
     if (first) {
-        const angle = ((2 * Math.PI) / NUM_PLAYERS) * player.id;
+        const angle =
+            Math.PI / 2 + ((2 * Math.PI) / numPlayers) * (player.id - 1);
         const dist = 5;
         const pos = new Vector3(
             dist * Math.cos(angle),
             0,
             dist * Math.sin(angle)
         );
-        group.position.set(pos.x, pos.y, pos.z);
+        group.position.copy(pos);
         group.rotateY(-angle + Math.PI / 2);
         // group.rotation.set(0, -angle + Math.PI / 2, 0);
     }
@@ -153,7 +163,7 @@ export const renderPlayer = (
             token.rotateY(Math.PI);
             updatePlayerToken(player);
             token.dragend = clipFloor(token);
-            onComplete(player, token);
+            movables.push(token);
         });
     } else {
         updatePlayerToken(player);
@@ -161,7 +171,6 @@ export const renderPlayer = (
 
     if (first) {
         for (let j = 1; j <= DMChars.maxHealth; j++) {
-            console.log(j);
             let card = makeCardObject(`${j}`, 0.3, 0.3, 1);
             card.position.copy(positionFromHealth(j));
             group.add(card);
@@ -200,69 +209,14 @@ export const renderPlayer = (
         });
     }
 };
-export const initRenderPlayer = (scene, movables, NUM_PLAYERS, onComplete) => {
+export const initRenderPlayer = (scene, movables, numPlayers) => {
     return (player, i) => {
-        renderPlayer(player, i, true, scene, movables, NUM_PLAYERS, onComplete);
-    };
-};
-export const initRenderPlayerOld = (
-    scene,
-    movables,
-    NUM_PLAYERS,
-    onComplete
-) => {
-    return player => {
-        const angle = ((2 * Math.PI) / NUM_PLAYERS) * player.id;
-        const dist = 5;
-        const pos = new Vector3(
-            dist * Math.cos(angle),
-            0,
-            dist * Math.sin(angle)
-        );
-        const group = new THREE.Object3D();
-        group.position.set(pos.x, pos.y, pos.z);
-        group.rotateY(-angle + Math.PI / 2);
-        scene.add(group);
-        player.modelGroup = group;
-
-        loadModel(player.character.modelPath(), gltf => {
-            const token = gltf.scene.children[0];
-            group.add(token);
-            player.character.modelInWorld = token;
-            player.modelInWorld = token;
-
-            token.scale.multiplyScalar(0.03);
-            token.rotateY(Math.PI);
-            updatePlayerToken(player);
-            token.dragend = clipFloor(token);
-            onComplete(player, token);
-        });
-
-        for (let j = 1; j <= DMChars.maxHealth; j++) {
-            console.log(j);
-            let card = makeCardObject(`${j}`, 0.3, 0.3, 1);
-            card.position.copy(positionFromHealth(j));
-            group.add(card);
-            card.modelGroup = group;
-        }
-
-        player.deck.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.getCardText());
-            group.add(card.modelInWorld);
-            card.modelGroup = group;
-            moveCardToDeck(card, player, i);
-        });
-        player.hand.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.getCardText());
-            group.add(card.modelInWorld);
-            card.modelGroup = group;
-            moveCardToHand(card, player, i);
-        });
+        renderPlayer(player, i, true, scene, movables, numPlayers);
     };
 };
 
 const DiscardPilePosition = new Vector3(2, -0.49, 0);
-const HandPosition = new Vector3(0, 0.49, 1);
+const HandPosition = new Vector3(0, 0.49, 1.2);
 const ShieldsPosition = new Vector3(0, -0.49, -2);
 const DeckPosition = new Vector3(-2, -0.49, 0);
 const ZeroPosition = new Vector3();
@@ -306,10 +260,12 @@ export function moveCardToShields(card, player, i = 0) {
             card.modelGroup = player.modelGroup.add(card.modelInWorld);
         }
         const sign = i % 2 == 0 ? +1 : -1;
-        const offs = Math.round(i / 2);
+        const cardsPerRow = 5;
+        const offy = Math.floor(i / cardsPerRow);
+        const offx = Math.ceil((i % cardsPerRow) / 2);
         setCardPos(card, ShieldsPosition);
-        card.modelInWorld.position.x += 2 * offs * sign;
-        card.modelInWorld.position.y = 0.01;
+        card.modelInWorld.position.x += 1.2 * offx * sign;
+        card.modelInWorld.position.y += 1.6 * offy;
     }
 }
 export function moveCardToDeck(card, player, i = 0) {
@@ -347,6 +303,8 @@ export function createGameScene() {
     //     cube1.material.color.setHex("0x00FF00");
     // };
 
+    gameScene = scene;
+    gameMovables = movables;
     const game = startLocalGame(scene, movables);
 
     // const cube2 = cube(scene, { color: 0x44aa88 });
@@ -376,13 +334,12 @@ export function createGameScene() {
     // loadToken(evokerWizard, (gltf, token) => {
     //     movables.push(token);
     // });
-    const card = makeCardObject("Start Game");
-    chooseFromObjects("Start Game", 0, 1, [{ modelInWorld: card }]).then(i =>
-        gameLoop(game)
-    );
-    card.rotateX(Math.PI / 2);
-
-    scene.add(card);
+    // const startGameCard = makeCardObject("Start Game");
+    // chooseFromObjects("Start Game", 0, 1, [{ modelInWorld: startGameCard }]).then(i =>
+    //     gameLoop(game)
+    // );
+    // startGameCard.rotateX(Math.PI / 2);
+    // scene.add(startGameCard);
 
     const light1 = dir_light(scene);
     light1.position.set(-1, 2, 4);

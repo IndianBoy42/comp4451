@@ -11,7 +11,7 @@ const p3 = new Player("P3", new Characters.Ranger(), game);
 const p4 = new Player("P4", new Characters.Wizard(), game);
 const p5 = new Player("P5", new Characters.Barbarian(), game);
 const p6 = new Player("P6", new Characters.Druid(), game);
-const NUM_PLAYERS = game.players.length;
+const numPlayers = game.players.length;
 
 //======testing setups======//
 // import * as Powers from './powers/powers.mjs';
@@ -140,7 +140,7 @@ while (true) {
     }
 
     ++pTurn;
-    if (pTurn > NUM_PLAYERS) {
+    if (pTurn > numPlayers) {
         pTurn = 1;
         ++turn;
     }

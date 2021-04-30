@@ -17,7 +17,8 @@ function newCamera() {
     const far = 50;
     const newCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-    newCamera.position.z = 2;
+    newCamera.position.set(0, 3, 8);
+    newCamera.lookAt(0, 0, 0);
 
     return newCamera;
 }

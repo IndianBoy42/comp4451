@@ -1,4 +1,5 @@
 import { MightyPower } from "../DMpower.mjs";
+import { allPowers } from "../DMpower.mjs";
 
 // immune for 1 turn
 export class RogueImmune extends MightyPower {
@@ -30,3 +31,7 @@ export class RogueStealDiscard extends MightyPower {
         if (!(card === null)) await card.play(player, context);
     }
 }
+
+allPowers.RogueImmune = RogueImmune;
+allPowers.RogueDestroyShield = RogueDestroyShield;
+allPowers.RogueStealDiscard = RogueStealDiscard;

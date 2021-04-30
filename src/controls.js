@@ -20,9 +20,11 @@ function onMouseMove(event) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
 
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mouse, mouseIntersectionCamera);
+    if (mouseIntersectionCamera) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, mouseIntersectionCamera);
+    }
 }
 function onMouseClick(event) {
     if (objectChoices.length > 0) {
@@ -61,7 +63,7 @@ export function initControls(objects, camera, renderer) {
     orbitControls.update();
     orbitControls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     orbitControls.dampingFactor = 0.15;
-    // orbitControls.screenSpacePanning = true;
+    orbitControls.screenSpacePanning = true;
     // orbitControls.minDistance = 50;
     // orbitControls.maxDistance = 200;
     orbitControls.maxPolarAngle = Math.PI / 2;
@@ -155,7 +157,7 @@ export function chooseFromObjects(query, min, max, objects) {
             setTimeout(() => {
                 const i = Math.floor(Math.random() * (max - min + 1)) + min;
                 resolve(i);
-            }, 1000);
+            }, 300);
         });
     }
     // TODO: the controls

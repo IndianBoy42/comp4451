@@ -19,7 +19,7 @@ export class DungeonMayhem {
         for (const player of this.players) {
             player.endTurn();
         }
-        this.players.forEach(p => p.newGameStart())
+        this.players.forEach(p => p.newGameStart());
     }
 
     allOpponents(player) {
@@ -141,10 +141,8 @@ export class DungeonMayhem {
         }
 
         if (opps.length === 0 || opps.length === 1) return opps;
-        const opp = await player.selectPlayer(opps);
-        return [opp];
-
-        //return [allOpps[Math.floor(Math.random() * allOpps.length)]];
+        const i = await player.selectPlayer(opps);
+        return [opps[i]];
     }
 
     /**

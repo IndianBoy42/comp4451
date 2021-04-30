@@ -2,9 +2,10 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import { createPeer } from "./p2p";
 import { Base64 } from "js-base64";
-import { addRemotePlayer } from "./3dgame";
+import { addRemotePlayer, startCurrentGame } from "./3dgame";
 import { remotePlayerConnect, remotePlayerData } from "./DMRemotePlayer.mjs";
 import { remoteGameConnect, remoteGameData } from "./remoteGame.mjs";
+import { loaders } from "./gfx";
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -16,7 +17,7 @@ export function createGui() {
         host: true,
     };
     const gui = new dat.GUI({
-        hidable: true,
+        // hidable: true,
         // closed: true,
         closeOnTop: true,
         name: "Dungeon Mayhem Online",
@@ -28,6 +29,24 @@ export function createGui() {
         console.log(values);
         return g.add(values, name);
     }
+
+    const loadingBar = add("loading", 0).name("Loading").listen();
+    const loadingBarMonitor = setInterval(() => {
+        let pc = 0;
+        let c = 0;
+        for (const loader in loaders) {
+            if (Object.hasOwnProperty.call(loaders, loader)) {
+                const element = loaders[loader];
+                pc += element;
+                c++;
+            }
+        }
+        values.loading = pc / c;
+        if (pc >= c * 100) {
+            clearInterval(loadingBarMonitor);
+            gui.remove(loadingBar);
+        }
+    }, 250);
 
     // var folderLMP = gui.addFolder("Local Multiplayer");
     function addPeer(subValues, folder, initiator) {
@@ -96,9 +115,6 @@ export function createGui() {
         return conn;
     }
     const addPlayerBtn = add("Add Player", () => {
-        if (values.playerCount == 0) {
-            add("startGame", () => {}).name("Start Game");
-        }
         const i = values.playerCount;
         values.playerCount += 1;
         const folder = gui.addFolder(`Player ${i + 1}`);
@@ -127,6 +143,13 @@ export function createGui() {
         );
         connected.then(() => remoteGameConnect(values.joinedGamed));
     });
+
+    const startGameBtn = add("start", () => {
+        gui.remove(addPlayerBtn);
+        gui.remove(joinGameBtn);
+        gui.remove(startGameBtn);
+        startCurrentGame();
+    }).name("Start Game");
 
     return [gui, values];
 }

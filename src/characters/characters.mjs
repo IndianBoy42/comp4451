@@ -35,7 +35,8 @@ export function chooseCharacter(i = -1) {
     if (i < 0) {
         i = randIndex(allCharacters);
     }
-    return allCharacters[i];
+    const constructor = allCharacters[i];
+    return new constructor();
 }
 
 export class Wizard extends Character {

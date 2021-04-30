@@ -33,6 +33,7 @@ export class Player {
 
             //init player deck
             this.discardPile = [];
+            console.log(this.character);
             this.deck = this.character.defaultDeck();
             shuffle(this.deck);
             this.hand = [];
@@ -337,10 +338,10 @@ export class Player {
     async selectCard() {
         await this.context.updateGameState();
         return await chooseFromObjects(
-            "Choose discarded card: ",
+            "Choose card to play: ",
             0,
-            this.discardPile.length - 1,
-            this.discardPile
+            this.hand.length - 1,
+            this.hand
         );
     }
 
@@ -381,10 +382,10 @@ export class Player {
     async selectDiscardedCard(player) {
         await this.context.updateGameState();
         return await chooseFromObjects(
-            "Choose card to play: ",
+            "Choose discarded card: ",
             0,
-            player.hand.length - 1,
-            player.hand
+            player.discardPile.length - 1,
+            player.discardPile
         );
     }
 }

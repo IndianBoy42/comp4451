@@ -1,4 +1,5 @@
 import { MightyPower } from "../DMpower.mjs";
+import { allPowers } from "../DMpower.mjs";
 
 // Each player gives their hit point total to the player on their right
 export class RangerRotateHP extends MightyPower {
@@ -37,3 +38,7 @@ export class RangerBonusDamage extends MightyPower {
         }
     }
 }
+
+allPowers.RangerRotateHP = RangerRotateHP;
+allPowers.RangerStealCards = RangerStealCards;
+allPowers.RangerBonusDamage = RangerBonusDamage;

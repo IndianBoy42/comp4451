@@ -1,4 +1,5 @@
 import { MightyPower } from "../DMpower.mjs";
+import { allPowers } from "../DMpower.mjs";
 
 // gain any discarded card
 export class PaladinGetDiscard extends MightyPower {
@@ -20,3 +21,6 @@ export class PaladinDestroyShields extends MightyPower {
         }
     }
 }
+
+allPowers.PaladinGetDiscard = PaladinGetDiscard;
+allPowers.PaladinDestroyShields = PaladinDestroyShields;

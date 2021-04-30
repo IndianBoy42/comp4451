@@ -1,11 +1,11 @@
-import * as THREE from "three";
 import { DungeonMayhem } from "./DMgame.mjs";
 import { Player } from "./DMplayer.mjs";
+import { RemotePlayer } from "./DMRemotePlayer.mjs";
 import * as Characters from "./characters/characters.mjs";
-import { initRenderPlayer, rerenderPlayer, updatePlayerToken } from "./gfx.js";
+import { initRenderPlayer, renderPlayer, updatePlayerToken } from "./gfx.js";
 
 export async function gameLoop(game) {
-    const NUM_PLAYERS = game.players.length;
+    const numPlayers = game.players.length;
 
     console.log("====================================");
     for (const pl of game.players) {
@@ -49,7 +49,7 @@ export async function gameLoop(game) {
         }
 
         ++playerTurn;
-        if (playerTurn > NUM_PLAYERS) {
+        if (playerTurn > numPlayers) {
             playerTurn = 1;
             ++round;
         }
@@ -58,12 +58,12 @@ export async function gameLoop(game) {
                 "" + pl.name + " has " + pl.character.health + " hp left"
             );
         }
-        if (game.gameEnded()) break;
 
         for (const pl of game.players) {
             renderPlayer(pl);
-            // updatePlayerToken(pl);
         }
+
+        if (game.gameEnded()) break;
     }
 
     console.log("==============GAME END==============");
@@ -72,19 +72,15 @@ export async function gameLoop(game) {
     }
 }
 
-export let NUM_PLAYERS;
-let ongoingGame;
+export let numPlayers;
+let currentGame;
 
-function startAGame(scene, movables) {
-    const game = ongoingGame;
+function renderGame(scene, movables) {
+    const game = currentGame;
 
-    NUM_PLAYERS = game.players.length;
+    numPlayers = game.players.length;
 
-    game.players.forEach(
-        initRenderPlayer(scene, movables, NUM_PLAYERS, (player, token) => {
-            movables.push(token);
-        })
-    );
+    game.players.forEach(initRenderPlayer(scene, movables, numPlayers));
 
     return game;
 }
@@ -99,27 +95,34 @@ export function startLocalGame(scene, movables) {
     // const p5 = new Player("P5", new Characters.Barbarian(), game);
     // const p6 = new Player("P6", new Characters.Druid(), game);
 
-    ongoingGame = game;
+    currentGame = game;
 
-    return startAGame(scene, movables);
+    return renderGame(scene, movables);
 }
 
 export function createMPGameMenu(scene, movables) {
     const game = new DungeonMayhem();
-    ongoingGame = game;
+    currentGame = game;
 
     let me = new Player("Me", Characters.chooseCharacter(), game);
 
-    // Dont render players until start game
+    renderGame(scene, movables);
 
     return game;
 }
 
 export function addRemotePlayer(playerValues) {
-    new RemotePlayer(
+    const player = new RemotePlayer(
         playerValues,
         "P",
         Characters.chooseCharacter(),
-        ongoingGame
+        currentGame
     );
+
+    initRenderPlayer()(player);
+    currentGame.updateState();
+}
+
+export function startCurrentGame() {
+    gameLoop(currentGame);
 }
