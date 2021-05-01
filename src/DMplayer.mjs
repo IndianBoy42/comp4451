@@ -29,6 +29,7 @@ export class Player {
         this.context.players.push(this);
 
         this.isClone = isClone;
+        this.isRandomSimClone = false;
         if (!isClone) {
             this.id = globalPlayerIdCounter;
             ++globalPlayerIdCounter;
@@ -116,27 +117,32 @@ export class Player {
             context,
             true
         );
+        clone.cloneAttributes(this, isOpponent);
+        return clone;
+    }
+
+    // helper function for clone(), to be used by AIPlayer as well
+    cloneAttributes(original, isOpponent) {
         //copy attributes
-        //clone.id = this.id;
-        clone.discardPile = this.discardPile.slice(0);
+        this.id = original.id;
+        this.discardPile = original.discardPile.slice(0);
         if (isOpponent) {
             //randomize the deck + hand to simulate not knowing opponent's hand
-            let deckhand = this.deck.slice(0);
-            deckhand.push(this.hand.slice(0));
+            let deckhand = original.deck.slice(0);
+            deckhand.push(original.hand.slice(0));
             shuffle(deckhand);
-            clone.hand = deckhand.splice(0, this.hand.length);
-            clone.deck = deckhand;
+            this.hand = deckhand.splice(0, original.hand.length);
+            this.deck = deckhand;
         } else {
-            clone.hand = this.hand.slice(0);
-            //replace deck with a deck full of dummy cards for AI simulations
-            // clone.deck = this.deck.slice(0);
-            // shuffle(clone.deck);
-            clone.deck = [];
-            for (const i in this.deck) {
-                clone.deck.push(DummyCard());
-            }
+            this.hand = original.hand.slice(0);
+            // (nvm should keep original deck for simulator) replace deck with a deck full of dummy cards for AI simulations
+            this.deck = original.deck.slice(0);
+            shuffle(this.deck);
+            // this.deck = [];
+            // for (const i in original.deck) {
+            //     this.deck.push(DummyCard());
+            // }
         }
-        return clone;
     }
 
     updatePlayerRender() {
@@ -350,15 +356,28 @@ export class Player {
 
     /**
      * Perform player's turn
-     * To be overridden by AI
      */
     async playerTurn() {
         while (this.character.actionsLeft > 0) {
-            this.debugLogMe();
+            //this.debugLogMe();
             const cardPos = await this.selectCard();
             await this.playCard(cardPos, this.context);
             if (this.context.gameEnded()) break;
         }
+    }
+
+    /**
+     * Perform player's turn while dead
+     */
+     async playerDeadTurn() {
+        const opp = await this.context.choosePlayer(
+            this,
+            true,
+            false,
+            false,
+            true
+        );
+        if (opp.length > 0) this.character.doDamage(opp, 1);
     }
 
     /**
@@ -369,11 +388,38 @@ export class Player {
      */
 
     /**
+     * Unified function to select from object
+     * If this is a random simulation clone, return a random selection
+     * @param objects objects to select from
+     * @param message message to be displayed
+     * @returns index of chosen object
+     */
+    async selectObject(objects, message = "") {
+        if (this.isRandomSimClone) {
+            return Math.floor(Math.random() * (objects.length));
+        }
+        else {
+            await this.context.updateGameState();
+            return await chooseFromObjects(
+                message, 
+                0, 
+                objects.length - 1, 
+                objects
+            );
+        }
+    }
+
+    /**
      * Selects a card to play from a specific set of cards
+     * @param cards card objects to select from
+     * @param message message to be displayed
      * @returns index of chosen card
      */
     async selectCardCustom(cards, message = "") {
-        return await chooseFromObjects(message, 0, cards.length - 1, cards);
+        return await this.selectObjects(
+            message, 
+            cards
+        );
     }
 
     /**
@@ -381,11 +427,8 @@ export class Player {
      * @returns index of chosen card
      */
     async selectCard() {
-        await this.context.updateGameState();
-        return await chooseFromObjects(
-            "Choose card to play: ",
-            0,
-            this.hand.length - 1,
+        return await this.selectObjects(
+            "Choose card to play: ", 
             this.hand
         );
     }
@@ -393,14 +436,11 @@ export class Player {
     /**
      * Selects a player from an array of players
      * @param players array of selectable players
-     * @returns 1 chosen player
+     * @returns index of chosen player
      */
     async selectPlayer(opponents) {
-        await this.context.updateGameState();
-        return await chooseFromObjects(
-            "Choose target: ",
-            0,
-            opponents.length - 1,
+        return await this.selectObjects(
+            "Choose target: ", 
             opponents
         );
     }
@@ -408,28 +448,24 @@ export class Player {
     /**
      * Selects a shield from array of shields
      * @param player player whose shields is chosen
-     * @returns index of chosen shield
+     * @returns index of chosen shield, -1 if player has no shield
      */
     async selectShield(player) {
-        await this.context.updateGameState();
-        return await chooseFromObjects(
-            "Choose shield index: ",
-            0,
-            player.character.shields.length - 1,
+        if (player.character.shields.length === 0) return -1;
+        return await this.selectObjects(
+            "Choose shield to play: ", 
             player.character.shields
         );
     }
 
     /**
      * Selects a card to pick from discard pile
-     * @returns index of chosen card
+     * @returns index of chosen card, -1 if player has no discard
      */
     async selectDiscardedCard(player) {
-        await this.context.updateGameState();
-        return await chooseFromObjects(
-            "Choose discarded card: ",
-            0,
-            player.discardPile.length - 1,
+        if (player.discardPile.length === 0) return -1;
+        return await this.selectObjects(
+            "Choose discarded card: ", 
             player.discardPile
         );
     }

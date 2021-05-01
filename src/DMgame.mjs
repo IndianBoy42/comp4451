@@ -5,12 +5,22 @@ export class DungeonMayhem {
     constructor() {
         this.players = [];
         this.playerTurn = 0;
+        this.round = 1;
+    }
+
+    clone() {
+        let clone = new DungeonMayhem();
+        //dont copy players, when making new player clones add them to this clone
+        clone.playerTurn = this.playerTurn;
+        clone.round = this.round;
+        return clone;
     }
 
     encode() {
         return {
             players: this.players.map(p => p.encode()),
             turn: this.playerTurn,
+            round: this.round,
         };
     }
     decode(obj) {
@@ -20,7 +30,8 @@ export class DungeonMayhem {
             const player = Player.newFrom(newPlayerData, this);
             initRenderPlayer(player);
         }
-        this.turn = this.playerTurn;
+        this.playerTurn = obj.turn;
+        this.round = obj.round;
     }
 
     async start() {
@@ -187,4 +198,41 @@ export class DungeonMayhem {
     updateGameState() {
         return Promise.all(this.players.flatMap(p => p.updateGameState()));
     }
+
+    getWinner() {
+        if (!this.gameEnded()) return null;
+        for (const player of this.players) {
+            if (player.character.health > 0) return player;
+        }
+        return null; //in case everyone dies
+    }
+
+
+    /**
+     * Process a turn in the game
+     * Automatically updates playerTurn and round
+     * @param hostPlayer if not null, this is the actual game and will hide/show cards
+     * @param midTurnSim is true, this is simulating from the middle of a player's turn, so don't do startTurn
+     */
+    async processNextTurn(hostPlayer = null, midTurnSim = false) {
+        const player = this.players[this.playerTurn];
+
+        if (player.character.health > 0) {
+            if (!midTurnSim) player.startTurn(!(hostPlayer && hostPlayer.id == player.id));
+            if (!midTurnSim) player.drawCards(1);
+            await player.playerTurn();
+            player.endTurn(!(hostPlayer && hostPlayer.id == player.id));
+        } else {
+            // ghost ping
+            await player.playerDeadTurn();
+        }
+
+        //end turn, update playerTurn and round
+        this.playerTurn += 1;
+        if (this.playerTurn === this.players.length) {
+            this.playerTurn = 0;
+            this.round += 1;
+        }
+    }
+
 }

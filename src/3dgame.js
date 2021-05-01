@@ -12,8 +12,6 @@ export async function gameLoop(game) {
     for (const pl of game.players) {
         pl.debugLogMe();
     }
-    let round = 1;
-    let playerTurn = 1;
 
     await game.start();
 
@@ -28,35 +26,11 @@ export async function gameLoop(game) {
 
     while (true) {
         console.log(
-            "==========PLAYER " + playerTurn + " TURN " + round + "==========="
+            "==========PLAYER " + (game.playerTurn + 1) + " TURN " + game.round + "==========="
         );
-        var player;
 
-        game.playerTurn = playerTurn;
-        player = game.players[playerTurn - 1];
+        await game.processNextTurn(hostPlayer);
 
-        if (player.character.health > 0) {
-            player.startTurn(!(hostPlayer && hostPlayer.id == player.id));
-            player.drawCards(1);
-            await player.playerTurn();
-            player.endTurn(!(hostPlayer && hostPlayer.id == player.id));
-        } else {
-            // ghost ping
-            const opp = await game.choosePlayer(
-                player,
-                true,
-                false,
-                false,
-                true
-            );
-            if (opp.length > 0) player.character.doDamage(opp, 1);
-        }
-
-        ++playerTurn;
-        if (playerTurn > numPlayers) {
-            playerTurn = 1;
-            ++round;
-        }
         for (const pl of game.players) {
             console.log(
                 "" + pl.name + " has " + pl.character.health + " hp left"
