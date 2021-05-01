@@ -1,8 +1,4 @@
-import { updatePlayerToken } from "./gfx.js";
-
 export const maxHealth = 10;
-
-//TODO put all special powers related stuff in start/endTurnCallbacks?
 
 export class Character {
     /**
@@ -25,6 +21,32 @@ export class Character {
         // other special callbacks
         this.startTurnCallbacks = [];
         this.endTurnCallbacks = [];
+    }
+
+    encode() {
+        return {
+            name: this.name,
+            class: this.constructor.name,
+            health: this.health,
+            shields: this.shields.map(shield => shield.encode()),
+            actionsLeft: this.actionsLeft,
+            bonus: this.bonus,
+            disguised: this.disguised,
+            forme: this.forme,
+            ignoringShields: this.ignoringShields,
+            multiAttack: this.multiAttack,
+        };
+    }
+    decode(obj) {
+        this.name = obj.name;
+        this.health = obj.health;
+        // this.shields: handled by player because....
+        this.actionsLeft = obj.actionsLeft;
+        this.bonus = obj.bonus;
+        this.disguised = obj.disguised;
+        this.forme = obj.forme;
+        this.ignoringShields = obj.ignoringShields;
+        this.multiAttack = obj.multiAttack;
     }
 
     /**
@@ -110,7 +132,6 @@ export class Character {
             this.health = 0;
             return amt;
         }
-        updatePlayerToken(this.player);
     }
     /**
      * Receive damage (including shield)

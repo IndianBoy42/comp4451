@@ -20,9 +20,11 @@ function onMouseMove(event) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
 
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mouse, mouseIntersectionCamera);
+    if (mouseIntersectionCamera) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, mouseIntersectionCamera);
+    }
 }
 function onMouseClick(event) {
     if (objectChoices.length > 0) {
@@ -61,7 +63,7 @@ export function initControls(objects, camera, renderer) {
     orbitControls.update();
     orbitControls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     orbitControls.dampingFactor = 0.15;
-    // orbitControls.screenSpacePanning = true;
+    orbitControls.screenSpacePanning = true;
     // orbitControls.minDistance = 50;
     // orbitControls.maxDistance = 200;
     orbitControls.maxPolarAngle = Math.PI / 2;
@@ -147,7 +149,11 @@ export const clipFloor = (obj, offset = 0) => {
  * Game selection functions
  * set DEBUG_RNG_INPUT to true to play a fully randomized automatic game
  */
-export const DEBUG_RNG_INPUT = false;
+export let DEBUG_RNG_INPUT = false;
+export function setDebugRngInput(v) {
+    DEBUG_RNG_INPUT = v;
+    console.log("DEBUG_RNG_INPUT " + DEBUG_RNG_INPUT);
+}
 
 export function chooseFromObjects(query, min, max, objects) {
     if (DEBUG_RNG_INPUT) {
@@ -155,7 +161,7 @@ export function chooseFromObjects(query, min, max, objects) {
             setTimeout(() => {
                 const i = Math.floor(Math.random() * (max - min + 1)) + min;
                 resolve(i);
-            }, 1000);
+            }, 300);
         });
     }
     // TODO: the controls
@@ -167,42 +173,4 @@ export function chooseFromObjects(query, min, max, objects) {
         objectChoicesIntersectables = objects.map(obj => obj.modelInWorld);
         objectChoiceResolve = resolve;
     });
-}
-
-export async function chooseFromDiscardPile(player) {
-    const i = await chooseFromObjects(
-        "Choose discarded card: ",
-        0,
-        player.discardPile.length - 1,
-        player.discardPile
-    );
-    return i;
-}
-export async function chooseOpponent(opponents) {
-    const input = await chooseFromObjects(
-        "Choose target: ",
-        0,
-        opponents.length - 1,
-        opponents
-    );
-    return opponents[input];
-}
-export async function chooseShieldOf(player) {
-    ishield = await chooseFromObjects(
-        "Choose shield index: ",
-        0,
-        player.character.shields.length - 1,
-        player.character.shields
-    );
-    return ishield;
-}
-export async function chooseFromPlayerHand(player) {
-    const cardPos = await chooseFromObjects(
-        "Choose card to play: ",
-        0,
-        player.hand.length - 1,
-        player.hand
-    );
-
-    return cardPos;
 }

@@ -1,5 +1,6 @@
 import { Shield } from "./DMshields.mjs";
-import * as THREE from "three";
+import * as GFX from "./gfx.js";
+import { addToAllCards } from "./cards/cards.mjs";
 
 export class DMCard {
     constructor(
@@ -9,7 +10,8 @@ export class DMCard {
         dmgValue = 0,
         extraActions = 0,
         drawCards = 0,
-        extraPowers = []
+        extraPowers = [],
+        dummyCard = false
     ) {
         this.name = name;
         this.shieldValue = shieldValue;
@@ -18,7 +20,45 @@ export class DMCard {
         this.extraActions = extraActions;
         this.drawCards = drawCards;
         this.extraPowers = extraPowers;
-        this.animation = {}; //TODO: figure out how to handle animations
+        if (dummyCard) addToAllCards(this);
+    }
+
+    hideShow(hidden) {
+        GFX.setCardObjectText(
+            this.modelInWorld.canvas,
+            this.modelInWorld.context,
+            this.modelInWorld.texture,
+            this.getCardText(),
+            hidden ? "#000000" : "#00ff00"
+        );
+    }
+
+    // encode() {
+    //     return {
+    //         name: this.name,
+    //         shieldValue: this.shieldValue,
+    //         healValue: this.healValue,
+    //         dmgValue: this.dmgValue,
+    //         extraActions: this.extraActions,
+    //         drawCards: this.drawCards,
+    //         extraPowers: this.extraPowers.map(power => power.encode()),
+    //     };
+    // }
+    // decode(obj) {
+    //     this.name = obj.name;
+    //     this.shieldValue = obj.shieldValue;
+    //     this.healValue = obj.healValue;
+    //     this.dmgValue = obj.dmgValue;
+    //     this.extraActions = obj.extraActions;
+    //     this.drawCards = obj.drawCards;
+    //     this.extraPowers.push(
+    //         ...obj.extraPowers.map(pow => new allPowers[pow.id](pow.amount))
+    //     );
+    // }
+    encode() {
+        return {
+            indexInAllCards: this.indexInAllCards,
+        };
     }
 
     makeThreeObject() {
@@ -70,7 +110,8 @@ export class DMCard {
     }
 
     getCardText() {
-        return this.name +
+        return (
+            this.name +
             (this.shieldValue > 0 ? ", shield=" + this.shieldValue : "") +
             (this.healValue > 0 ? ", heal=" + this.healValue : "") +
             (this.dmgValue > 0 ? ", dmg=" + this.dmgValue : "") +
@@ -79,7 +120,8 @@ export class DMCard {
             " " +
             (this.extraPowers.length === 0
                 ? ""
-                : this.extraPowers[0].constructor.name);
+                : this.extraPowers[0].constructor.name)
+        );
     }
 
     /**
@@ -92,7 +134,13 @@ export class DMCard {
      */
     async play(player, context) {
         //debug
-        console.log("" + player.name + (player.isClone ? " (clone)" : "") + " plays " + this.name);
+        console.log(
+            "" +
+                player.name +
+                (player.isClone ? " (clone)" : "") +
+                " plays " +
+                this.name
+        );
 
         let discard = true;
         player.character.actionsLeft -= 1;

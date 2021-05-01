@@ -1,13 +1,12 @@
-import * as THREE from "three";
 import { DungeonMayhem } from "./DMgame.mjs";
 import { Player } from "./DMplayer.mjs";
+import { RemotePlayer } from "./DMRemotePlayer.mjs";
 import { AIPlayer } from "./DMAIPlayer.mjs";
 import * as Characters from "./characters/characters.mjs";
-import { initRenderPlayer, loadModel, updatePlayerToken } from "./gfx.js";
-import { chooseFromObjects, chooseFromPlayerHand } from "./controls";
+import { initRenderPlayer, renderPlayer, updatePlayerToken } from "./gfx.js";
 
 export async function gameLoop(game) {
-    const NUM_PLAYERS = game.players.length;
+    const numPlayers = game.players.length;
 
     console.log("====================================");
     for (const pl of game.players) {
@@ -16,7 +15,16 @@ export async function gameLoop(game) {
     let round = 1;
     let playerTurn = 1;
 
-    game.start();
+    await game.start();
+
+    const hostPlayer = (() => {
+        let hostPlayers = game.players.filter(p => p.isLocalOnHost());
+        if (hostPlayers.length == 1) {
+            return hostPlayers[0];
+        } else {
+            return null;
+        }
+    })();
 
     while (true) {
         console.log(
@@ -24,13 +32,14 @@ export async function gameLoop(game) {
         );
         var player;
 
+        game.playerTurn = playerTurn;
         player = game.players[playerTurn - 1];
 
         if (player.character.health > 0) {
-            player.startTurn();
+            player.startTurn(!(hostPlayer && hostPlayer.id == player.id));
             player.drawCards(1);
             await player.playerTurn();
-            player.endTurn();
+            player.endTurn(!(hostPlayer && hostPlayer.id == player.id));
         } else {
             // ghost ping
             const opp = await game.choosePlayer(
@@ -44,7 +53,7 @@ export async function gameLoop(game) {
         }
 
         ++playerTurn;
-        if (playerTurn > NUM_PLAYERS) {
+        if (playerTurn > numPlayers) {
             playerTurn = 1;
             ++round;
         }
@@ -53,36 +62,64 @@ export async function gameLoop(game) {
                 "" + pl.name + " has " + pl.character.health + " hp left"
             );
         }
-        if (game.gameEnded()) break;
 
         for (const pl of game.players) {
-            updatePlayerToken(pl);
+            renderPlayer(pl);
         }
+
+        if (game.gameEnded()) break;
     }
 
+    game.updateGameState();
     console.log("==============GAME END==============");
     for (const pl of game.players) {
         pl.debugLogMe();
     }
 }
 
-export function startGame(scene, movables) {
+export let numPlayers;
+export let currentGame;
+
+function renderGame(scene, movables) {
+    currentGame.players.forEach(initRenderPlayer);
+    return currentGame;
+}
+
+export function startLocalGame(scene, movables) {
     const game = new DungeonMayhem();
 
-    const p1 = new AIPlayer("P1", new Characters.Rogue(), game);
-    const p2 = new AIPlayer("P2", new Characters.Paladin(), game);
-    const p3 = new AIPlayer("P3", new Characters.Ranger(), game);
-    const p4 = new AIPlayer("P4", new Characters.Wizard(), game);
-    const p5 = new AIPlayer("P5", new Characters.Barbarian(), game);
-    const p6 = new AIPlayer("P6", new Characters.Druid(), game);
+    // const p3 = new Player("P3", new Characters.Ranger(), game);
+    // const p1 = new Player("P1", new Characters.Rogue(), game);
+    // const p2 = new Player("P2", new Characters.Paladin(), game);
+    // const p4 = new Player("P4", new Characters.Wizard(), game);
+    // const p5 = new Player("P5", new Characters.Barbarian(), game);
+    // const p6 = new Player("P6", new Characters.Druid(), game);
 
-    const NUM_PLAYERS = game.players.length;
+    currentGame = game;
 
-    game.players.forEach(
-        initRenderPlayer(scene, movables, NUM_PLAYERS, (player, token) => {
-            movables.push(token);
-        })
-    );
+    return renderGame(scene, movables);
+}
 
-    return game;
+export async function addAIPlayer(name, character) {
+    const player = new AIPlayer(name, character, currentGame);
+
+    initRenderPlayer(player);
+    await currentGame.updateGameState();
+}
+export async function addLocalPlayer(name, character) {
+    const player = new Player(name, character, currentGame);
+
+    initRenderPlayer(player);
+    await currentGame.updateGameState();
+}
+export async function addRemotePlayer(playerValues, name, character) {
+    const player = new RemotePlayer(playerValues, name, character, currentGame);
+
+    initRenderPlayer(player);
+    await currentGame.updateGameState();
+    await player.sendPlayerID();
+}
+
+export function startCurrentGame() {
+    gameLoop(currentGame);
 }

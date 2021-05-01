@@ -1,14 +1,33 @@
+import { Player } from "./DMplayer.mjs";
+import { initRenderPlayer } from "./gfx.js";
 
 export class DungeonMayhem {
     constructor() {
         this.players = [];
-        //this.shields = [];
+        this.playerTurn = 0;
     }
 
-    start() {
+    encode() {
+        return {
+            players: this.players.map(p => p.encode()),
+            turn: this.playerTurn,
+        };
+    }
+    decode(obj) {
+        this.players.forEach((p, i) => p.decode(obj.players[i]));
+        for (let i = this.players.length; i < obj.players.length; i++) {
+            const newPlayerData = obj.players[i];
+            const player = Player.newFrom(newPlayerData, this);
+            initRenderPlayer(player);
+        }
+        this.turn = this.playerTurn;
+    }
+
+    async start() {
         for (const player of this.players) {
             player.endTurn();
         }
+        await Promise.all(this.players.flatMap(p => p.newGameStart()));
     }
 
     allOpponents(player) {
@@ -130,10 +149,8 @@ export class DungeonMayhem {
         }
 
         if (opps.length === 0 || opps.length === 1) return opps;
-        const opp = await player.selectPlayer(opps);
-        return [opp];
-
-        //return [allOpps[Math.floor(Math.random() * allOpps.length)]];
+        const i = await player.selectPlayer(opps);
+        return [opps[i]];
     }
 
     /**
@@ -144,6 +161,7 @@ export class DungeonMayhem {
      */
     async chooseShield(player, targetSelf = false) {
         const t = await this.choosePlayer(player, true, targetSelf);
+        console.trace(t);
         if (t.length === 0) return [null, -1];
         const target = t[0];
         let ishield = -1;
@@ -164,5 +182,9 @@ export class DungeonMayhem {
             if (player.character.health === 0) ++playerDead;
         }
         return playerDead + 1 >= this.players.length;
+    }
+
+    updateGameState() {
+        return Promise.all(this.players.flatMap(p => p.updateGameState()));
     }
 }

@@ -2,58 +2,74 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import { createPeer } from "./p2p";
 import { Base64 } from "js-base64";
-import { GeometryUtils } from "three";
+import { addLocalPlayer, addAIPlayer, startCurrentGame } from "./3dgame";
+import { remotePlayerConnect, remotePlayerData } from "./DMRemotePlayer.mjs";
+import { remoteGameConnect, remoteGameData } from "./remoteGame.mjs";
+import { loaders } from "./gfx";
+import { allCharacters, characterMap } from "./characters/characters.mjs";
+import { DEBUG_RNG_INPUT, setDebugRngInput } from "./controls.js";
+import { hashDict } from "./url.js";
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
+export const guiValues = {
+    playerCount: 0,
+    players: [],
+    host: true,
+    debug_auto: false,
+};
 export function createGui() {
-    const values = {
-        playerCount: 0,
-        players: [],
-        host: true,
-    };
+    const values = guiValues;
     const gui = new dat.GUI({
-        hidable: true,
+        // hidable: true,
         // closed: true,
         closeOnTop: true,
         name: "Dungeon Mayhem Online",
     });
     gui.remember(values);
 
-    function add(name, value, g = gui) {
-        values[name] = value;
-        console.log(values);
-        return g.add(values, name);
+    function add(name, value, g = gui, vals = values) {
+        vals[name] = value;
+        return g.add(vals, name);
     }
 
-    // var folderLMP = gui.addFolder("Local Multiplayer");
+    function newPlayerFolder() {
+        const i = values.playerCount;
+        values.playerCount += 1;
+        return gui.addFolder(`Player ${i + 1}`);
+    }
+
     function addPeer(subValues, folder, initiator) {
         function addp(name, value) {
             subValues[name] = value;
-            console.log(subValues);
             return folder.add(subValues, name);
         }
 
-        addp("status", "Please Wait");
+        addp("status", "Please Wait").listen();
         const { peer, signalOut, connected } = createPeer(
             new Promise(resolve => {
-                addp("token", "Token").onFinishChange(() => {
-                    const code = subValues.token;
-                    const signal = Base64.decode(code);
-                    resolve(signal);
-                });
-                addp("paste", () => {
+                subValues.signalResolver = resolve;
+                subValues.tokenField = addp("token", "Token").onFinishChange(
+                    () => {
+                        const code = subValues.token;
+                        const signal = Base64.decode(code);
+                        subValues.signalResolver(signal);
+                        folder.remove(subValues.copyBtn);
+                    }
+                );
+                subValues.pasteBtn = addp("paste", () => {
                     navigator.clipboard.readText().then(code => {
                         subValues.token = code;
-                        gui.updateDisplay();
                         const signal = Base64.decode(code);
-                        resolve(signal);
+                        subValues.signalResolver(signal);
+                        if (subValues.copyBtn) folder.remove(subValues.copyBtn);
                     });
                 });
             }),
             initiator // joining a game is a different part of the GUI, this guy is always the initiator
         );
+        subValues.peer = peer;
         signalOut.then(signal => {
             console.log(signal);
             subValues.signalOut = signal;
@@ -64,49 +80,160 @@ export function createGui() {
                 const code = Base64.encode(subValues.signalOut);
                 navigator.clipboard.writeText(code);
             }
-            gui.updateDisplay();
         });
-        connected.then(() => {
+        let conn = connected.then(() => {
             subValues.status = "Connected";
-            gui.updateDisplay();
+            folder.remove(subValues.pasteBtn);
+            folder.remove(subValues.tokenField);
         });
         if (initiator) {
-            addp("copy", () => {
+            subValues.copyBtn = addp("copy", () => {
                 subValues.status = "Paste Answer";
-                gui.updateDisplay();
                 const code = Base64.encode(subValues.signalOut);
                 navigator.clipboard.writeText(code);
             });
         } else {
             subValues.status = "Paste Offer";
-            gui.updateDisplay();
         }
-        peer.on("data", data => {
-            subValues.msg = data;
-            gui.updateDisplay();
-        });
-        addp("ping", () => {
+
+        addp("debug_ping", () => {
             peer.send("hello world");
         });
-        addp("msg", "<Blank>");
+        addp("debug_msg", "<Blank>").listen();
+
+        return conn;
     }
-    const addPlayerBtn = add("Add Player", () => {
-        const i = values.playerCount;
-        values.playerCount += 1;
-        const folder = gui.addFolder(`Player ${i + 1}`);
-        values.players.push({});
+    const addRemotePlayerBtn = add("addRemotePlayer", () => {
+        const folder = newPlayerFolder();
+        folder.open();
+        const player = {};
+        values.players.push(player);
         gui.remove(joinGameBtn);
-        addPeer(values.players[i], folder, true);
-    });
+        const connected = addPeer(player, folder, true);
+
+        connected.then(() => remotePlayerConnect(player));
+        player.peer.on("data", data => {
+            player.msg = data;
+            remotePlayerData(player, data);
+        });
+    }).name("Add Remote Player");
+
+    const addAIPlayerFolder = gui.addFolder("Add AI Player");
+    add("Name", "Player", addAIPlayerFolder);
+    let newPlayerAI = c => {
+        addAIPlayer(values.Name, new c());
+        const folder = newPlayerFolder();
+        add("Name (AI): " + values.Name, () => {}, folder);
+        add("Class: " + c.name, () => {}, folder);
+    };
+    const addLocalPlayerFolder = gui.addFolder("Add Local Player");
+    add("Name", "Player", addLocalPlayerFolder);
+    let newPlayerLocal = c => {
+        addLocalPlayer(values.Name, new c());
+        const folder = newPlayerFolder();
+        add("Name: " + values.Name, () => {}, folder);
+        add("Class: " + c.name, () => {}, folder);
+    };
+    let charClassesButtons = folder =>
+        allCharacters.forEach(c => {
+            add(c.name, () => newPlayerLocal(c), folder);
+            add(c.name, () => newPlayerAI(c), folder);
+        });
+    charClassesButtons(addLocalPlayerFolder);
+    // const addLocalPlayerBtn = add("Add Local Player", () => {
+    //     const i = values.playerCount;
+    //     values.playerCount += 1;
+    //     const folder = gui.addFolder(`Player ${i + 1}`);
+    //     const subValues = {};
+    //     values.players.push(subValues);
+    //     gui.remove(joinGameBtn);
+    //     add("class", "", folder, subValues)
+    //         .options(allCharacters.map(c => c.name))
+    //         .name("Class");
+    //     add("Confirm", () => {}, folder, subValues);
+    // });
     const joinGameBtn = add("Join Game", () => {
         let folder = gui.addFolder("Game");
+        folder.open();
         values.joinedGame = {};
         values.host = false;
-        gui.remove(addPlayerBtn);
+        gui.remove(addRemotePlayerBtn);
+        gui.removeFolder(addLocalPlayerFolder);
         gui.remove(joinGameBtn);
-        addPeer(values.joinedGame, folder, false);
+        gui.remove(startGameBtn);
+        add("name", "", folder, values.joinedGame).name("Name");
+        add(
+            "class",
+            hashDict.hasOwnProperty("char") ? hashDict.char : "Wizard",
+            folder,
+            values.joinedGame
+        )
+            .options(allCharacters.map(c => c.name))
+            .name("Class");
+        const connected = addPeer(values.joinedGame, folder, false);
+
+        values.joinedGame.peer.on("data", data =>
+            remoteGameData(values.joinedGame, data)
+        );
+        connected.then(() => remoteGameConnect(values.joinedGame));
     });
-    add("hello", 10.0);
+
+    const startGameBtn = add("start", () => {
+        try {
+            gui.remove(addRemotePlayerBtn);
+        } catch (e) {}
+        try {
+            gui.remove(joinGameBtn);
+        } catch (e) {}
+        try {
+            gui.remove(startGameBtn);
+        } catch (e) {}
+        try {
+            gui.removeFolder(addLocalPlayerFolder);
+        } catch (e) {}
+        startCurrentGame();
+    }).name("Start Game");
+
+    add("debug_auto", false).onFinishChange(setDebugRngInput);
+
+    if (false) {
+        // FIXME: This is not so reliable as things load on demand now
+        const loadingBar = add("loading", 0).name("Loading").listen();
+        const loadingBarMonitor = setInterval(() => {
+            let pc = 0;
+            let c = 0;
+            for (const loader in loaders) {
+                if (Object.hasOwnProperty.call(loaders, loader)) {
+                    const element = loaders[loader];
+                    pc += element;
+                    c++;
+                }
+            }
+            values.loading = pc / c;
+            if (pc >= c * 100) {
+                clearInterval(loadingBarMonitor);
+                gui.remove(loadingBar);
+            }
+        }, 250);
+    }
+
+    if (hashDict.hasOwnProperty("join")) {
+        values["Join Game"]();
+    }
+    ["p1", "p2", "p3", "p4", "p5", "p6"].forEach(p => {
+        if (hashDict.hasOwnProperty(p)) {
+            if ("remote".startsWith(hashDict[p].toLowerCase())) {
+                values["addRemotePlayer"]();
+            } else {
+                const newP = (f, cls) => {
+                    if (characterMap[cls]) f(characterMap[cls]);
+                };
+                if (hashDict[p].startsWith("AI"))
+                    newP(newPlayerAI, hashDict[p].substr(2));
+                else newP(newPlayerLocal, hashDict[p]);
+            }
+        }
+    });
 
     return [gui, values];
 }

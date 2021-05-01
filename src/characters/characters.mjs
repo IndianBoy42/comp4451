@@ -9,6 +9,36 @@ import halflingDruid from "../assets/halfling_druid.glb";
 import orcBarbarian from "../assets/orc_barbarian.glb";
 import crossbowRanger from "../assets/crossbow_ranger.glb";
 
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive).
+ * The value is no lower than min (or the next integer greater than min
+ * if min isn't an integer) and no greater than max (or the next integer
+ * lower than max if max isn't an integer).
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+function randInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randBool() {
+    return Math.random() > 0.5;
+}
+function randIndex(arr) {
+    return randInt(0, arr.length - 1);
+}
+function randChoose(arr) {
+    return arr[randIndex(arr)];
+}
+export function chooseCharacter(i = -1) {
+    if (i < 0) {
+        i = randIndex(allCharacters);
+    }
+    const constructor = allCharacters[i];
+    return new constructor();
+}
+
 export class Wizard extends Character {
     constructor() {
         super("Azzan");
@@ -156,3 +186,18 @@ export class OwlBear extends Character {
         else return null;
     }
 }
+
+export const allCharacters = [
+    Wizard,
+    Paladin,
+    Barbarian,
+    Rogue,
+    Druid,
+    Ranger,
+    GelatinousCube,
+    OwlBear,
+];
+export let characterMap = {};
+allCharacters.forEach(c => {
+    characterMap[c.name] = c;
+});

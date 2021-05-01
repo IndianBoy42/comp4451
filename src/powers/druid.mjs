@@ -1,5 +1,6 @@
 import { MightyPower } from "../DMpower.mjs";
 import { chooseFromObjects } from ".././controls.js";
+import { allPowers } from "../DMpower.mjs";
 
 // If in Bear Form HEAL(1)
 // If in Wolf Form ATTACK(1)
@@ -70,3 +71,9 @@ export class DruidFreeShapeshift extends MightyPower {
         }
     }
 }
+
+allPowers.DruidFormePower = DruidFormePower;
+allPowers.DruidShapeshiftWolf = DruidShapeshiftWolf;
+allPowers.DruidShapeshiftBear = DruidShapeshiftBear;
+allPowers.DruidAnimalMultiattack = DruidAnimalMultiattack;
+allPowers.DruidFreeShapeshift = DruidFreeShapeshift;

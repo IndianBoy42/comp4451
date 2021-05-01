@@ -1,4 +1,5 @@
 import { MightyPower } from "../DMpower.mjs";
+import { allPowers } from "../DMpower.mjs";
 
 // do 3 damage to everyone
 export class WizardFireball extends MightyPower {
@@ -29,3 +30,7 @@ export class WizardSwapHP extends MightyPower {
         player.character.swapHealth(opponent.character);
     }
 }
+
+allPowers.WizardFireball = WizardFireball;
+allPowers.WizardStealShield = WizardStealShield;
+allPowers.WizardSwapHP = WizardSwapHP;

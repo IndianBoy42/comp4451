@@ -6,6 +6,8 @@ import { createGameScene, renderer, canvas } from "./gfx.js";
 import { initControls } from "./controls.js";
 import { createGui, createHud } from "./hud";
 
+THREE.Cache.enabled = true;
+
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
@@ -17,7 +19,8 @@ function newCamera() {
     const far = 50;
     const newCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-    newCamera.position.z = 2;
+    newCamera.position.set(0, 3, 8);
+    newCamera.lookAt(0, 0, 0);
 
     return newCamera;
 }
