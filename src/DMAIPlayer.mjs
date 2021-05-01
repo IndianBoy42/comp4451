@@ -211,7 +211,7 @@ export class AIPlayer extends Player {
      * Selects a card to play from a specific set of cards
      * @returns index of chosen card
      */
-    async selectCardCustom(cards) {
+    async selectCardCustom(cards, message = "") {
         //TODO
         console.log((this.isClone ? "CLONE " : "" ) + "SELECTING CARD CUSTOM");
         let decisions = [];
