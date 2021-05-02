@@ -240,10 +240,14 @@ export class GelatinousCube extends Character {
         super("Blorp");
     }
     mightyPowers() {
-        return []; // TODO: Add mightyPowers
+        return [
+            Powers.GelCubeDestroyShield,
+            Powers.GelCubeIgnoreShield,
+            Powers.GelCubeDmgShield,
+        ];
     }
     defaultDeck() {
-        return []; // TOOD: Add defaultDeck
+        return Cards.getGelCubeDeck();
     }
     modelPath(i = 0) {
         if (i == 0) return tieflingRogue;
@@ -301,7 +305,7 @@ export const allCharacters = [
     Druid,
     Ranger,
     GelatinousCube,
-    OwlBear,
+    //OwlBear,
 ];
 export let characterMap = {};
 allCharacters.forEach(c => {

@@ -1,4 +1,4 @@
-import { Shield } from "./DMshields.mjs";
+import { Shield, DamagingShield } from "./DMshields.mjs";
 import * as GFX from "./gfx.js";
 import { addToAllCards } from "./cards/cards.mjs";
 
@@ -225,6 +225,15 @@ export class DMCard {
 
         let discard = true;
         player.character.actionsLeft -= 1;
+        for (const p of this.extraPowers) {
+            await p.play(player, context);
+            // special cases
+            if (p.constructor.name == "GelCubeDmgShield") {
+                this.shieldObj = new DamagingShield(3, 2);
+                player.addShield(this);
+                discard = false;
+            }
+        }
         if (this.shieldValue != 0) {
             this.shieldObj = new Shield(this.shieldValue);
             player.addShield(this);
@@ -247,9 +256,6 @@ export class DMCard {
         }
         if (this.drawCards != 0) {
             player.drawCards(this.drawCards);
-        }
-        for (const p of this.extraPowers) {
-            await p.play(player, context);
         }
         if (discard) player.disCard(this);
         if (player.hand.length === 0) {

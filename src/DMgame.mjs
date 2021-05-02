@@ -184,11 +184,6 @@ export class DungeonMayhem {
         return [target, ishield];
     }
 
-    makeAnimalNoise() {
-        // TODO: Fun UI for this
-        return true;
-    }
-
     gameEnded() {
         let playerDead = 0;
         for (const player of this.players) {

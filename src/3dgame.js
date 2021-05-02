@@ -85,12 +85,16 @@ export async function addAIPlayer(name, character) {
 
     initRenderPlayer(player);
     await currentGame.updateGameState();
+
+    return player;
 }
 export async function addLocalPlayer(name, character) {
     const player = new Player(name, character, currentGame);
 
     initRenderPlayer(player);
     await currentGame.updateGameState();
+
+    return player;
 }
 export async function addRemotePlayer(playerValues, name, character) {
     const player = new RemotePlayer(playerValues, name, character, currentGame);
@@ -98,6 +102,8 @@ export async function addRemotePlayer(playerValues, name, character) {
     initRenderPlayer(player);
     await currentGame.updateGameState();
     await player.sendPlayerID();
+
+    return player;
 }
 
 export function startCurrentGame() {

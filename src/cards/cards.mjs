@@ -16,7 +16,7 @@ export function addToAllCards(card) {
     allCards.push(card);
 }
 
-// a dummy card for AI calculation: dummy cards replace drawn cards
-export function DummyCard() {
-    return new DMCard("Dummy Card", 0, 0, 0, 0, 0, [], false);
-}
+// // a dummy card for AI calculation: dummy cards replace drawn cards
+// export function DummyCard() {
+//     return new DMCard("Dummy Card", 0, 0, 0, 0, 0, [], false);
+// }

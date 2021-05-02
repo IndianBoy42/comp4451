@@ -125,20 +125,44 @@ export function createGui() {
     values.aiPlayerButtons = {};
     const addAIPlayerFolder = gui.addFolder("Add AI Player");
     add("Name", "Player", addAIPlayerFolder);
-    let newPlayerAI = c => {
-        addAIPlayer(values.Name, new c());
+    let newPlayerAI = async c => {
+        const p = await addAIPlayer(values.Name, new c());
         const folder = newPlayerFolder();
         add("Name (AI): " + values.Name, () => {}, folder);
         add("Class: " + c.name, () => {}, folder);
+        const deckFolder = folder.addFolder("Deck");
+        for (const cardIndex in p.deck) {
+            const card = p.deck[cardIndex];
+            const cardFolder = deckFolder.addFolder("Card " + (+cardIndex + 1) + ": " + card.name);
+            add("Name: " + card.name, () => {}, cardFolder);
+            add("Dmg: " + card.dmgValue, () => {}, cardFolder);
+            add("Heal: " + card.healValue, () => {}, cardFolder);
+            add("Shield: " + card.shieldValue, () => {}, cardFolder);
+            add("Extra: " + card.extraActions, () => {}, cardFolder);
+            add("Draw: " + card.drawCards, () => {}, cardFolder);
+            add("P: " + (card.extraPowers.length > 0 ? card.extraPowers[0].constructor.name : ""), () => {}, cardFolder);
+        }
     };
     values.localPlayerButtons = {};
     const addLocalPlayerFolder = gui.addFolder("Add Local Player");
     add("Name", "Player", addLocalPlayerFolder);
-    let newPlayerLocal = c => {
-        addLocalPlayer(values.Name, new c());
+    let newPlayerLocal = async c => {
+        const p = await addLocalPlayer(values.Name, new c());
         const folder = newPlayerFolder();
         add("Name: " + values.Name, () => {}, folder);
         add("Class: " + c.name, () => {}, folder);
+        const deckFolder = folder.addFolder("Deck");
+        for (const cardIndex in p.deck) {
+            const card = p.deck[cardIndex];
+            const cardFolder = deckFolder.addFolder("Card " + (+cardIndex + 1) + ": " + card.name);
+            add("Name: " + card.name, () => {}, cardFolder);
+            add("Dmg: " + card.dmgValue, () => {}, cardFolder);
+            add("Heal: " + card.healValue, () => {}, cardFolder);
+            add("Shield: " + card.shieldValue, () => {}, cardFolder);
+            add("Extra: " + card.extraActions, () => {}, cardFolder);
+            add("Draw: " + card.drawCards, () => {}, cardFolder);
+            add("P: " + (card.extraPowers.length > 0 ? card.extraPowers[0].constructor.name : ""), () => {}, cardFolder);
+        }
     };
     allCharacters.forEach(c => {
         add(

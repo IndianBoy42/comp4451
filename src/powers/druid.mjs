@@ -28,9 +28,10 @@ export class DruidShapeshiftBear extends MightyPower {
 }
 
 // You may make an animal noise to ATTACK(1) each opponent.
+// Changed to attack if player is in an animal form to fit an online game
 export class DruidAnimalMultiattack extends MightyPower {
     play(player, context) {
-        if (context.makeAnimalNoise()) {
+        if (player.character.forme == "bear" || player.character.forme == "wolf"/*context.makeAnimalNoise()*/) {
             player.character.doDamage(context.allOpponents(player), 1);
         }
     }

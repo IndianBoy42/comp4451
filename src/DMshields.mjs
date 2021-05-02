@@ -51,11 +51,11 @@ export class DamagingShield extends Shield {
         return con;
     }
 
-    getDamaged(amt, by, owner) {
+    async getDamaged(amt, by, owner) {
         const ret = this.getDamaged(amt, by);
         if (this.current == 0) {
-            // by.getDamaged(this.dmg, owner);
-            owner.doDamage(by, this.dmg);
+            const others = await context.choosePlayer(owner.player, true, false, false, false, true);
+            owner.doDamage(others, this.dmg);
         }
         return ret;
     }
