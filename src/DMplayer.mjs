@@ -342,7 +342,7 @@ export class Player {
      * Call the character's end turn sequence
      */
     endTurn(showCards = true) {
-        if (!this.isClone/*  && showCards */) {
+        if (!this.isClone /*  && showCards */) {
             this.handHideShow(showCards);
         }
         this.character.endTurn();
@@ -363,7 +363,7 @@ export class Player {
     /**
      * Perform player's turn while dead
      */
-     async playerDeadTurn() {
+    async playerDeadTurn() {
         const opp = await this.context.choosePlayer(
             this,
             true,
@@ -388,16 +388,15 @@ export class Player {
      * @param message message to be displayed
      * @returns index of chosen object
      */
-    async selectObject(objects, message = "") {
+    async selectObjects(message, objects) {
         if (this.isRandomSimClone) {
-            return Math.floor(Math.random() * (objects.length));
-        }
-        else {
+            return Math.floor(Math.random() * objects.length);
+        } else {
             await this.context.updateGameState();
             return await chooseFromObjects(
-                message, 
-                0, 
-                objects.length - 1, 
+                message,
+                0,
+                objects.length - 1,
                 objects
             );
         }
@@ -410,10 +409,7 @@ export class Player {
      * @returns index of chosen card
      */
     async selectCardCustom(cards, message = "") {
-        return await this.selectObjects(
-            message, 
-            cards
-        );
+        return await this.selectObjects(message, cards);
     }
 
     /**
@@ -421,10 +417,7 @@ export class Player {
      * @returns index of chosen card
      */
     async selectCard() {
-        return await this.selectObjects(
-            "Choose card to play: ", 
-            this.hand
-        );
+        return await this.selectObjects("Choose card to play: ", this.hand);
     }
 
     /**
@@ -433,10 +426,7 @@ export class Player {
      * @returns index of chosen player
      */
     async selectPlayer(opponents) {
-        return await this.selectObjects(
-            "Choose target: ", 
-            opponents
-        );
+        return await this.selectObjects("Choose target: ", opponents);
     }
 
     /**
@@ -447,7 +437,7 @@ export class Player {
     async selectShield(player) {
         if (player.character.shields.length === 0) return -1;
         return await this.selectObjects(
-            "Choose shield to play: ", 
+            "Choose shield to play: ",
             player.character.shields
         );
     }
@@ -459,7 +449,7 @@ export class Player {
     async selectDiscardedCard(player) {
         if (player.discardPile.length === 0) return -1;
         return await this.selectObjects(
-            "Choose discarded card: ", 
+            "Choose discarded card: ",
             player.discardPile
         );
     }

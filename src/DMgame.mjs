@@ -1,5 +1,5 @@
 import { Player } from "./DMplayer.mjs";
-import { initRenderPlayer } from "./gfx.js";
+import { initRenderPlayer, spotlightPlayerTurn } from "./gfx.js";
 
 export class DungeonMayhem {
     constructor() {
@@ -217,6 +217,7 @@ export class DungeonMayhem {
      */
     async processNextTurn(hostPlayer = null, midTurnSim = false) {
         const player = this.players[this.playerTurn];
+        spotlightPlayerTurn(player);
 
         if (player.character.health > 0) {
             if (!midTurnSim) player.startTurn(!(hostPlayer && hostPlayer.id == player.id));

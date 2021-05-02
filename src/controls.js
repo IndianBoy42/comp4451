@@ -161,7 +161,7 @@ export function chooseFromObjects(query, min, max, objects) {
             setTimeout(() => {
                 const i = Math.floor(Math.random() * (max - min + 1)) + min;
                 resolve(i);
-            }, 300);
+            }, 100);
         });
     }
     // TODO: the controls

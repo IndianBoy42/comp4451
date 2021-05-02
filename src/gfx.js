@@ -89,8 +89,8 @@ function dir_light(scene) {
     return light;
 }
 
-export function addSpotLightTo(obj, color = 0xff0000) {
-    obj.selectionLight = new THREE.SpotLight(color, 5);
+export function addSpotLightTo(obj, color = 0xff0000, light = null) {
+    obj.selectionLight = light ? null : new THREE.SpotLight(color, 5);
     obj.selectionLight.angle = Math.PI / 6;
     obj.selectionLight.penumbra = 0;
     obj.selectionLight.position.set(0, 2 / obj.modelInWorld.scale.length(), 0);
@@ -255,6 +255,23 @@ export const renderPlayer = async (player, i, first = false) => {
 export const initRenderPlayer = (player, i) => {
     return renderPlayer(player, i, true);
 };
+let playerTurnSpotlight = null;
+export function spotlightPlayerTurn(player) {
+    const color = 0x00ffff;
+    if (playerTurnSpotlight == null) {
+        playerTurnSpotlight = new THREE.SpotLight(color, 2);
+        playerTurnSpotlight.angle = Math.PI / 6;
+        playerTurnSpotlight.penumbra = 0;
+    } else if (playerTurnSpotlight.onPlayer)
+        playerTurnSpotlight.onPlayer.remove(playerTurnSpotlight);
+    const model = player.modelGroup;
+    if (model) {
+        playerTurnSpotlight.position.set(0, 2 / model.scale.length(), 0);
+        playerTurnSpotlight.target = model;
+        model.add(playerTurnSpotlight);
+        playerTurnSpotlight.onPlayer = model;
+    }
+}
 function setCardObjPos(card, pos) {
     card.position.copy(ZeroPosition);
     card.lookAt(new Vector3(0, 10000, 0));

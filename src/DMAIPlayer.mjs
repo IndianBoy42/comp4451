@@ -83,8 +83,8 @@ export class AIPlayer extends Player {
     /**
      * Get the best decision from newDecisions
      * Will create new GameState children, calculate score and find best decision
-     * @param parentDecisions 
-     * @param newDecisions 
+     * @param parentDecisions
+     * @param newDecisions
      */
     async getBestDecision(parentDecisions, newDecisions) {
         await this.gameState.generateChildrenStates(
@@ -105,17 +105,18 @@ export class AIPlayer extends Player {
      * @returns Decision representing chosen option
      */
     async makeDecision(decisions) {
+        await new Promise(resolve => setInterval(() => resolve(), 10));
+
         // random simulation case
         if (this.isRandomSimClone) {
             const nextDecision = this.getNextParentDecision();
             if (nextDecision != null) {
                 //first decisions of the original player's clone is determined
                 return nextDecision;
+            } else {
+                return decisions[Math.floor(Math.random() * decisions.length)];
             }
-            else {
-                return decisions[Math.floor(Math.random() * (decisions.length))];
-            }
-        }
+        } else if (this.isClone) {
         /**
          * If this is a clone:
          * - Use getParentNextDecision() to get the next decision (need to keep cloneParentDecisions unchanged)
@@ -124,7 +125,6 @@ export class AIPlayer extends Player {
          *      use it as decision because that means this clone has finished simulation
          * - Else, start simulation
          */
-        else if (this.isClone) {
             const nextDecision = this.getNextParentDecision();
             if (nextDecision != null) {
                 if (
@@ -147,14 +147,14 @@ export class AIPlayer extends Player {
                 return bestDecision;
             }
         } else {
-        /**
-         * Else, this is the original AI player
-         * - If bestChildDecisions is not empty, use it to get the next decision
-         * - Else,
-         *      + Reset decision params and start the simulation tree
-         *      + For each decision, clone the root GameState and assign decision in cloneParentDecisions
-         *      + Let the GameState progress and get the score for that child node
-         */
+            /**
+             * Else, this is the original AI player
+             * - If bestChildDecisions is not empty, use it to get the next decision
+             * - Else,
+             *      + Reset decision params and start the simulation tree
+             *      + For each decision, clone the root GameState and assign decision in cloneParentDecisions
+             *      + Let the GameState progress and get the score for that child node
+             */
             if (this.bestChildDecisions.length > 0) {
                 //do nothing, splice later
                 console.log("ORIGINAL USING FINAL DECISION");
@@ -162,10 +162,7 @@ export class AIPlayer extends Player {
                 console.log("ORIGINAL GENERATING TREE");
                 this.resetDecisions();
                 this.createSimulationTree();
-                await this.getBestDecision(
-                    [],
-                    decisions
-                );
+                await this.getBestDecision([], decisions);
                 // console.log("FINAL DECISIONS");
                 // console.log(this.bestChildDecisions);
             }
@@ -193,7 +190,9 @@ export class AIPlayer extends Player {
         const decision = await this.makeDecision(decisions);
         if (decision.playType != "Card") {
             //safety check
-            throw new Error("Wrong playType: " + decision.playType + " instead of Card");
+            throw new Error(
+                "Wrong playType: " + decision.playType + " instead of Card"
+            );
         }
         return decision.playNum;
     }
@@ -212,7 +211,9 @@ export class AIPlayer extends Player {
         const decision = await this.makeDecision(decisions);
         if (decision.playType != "Card") {
             //safety check
-            throw new Error("Wrong playType: " + decision.playType + " instead of Card");
+            throw new Error(
+                "Wrong playType: " + decision.playType + " instead of Card"
+            );
         }
         return decision.playNum;
     }
@@ -232,7 +233,9 @@ export class AIPlayer extends Player {
         const decision = await this.makeDecision(decisions);
         if (decision.playType != "Player") {
             //safety check
-            throw new Error("Wrong playType: " + decision.playType + " instead of Player");
+            throw new Error(
+                "Wrong playType: " + decision.playType + " instead of Player"
+            );
         }
         return decision.playNum;
     }
@@ -255,7 +258,9 @@ export class AIPlayer extends Player {
         const decision = await this.makeDecision(decisions);
         if (decision.playType != "Shield") {
             //safety check
-            throw new Error("Wrong playType: " + decision.playType + " instead of Shield");
+            throw new Error(
+                "Wrong playType: " + decision.playType + " instead of Shield"
+            );
         }
         return decision.playNum;
     }
@@ -277,7 +282,9 @@ export class AIPlayer extends Player {
         const decision = await this.makeDecision(decisions);
         if (decision.playType != "Discard") {
             //safety check
-            throw new Error("Wrong playType: " + decision.playType + " instead of Discard");
+            throw new Error(
+                "Wrong playType: " + decision.playType + " instead of Discard"
+            );
         }
         return decision.playNum;
     }
