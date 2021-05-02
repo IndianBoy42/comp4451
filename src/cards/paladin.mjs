@@ -14,6 +14,7 @@ import { cardTexture1, cardTexture2 } from "./textures.js";
 const backTex = async () => {
     return {
         texture: await cardTexture1,
+        uvCoords: uvFromGrid(0, 1, 1)
     };
 };
 const frontTex = i => {
