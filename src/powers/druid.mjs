@@ -64,7 +64,7 @@ export class DruidFreeShapeshift extends MightyPower {
             //     j - 1,
             //     shapeshiftCards
             // );
-            const k = await player.selectCardCustom(shapeshiftCards);
+            const k = await player.selectCardCustom(shapeshiftCards, "Choose shapeshift card to play for free: ");
             const cardIndex = shapeshiftCardsIndex[k];
             const card = player.hand.splice(cardIndex, 1)[0];
             card.play(player, context);

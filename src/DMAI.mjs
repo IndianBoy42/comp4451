@@ -1,6 +1,14 @@
 import { DungeonMayhem } from './DMgame.mjs';
 import { Player } from './DMplayer.mjs';
 
+//Simulation parameters
+const NUM_SIM_GAMES = 1000;
+const NUM_SIM_ROUNDS = 5;
+const PLAYER_HP_WEIGHT = 0.5;
+const OPPONENT_HP_WEIGHT = 0.5;
+//theoretical worst scenario: for all NUM_SIM_GAMES, playerHP = 0 while opponentHP combined = 10
+export const MIN_SCORE = -NUM_SIM_GAMES*10;
+
 export class Decision {
     /**
      * Object containing AI decision
@@ -14,10 +22,13 @@ export class Decision {
 }
 
 export class GameState {
-    constructor() {
-        this.context = new DungeonMayhem();
+    constructor(context) {
+        this.context = context.clone();
         this.player = null;
         this.allPlayers = [];
+        this.score = MIN_SCORE;
+        this.children = [];
+        this.decision = null;
     }
 
     /**
@@ -29,27 +40,52 @@ export class GameState {
     addPlayerClones(player, allPlayers) {
         for (const p of allPlayers) {
             const c = p.clone(this.context, !(p === player));
-            if (p === player) this.player = c;
+            if (p === player) {
+                this.player = c;
+                this.player.gameState = this;
+            }
             this.allPlayers.push(c);
         }
     }
 
     /**
      * Create a clone of this GameState
-     * @param parentDecisions 
-     * @returns 
+     * @param parentDecisions decisions used by the player to reach the needed state
+     * @returns clone
      */
-    makeClone(parentDecisions) {
-        let cloneState = new GameState();
+    clone(parentDecisions) {
+        let cloneState = new GameState(this.context);
         cloneState.addPlayerClones(this.player, this.allPlayers);
         cloneState.player.cloneParentDecisions = parentDecisions;
         return cloneState;
     }
 
     /**
+     * Generate child GameStates
+     * @param parentDecisions 
+     * @param newDecisions 
+     */
+    async generateChildrenStates(parentDecisions, newDecisions) {
+        for (const decision of newDecisions) {
+            // generate new parent decisions
+            let newParentDecisions = parentDecisions.slice(0);
+            //console.log("PARENT DECISIONS");
+            //console.log(newParentDecisions);
+            newParentDecisions.push(decision);
+            // create child node
+            // in the clone function, the cloned player's gameState is set to be this child
+            let child = this.player.rootGameState.clone(newParentDecisions);
+            child.decision = decision;
+            this.children.push(child);
+            // let it progress until end
+            await child.progress();
+        }
+    }
+
+    /**
      * Let the clone GameState progress until it reaches end of parentDecisions
      * The clone would now either be the root of more branches,
-     * or it has reached a state where 
+     * or it has finished simulating everything related to making the first decision.
      * 
      * TODO: GameState needs to know what functions were called originally so that it can catch up
      * In case of normal turn, just call player.selectCard() and player.playCard()
@@ -57,9 +93,10 @@ export class GameState {
      * For other cases where AI would be invoked (ghost ping, shield attack, etc),
      * how to let this function know what functions should be called?
      * Maybe handle those cases separately idk, reserve this for decision making in player's turn
+     * 
      */
     async progress() {
-        console.log(this.player);
+        //console.log(this.player);
         const nextPlay = this.player.cloneParentDecisions[0].playType;
         switch (nextPlay) {
             case 'Card':
@@ -67,14 +104,7 @@ export class GameState {
                 await this.player.playCard(cardPos, this.context);
                 break;
             case 'Player':
-                const opp = await this.context.choosePlayer(
-                    this.player,
-                    true,
-                    false,
-                    false,
-                    true
-                );
-                if (opp.length > 0) this.player.character.doDamage(opp, 1);
+                await this.player.playerDeadTurn();
                 break;
             case 'Shield':
                 //TODO
@@ -89,20 +119,92 @@ export class GameState {
             default:
                 throw new Error("Invalid playType: " + nextPlay);
         }
+
+        console.log("GAMESTATE FINISHED PROGRESS");
     }
 
     /**
-     * Get the score for this GameState
+     * Calculate score for this GameState
+     * @returns GameState child with best score (itself if it does not have any children)
      */
-    getScore() {
-        //TODO
-        let score = this.player.character.health;
-        for (const p of this.allPlayers) {
-            if (p === this.player) continue;
-            score -= p.character.health;
+    async calculateScore() {
+        //if this GameState has children, just get score from the best of its children
+        if (this.children.length > 0) {
+            let maxScore = MIN_SCORE;
+            let bestChild = null;
+            for (const child of this.children) {
+                child.calculateScore();
+                if (child.score > maxScore) {
+                    maxScore = child.score;
+                    bestChild = child;
+                }
+            }
+            this.score = maxScore;
+            console.log("BEST CHILD SCORE: " + this.score);
+            return bestChild;
         }
-        return score;
+
+        //else, this GameState is one where the player has enough cloneParentDecisions to reach end of card play
+        //do random game simulations
+        if (this.score > MIN_SCORE) return this; //if score is somehow calculated already
+        this.score = 0;
+
+        //for NUM_SIM_GAMES times:
+        for (const t in Array.from(Array(NUM_SIM_GAMES))) {
+            // create a clone of the context
+            // this context is cloned from the player.rootGameState.context, which is currently at that player's turn
+            // the playerTurn and round variables are before the player's turn had actually happened
+            // but if player has played card before, it should be reflected in the players already
+            // therefore, just need to keep track of what decision the player has made for this new card
+            // and randomize the rest
+            // also game shouldn't do startTurn() for the first player
+            let simContext = this.context.clone();
+            let simPlayer = null;
+            for (const p of this.allPlayers) {
+                const c = p.clone(simContext, !(p === this.player));
+                //set everyone to be in randomSim mode
+                c.isRandomSimClone = true;
+                //copy this player's parent decisions to the clone
+                if (p === this.player) {
+                    simPlayer = c;
+                    simPlayer.cloneParentDecisions = this.player.cloneParentDecisions;
+                }
+            }
+            if (simPlayer === null) {
+                throw new Error("No current player found???");
+            }
+            //let the simContext run for NUM_SIM_ROUND rounds
+            let remainingTurns = NUM_SIM_ROUNDS * simContext.players.length;
+            let midTurnSim = true;
+            while (remainingTurns > 0 && simContext.gameEnded()) {
+                await simContext.processNextTurn(null, midTurnSim);
+                midTurnSim = false;
+                remainingTurns -= 1;
+            }
+            //calculate score of this run
+            let playerHP = simPlayer.character.effectiveHealth;
+            let oppHP = 0;
+            for (const opp of simContext.players) {
+                if (opp === simPlayer) continue;
+                oppHP += opp.character.effectiveHealth;
+            }
+            if (oppHP === 0) playerHP *= 100; //win bonus
+            const simScore = 
+                playerHP * PLAYER_HP_WEIGHT - 
+                oppHP * OPPONENT_HP_WEIGHT / (simContext.players.length - 1)
+            ;
+            if (isNaN(simScore)) {
+                console.log(simPlayer);
+                throw new Error("player hp: " + playerHP + ", opp hp: " + oppHP);
+            }
+            this.score += simScore;
+        }
+
+        console.log("GAMESTATE FINISHED CALCULATING SCORE");
+        console.log("SCORE: " + this.score);
+        return this;
     }
+    
 
 }
 

@@ -109,7 +109,12 @@ export class Character {
         return this.health <= 0;
     }
     get effectiveHealth() {
-        return this.health + this.shield;
+        let hp = this.health;
+        if (hp === 0) return 0;
+        for (const shield of this.shields) {
+            hp += shield.shieldObj.current;
+        }
+        return hp;
     }
     /**
      * Do damage on other players
