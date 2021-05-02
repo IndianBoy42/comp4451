@@ -25,6 +25,7 @@ export async function gameLoop(game) {
             return null;
         }
     })();
+    console.log({hostPlayer: hostPlayer});
 
     while (true) {
         console.log(
@@ -84,7 +85,7 @@ function renderGame(scene, movables) {
     currentGame.players.forEach(initRenderPlayer);
 
     setInterval(() => {
-        currentGame.updateGameState();
+        // currentGame.updateGameState();
     }, 1000);
 
     return currentGame;

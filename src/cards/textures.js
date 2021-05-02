@@ -10,7 +10,7 @@ const helper = name =>
             loaderError
         )
     );
-import cardText12 from "../assets/cards/cardText12.jpg";
+import cardText12 from "../assets/cards/cardText12.png";
 export const cardTexture12 = helper(cardText12);
 import cardText17 from "../assets/cards/cardText17.png";
 export const cardTexture17 = helper(cardText17);

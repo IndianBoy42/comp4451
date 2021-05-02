@@ -10,6 +10,20 @@ import {
  * - TODO: check powers
  */
 
+const backTex = async () => {
+    return {
+        texture: await cardTexture17,
+    };
+};
+const frontTex = i => {
+    return async () => {
+        return {
+            texture: await cardTexture27,
+            uvCoords: uvFromGrid(i),
+        };
+    };
+};
+
 function ForTheMostJustice() {
     //x2
     return new DMCard("For The Most Justice!").addDamage(3);

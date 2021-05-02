@@ -70,6 +70,17 @@ export class Character {
         return clone;
     }
 
+    async healthCardTexture() {
+        return {
+            texture: null,
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: null,
+        };
+    }
+
     mightyPowers() {
         throw new Error(
             "Called mightyPowers() on abstract Character, You have to use a subclass of Character"

@@ -41,7 +41,7 @@ export class DMCard {
                 "#00ff00"
             );
         return {
-            texture: this.modelInWorld.texture,
+            // texture: this.modelInWorld.texture,
         };
     }
     setBackTexture(f) {
@@ -49,7 +49,8 @@ export class DMCard {
         return this;
     }
     async backTexture() {
-        if (this.modelInWorld.texture.isDummyTextTexture)
+        if (this.modelInWorld.texture.isDummyTextTexture) {
+            console.log("backTexture dummy text");
             GFX.setCardObjectText(
                 this.modelInWorld.canvas,
                 this.modelInWorld.context,
@@ -57,33 +58,46 @@ export class DMCard {
                 this.getCardText(),
                 "#000000"
             );
+        }
         return {
-            texture: this.modelInWorld ? this.modelInWorld.texture : null,
+            // texture: this.modelInWorld ? this.modelInWorld.texture : null,
         };
     }
     async hideShow(hidden) {
-        const tex = hidden
-            ? await this.backTexture()
-            : await this.frontTexture();
-        if (tex.texture && tex.texture != this.modelInWorld.texture) {
-            this.modelInWorld.texture = tex.texture;
-            this.modelInWorld.children[0].material.map = tex.texture;
-            tex.texture.needsUpdate = true;
-            this.modelInWorld.children[0].material.needsUpdate = true;
+        if (hidden) {
+            // FIXME: hiding cards in local mode is broken?
+            // console.log("hideshow hidden")
+            // const tex = await this.backTexture();
+            // GFX.renderCard(this.modelInWorld.children[0], tex);
+        } else {
+            const backTex = await this.backTexture();
+            const tex = await this.frontTexture();
+            GFX.renderCard(this.modelInWorld.children[0], tex);
+            GFX.renderCard(this.modelInWorld.children[1], backTex);
         }
-        if (tex.uvCorners) {
-            this.modelInWorld.children[0].geometry.attributes.uv.set(
-                uvFromCorner(tex.uvCorners)
-            );
-            this.modelInWorld.children[0].geometry.attributes.uv.needsUpdate = true;
-        }
-        if (tex.uvCoords) {
-            console.trace(tex.uvCoords);
-            this.modelInWorld.children[0].geometry.attributes.uv.set(
-                tex.uvCoords
-            );
-            this.modelInWorld.children[0].geometry.attributes.uv.needsUpdate = true;
-        }
+        // const backTex = await this.backTexture();
+        // const tex = hidden ? backTex : await this.frontTexture();
+        // GFX.renderCard(this.modelInWorld.children[0], tex);
+        // GFX.renderCard(this.modelInWorld.children[1], backTex);
+        // if (tex.texture && tex.texture != this.modelInWorld.texture) {
+        //     this.modelInWorld.texture = tex.texture;
+        //     this.modelInWorld.children[0].material.map = tex.texture;
+        //     tex.texture.needsUpdate = true;
+        //     this.modelInWorld.children[0].material.needsUpdate = true;
+        // }
+        // if (tex.uvCorners) {
+        //     this.modelInWorld.children[0].geometry.attributes.uv.set(
+        //         uvFromCorner(tex.uvCorners)
+        //     );
+        //     this.modelInWorld.children[0].geometry.attributes.uv.needsUpdate = true;
+        // }
+        // if (tex.uvCoords) {
+        //     console.trace(tex.uvCoords);
+        //     this.modelInWorld.children[0].geometry.attributes.uv.set(
+        //         tex.uvCoords
+        //     );
+        //     this.modelInWorld.children[0].geometry.attributes.uv.needsUpdate = true;
+        // }
     }
 
     // encode() {

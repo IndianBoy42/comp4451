@@ -25,7 +25,8 @@ export class DungeonMayhem {
 
     async start() {
         for (const player of this.players) {
-            player.endTurn();
+            player.endTurn(false);
+            player.drawCards(3);
         }
         await Promise.all(this.players.flatMap(p => p.newGameStart()));
     }

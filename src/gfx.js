@@ -102,7 +102,19 @@ export function addSpotLightTo(obj, color = 0xff0000) {
 function circlePos(angle, dist = 1) {
     return new Vector3(dist * Math.cos(angle), 0, dist * Math.sin(angle));
 }
-const positionFromHealthArray = [new Vector3()];
+const positionFromHealthArray = [
+    new Vector3(1.35, 0, -0.2),
+    new Vector3(0.66, 0, -0.7),
+    new Vector3(0.06, 0, -0.5),
+    new Vector3(-0.57, 0, -0.7),
+    new Vector3(-1.2, 0, -0.58),
+    new Vector3(-1.48, 0, 0),
+    new Vector3(-1.42, 0, 0.6),
+    new Vector3(-0.79, 0, 0.4),
+    new Vector3(-0.16, 0, 0.6),
+    new Vector3(0.47, 0, 0.4),
+    new Vector3(1.1, 0, 0.6),
+];
 for (let i = 1; i <= DMChars.maxHealth; i++) {
     positionFromHealthArray.push(
         circlePos(i * ((Math.PI * 2) / DMChars.maxHealth))
@@ -117,6 +129,14 @@ export function updatePlayerToken(player) {
             positionFromHealth(player.character.health)
         );
 }
+
+const DiscardPilePosition = new Vector3(2.5, -0.49, 0);
+const HandPosition = new Vector3(0, 0.49, 1.2);
+const ShieldsPosition = new Vector3(0, -0.49, -2);
+const InstrCardPosition = new Vector3(2.5, 1, 0);
+const HealthCardPosition = new Vector3(0, -0.48, 0);
+const DeckPosition = new Vector3(-2.5, -0.49, 0);
+const ZeroPosition = new Vector3();
 
 let gameScene, gameMovables;
 export const renderPlayer = async (player, i, first = false) => {
@@ -133,7 +153,7 @@ export const renderPlayer = async (player, i, first = false) => {
     if (first || 1) {
         const angle =
             Math.PI / 2 + ((2 * Math.PI) / numPlayers) * (player.id - 1);
-        const dist = 5;
+        const dist = 7;
         const pos = new Vector3(
             dist * Math.cos(angle),
             0,
@@ -164,7 +184,8 @@ export const renderPlayer = async (player, i, first = false) => {
     }
 
     if (first) {
-        for (let j = 1; j <= DMChars.maxHealth; j++) {
+        // TODO: use the health card
+        for (let j = 0; j <= DMChars.maxHealth; j++) {
             let card = await makeCardObject(`${j}`, {
                 w: 0.3,
                 h: 0.3,
@@ -174,9 +195,6 @@ export const renderPlayer = async (player, i, first = false) => {
             group.add(card);
             card.modelGroup = group;
         }
-    }
-
-    if (first) {
         player.discardPile.forEach(async (card, i) => {
             card.modelInWorld = await makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
@@ -195,6 +213,33 @@ export const renderPlayer = async (player, i, first = false) => {
             card.modelGroup = group;
             moveCardToHand(card, player, i);
         });
+        {
+            const instrCardTexture = await player.character.instrCardTexture();
+            console.log(instrCardTexture);
+            let instrCard = await makeCardObject("Instructions", {
+                h: 2.4,
+                w: 1.5,
+                texFront: instrCardTexture.texture,
+                texBack: instrCardTexture.textureBack,
+                uvFront: instrCardTexture.uvCoords,
+            });
+            group.add(instrCard);
+            setCardObjPos(instrCard, InstrCardPosition);
+            instrCard.rotateX(Math.PI / 2);
+        }
+        {
+            const healthCardTexture = await player.character.healthCardTexture();
+            console.log(healthCardTexture);
+            let healthCard = await makeCardObject("Helth", {
+                h: 4,
+                w: 2.5,
+                texFront: healthCardTexture.texture,
+                uvFront: healthCardTexture.uvCoords,
+            });
+            group.add(healthCard);
+            setCardObjPos(healthCard, HealthCardPosition);
+            healthCard.rotateZ(Math.PI / 2);
+        }
     } else {
         player.discardPile.forEach((card, i) => {
             moveCardToDiscard(card, player, i);
@@ -210,17 +255,14 @@ export const renderPlayer = async (player, i, first = false) => {
 export const initRenderPlayer = (player, i) => {
     return renderPlayer(player, i, true);
 };
-const DiscardPilePosition = new Vector3(2, -0.49, 0);
-const HandPosition = new Vector3(0, 0.49, 1.2);
-const ShieldsPosition = new Vector3(0, -0.49, -2);
-const DeckPosition = new Vector3(-2, -0.49, 0);
-const ZeroPosition = new Vector3();
-// TODO: Can be animated
+function setCardObjPos(card, pos) {
+    card.position.copy(ZeroPosition);
+    card.lookAt(new Vector3(0, 10000, 0));
+    card.rotateZ(Math.PI);
+    card.position.copy(pos);
+}
 function setCardPos(card, pos) {
-    card.modelInWorld.position.copy(ZeroPosition);
-    card.modelInWorld.lookAt(new Vector3(0, 10000, 0));
-    card.modelInWorld.rotateZ(Math.PI);
-    card.modelInWorld.position.copy(pos);
+    setCardObjPos(card.modelInWorld, pos);
 }
 export function moveCardToDiscard(card, player, i = 0) {
     if (card.modelInWorld) {
@@ -247,6 +289,7 @@ export function moveCardToHand(card, player, i = 0) {
         card.modelInWorld.position.x += 1.2 * offx;
         card.modelInWorld.position.y += 1.8 * offy;
         card.modelInWorld.rotateX(Math.PI / 2);
+        // card.hideShow(false);
     }
 }
 export function moveCardToShields(card, player, i = 0) {
@@ -285,7 +328,7 @@ export function createGameScene() {
     loadBackground(scene);
 
     loadModel(table, gltf => {
-        const scale = 20;
+        const scale = 30;
         gltf.scene.scale.multiplyScalar(scale);
         gltf.scene.position.y -= 0.35 * scale + 0.5;
         gltf.scene.receiveShadow = true;
@@ -436,12 +479,14 @@ export function uvFromGrid(i, rows = 7, cols = 10) {
 }
 export async function makeCardObject(
     name,
-    { w, h, minLines, texFront, texBack } = {
+    { w, h, minLines, texFront, texBack, uvFront, uvBack } = {
         w: 1,
         h: 1.618,
         minLines: 5,
         texFront: null,
         texBack: null,
+        uvFront: null,
+        uvBack: null,
     }
 ) {
     let canvas, context;
@@ -453,22 +498,31 @@ export async function makeCardObject(
         texFront.isDummyTextTexture = true;
     }
 
-    const materialFront = new THREE.MeshLambertMaterial({
+    const materialFront = new THREE.MeshPhongMaterial({
         color: 0xffffff,
         // side: THREE.DoubleSide,
         map: texFront,
     });
-    const materialBack = new THREE.MeshLambertMaterial({
+    const materialBack = new THREE.MeshPhongMaterial({
         color: texBack ? 0xffffff : 0,
+        // color: 0xffffff,
         map: texBack,
     });
+    if (texBack) console.log("texback", texBack);
     const front = new THREE.PlaneGeometry(w, h);
     const back = new THREE.PlaneGeometry(w, h);
-    const backUV = back.attributes.uv;
-    backUV.set(uvFromCorner(0, 0.8, 0.1, 1));
-    backUV.needsUpdate = true;
+    if (uvFront) {
+        front.attributes.uv.set(uvFront);
+        front.attributes.uv.needsUpdate = true;
+    }
+    if (uvBack) {
+        back.attributes.uv.set(uvBack);
+        back.attributes.uv.needsUpdate = true;
+    }
+    // const backUV = back.attributes.uv;
+    // backUV.set(uvFromCorner(0, 0.8, 0.1, 1));
+    // backUV.needsUpdate = true;
     back.rotateY(Math.PI);
-    // back.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI));
 
     const card = new THREE.Object3D();
     card.add(new THREE.Mesh(front, materialFront));
@@ -481,4 +535,20 @@ export async function makeCardObject(
     card.castShadow = true;
 
     return card;
+}
+
+export function renderCard(side, tex) {
+    if (tex.texture && tex.texture != side.material.map) {
+        side.material.color.set(0xffffff);
+        side.material.map = tex.texture;
+        tex.texture.needsUpdate = true;
+        side.material.needsUpdate = true;
+    }
+    if (tex.uvCorners) {
+        side.geometry.attributes.uv.set(uvFromCorner(tex.uvCorners));
+        side.geometry.attributes.uv.needsUpdate = true;
+    } else if (tex.uvCoords) {
+        side.geometry.attributes.uv.set(tex.uvCoords);
+        side.geometry.attributes.uv.needsUpdate = true;
+    }
 }

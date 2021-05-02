@@ -39,7 +39,7 @@ export class Player {
             this.deck = this.character.defaultDeck();
             shuffle(this.deck);
             this.hand = [];
-            this.drawCards(3);
+            // this.drawCards(3);
         }
     }
 
@@ -336,8 +336,8 @@ export class Player {
      * Call the character's end turn sequence
      */
     endTurn(showCards = true) {
-        if (!this.isClone && showCards) {
-            this.handHideShow(true);
+        if (!this.isClone/*  && showCards */) {
+            this.handHideShow(showCards);
         }
         this.character.endTurn();
     }

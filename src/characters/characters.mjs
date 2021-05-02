@@ -8,6 +8,8 @@ import sunPaladin from "../assets/sun_paladin.glb";
 import halflingDruid from "../assets/halfling_druid.glb";
 import orcBarbarian from "../assets/orc_barbarian.glb";
 import crossbowRanger from "../assets/crossbow_ranger.glb";
+import * as Tex from "../cards/textures.js";
+import { uvFromCorner, uvFromGrid } from "../gfx.js";
 
 /**
  * Returns a random integer between min (inclusive) and max (inclusive).
@@ -57,6 +59,19 @@ export class Wizard extends Character {
         if (i == 0) return evokerWizard;
         else return null;
     }
+    async healthCardTexture() {
+        return {
+            texture: await Tex.cardTexture32,
+            uvCoords: uvFromGrid(0, 1, 2),
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: await Tex.cardTexture32,
+            textureBack: await Tex.cardTexture12,
+            uvCoords: uvFromGrid(1, 1, 2),
+        };
+    }
 }
 
 export class Paladin extends Character {
@@ -72,6 +87,19 @@ export class Paladin extends Character {
     modelPath(i = 0) {
         if (i == 0) return sunPaladin;
         else return null;
+    }
+    async healthCardTexture() {
+        return {
+            texture: await Tex.cardTexture47,
+            uvCoords: uvFromGrid(0, 1, 2),
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: await Tex.cardTexture47,
+            textureBack: await Tex.cardTexture12,
+            uvCoords: uvFromGrid(1, 1, 2),
+        };
     }
 }
 
@@ -93,6 +121,19 @@ export class Barbarian extends Character {
         if (i == 0) return orcBarbarian;
         else return null;
     }
+    async healthCardTexture() {
+        return {
+            texture: await Tex.cardTexture20,
+            uvCoords: uvFromGrid(0, 1, 2),
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: await Tex.cardTexture20,
+            textureBack: await Tex.cardTexture7,
+            uvCoords: uvFromGrid(1, 1, 2),
+        };
+    }
 }
 
 export class Rogue extends Character {
@@ -112,6 +153,19 @@ export class Rogue extends Character {
     modelPath(i = 0) {
         if (i == 0) return tieflingRogue;
         else return null;
+    }
+    async healthCardTexture() {
+        return {
+            texture: await Tex.cardTexture16,
+            uvCoords: uvFromGrid(0, 1, 2),
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: await Tex.cardTexture16,
+            textureBack: await Tex.cardTexture26,
+            uvCoords: uvFromGrid(1, 1, 2),
+        };
     }
 }
 
@@ -133,6 +187,19 @@ export class Druid extends Character {
         if (i == 0) return halflingDruid;
         else return null;
     }
+    async healthCardTexture() {
+        return {
+            texture: await Tex.cardTexture21,
+            // uvCoords: uvFromGrid(0, 1, 2),
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: await Tex.cardTexture33,
+            textureBack: await Tex.cardTexture8,
+            // uvCoords: uvFromGrid(0, 1, 2),
+        };
+    }
 }
 
 export class Ranger extends Character {
@@ -153,6 +220,19 @@ export class Ranger extends Character {
         if (i == 0) return crossbowRanger;
         else return null;
     }
+    async healthCardTexture() {
+        return {
+            texture: await Tex.cardTexture28,
+            // uvCoords: uvFromGrid(0, 1, 2),
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: await Tex.cardTexture44,
+            textureBack: await Tex.cardTexture25,
+            // uvCoords: uvFromGrid(0, 1, 2),
+        };
+    }
 }
 
 export class GelatinousCube extends Character {
@@ -169,6 +249,19 @@ export class GelatinousCube extends Character {
         if (i == 0) return tieflingRogue;
         else return null;
     }
+    async healthCardTexture() {
+        return {
+            texture: await Tex.cardTexture28,
+            uvCoords: uvFromGrid(0),
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: await Tex.cardTexture29,
+            textureBack: await Tex.cardTexture24,
+            uvCoords: uvFromGrid(1),
+        };
+    }
 }
 
 export class OwlBear extends Character {
@@ -184,6 +277,19 @@ export class OwlBear extends Character {
     modelPath(i = 0) {
         if (i == 0) return tieflingRogue;
         else return null;
+    }
+    async healthCardTexture() {
+        return {
+            texture: await Tex.cardTexture30,
+            uvCoords: uvFromGrid(0),
+        };
+    }
+    async instrCardTexture() {
+        return {
+            texture: await Tex.cardTexture30,
+            textureBack: await Tex.cardTexture22,
+            uvCoords: uvFromGrid(1),
+        };
     }
 }
 

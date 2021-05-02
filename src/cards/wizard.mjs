@@ -31,7 +31,7 @@ function LightningBolt() {
     //x4
     return new DMCard("Lightning Bolt")
         .addDamage(3)
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(5))
         .setBackTexture(backTex);
 }
 function BurningHands() {
@@ -46,14 +46,14 @@ function MagicMissile() {
     return new DMCard("Magic Missile")
         .addDamage(1)
         .addActions(1)
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(6))
         .setBackTexture(backTex);
 }
 function SpeedOfThought() {
     //x3
     return new DMCard("Speed Of Thought")
         .addActions(2)
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(9))
         .setBackTexture(backTex);
 }
 function EvilSneer() {
@@ -61,14 +61,14 @@ function EvilSneer() {
     return new DMCard("Evil Sneer")
         .addHeal(1)
         .addActions(1)
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(2))
         .setBackTexture(backTex);
 }
 function KnowledgeIsPower() {
     //x3
     return new DMCard("Knowledge Is Power")
         .addDrawCards(3)
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(4))
         .setBackTexture(backTex);
 }
 function Shield() {
@@ -76,42 +76,42 @@ function Shield() {
     return new DMCard("Shield")
         .addShield(1)
         .addDrawCards(1)
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(8))
         .setBackTexture(backTex);
 }
 function Stoneskin() {
     //x1
     return new DMCard("Stoneskin")
         .addShield(2)
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(10))
         .setBackTexture(backTex);
 }
 function MirrorImage() {
     //x1
     return new DMCard("Mirror Image")
         .addShield(3)
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(7))
         .setBackTexture(backTex);
 }
 function Fireball() {
     //x2
     return new DMCard("Fireball")
         .addMightyPower(new WizardFireball())
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(3))
         .setBackTexture(backTex);
 }
 function Charm() {
     //x2
     return new DMCard("Charm")
         .addMightyPower(new WizardStealShield())
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(1))
         .setBackTexture(backTex);
 }
 function VampiricTouch() {
     //x2
     return new DMCard("Vampiric Touch")
         .addMightyPower(new WizardSwapHP())
-        .setFrontTexture(frontTex(0))
+        .setFrontTexture(frontTex(11))
         .setBackTexture(backTex);
 }
 

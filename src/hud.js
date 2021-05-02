@@ -195,7 +195,7 @@ export function createGui() {
         startCurrentGame();
     }).name("Start Game");
 
-    add("debug_auto", false).onFinishChange(setDebugRngInput);
+    add("debug_auto", false).onFinishChange(setDebugRngInput).listen();
 
     if (false) {
         // FIXME: This is not so reliable as things load on demand now
@@ -220,6 +220,9 @@ export function createGui() {
 
     if (hashDict.hasOwnProperty("join")) {
         values["Join Game"]();
+    }
+    if (hashDict.hasOwnProperty("auto")) {
+        values["debug_auto"] = true;
     }
     ["p1", "p2", "p3", "p4", "p5", "p6"].forEach(p => {
         if (hashDict.hasOwnProperty(p)) {
