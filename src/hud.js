@@ -118,6 +118,7 @@ export function createGui() {
         });
     }).name("Add Remote Player");
 
+    values.aiPlayerButtons = {};
     const addAIPlayerFolder = gui.addFolder("Add AI Player");
     add("Name", "Player", addAIPlayerFolder);
     let newPlayerAI = c => {
@@ -126,6 +127,7 @@ export function createGui() {
         add("Name (AI): " + values.Name, () => {}, folder);
         add("Class: " + c.name, () => {}, folder);
     };
+    values.localPlayerButtons = {};
     const addLocalPlayerFolder = gui.addFolder("Add Local Player");
     add("Name", "Player", addLocalPlayerFolder);
     let newPlayerLocal = c => {
@@ -134,24 +136,23 @@ export function createGui() {
         add("Name: " + values.Name, () => {}, folder);
         add("Class: " + c.name, () => {}, folder);
     };
-    let charClassesButtons = folder =>
-        allCharacters.forEach(c => {
-            add(c.name, () => newPlayerLocal(c), folder);
-            add(c.name, () => newPlayerAI(c), folder);
-        });
-    charClassesButtons(addLocalPlayerFolder);
-    // const addLocalPlayerBtn = add("Add Local Player", () => {
-    //     const i = values.playerCount;
-    //     values.playerCount += 1;
-    //     const folder = gui.addFolder(`Player ${i + 1}`);
-    //     const subValues = {};
-    //     values.players.push(subValues);
-    //     gui.remove(joinGameBtn);
-    //     add("class", "", folder, subValues)
-    //         .options(allCharacters.map(c => c.name))
-    //         .name("Class");
-    //     add("Confirm", () => {}, folder, subValues);
-    // });
+    allCharacters.forEach(c => {
+        add(
+            c.name,
+            () => newPlayerLocal(c),
+            addLocalPlayerFolder,
+            values.localPlayerButtons
+        );
+    });
+    allCharacters.forEach(c => {
+        add(
+            c.name,
+            () => newPlayerAI(c),
+            addAIPlayerFolder,
+            values.aiPlayerButtons
+        );
+    });
+
     const joinGameBtn = add("Join Game", () => {
         let folder = gui.addFolder("Game");
         folder.open();

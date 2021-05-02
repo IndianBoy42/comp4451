@@ -20,17 +20,70 @@ export class DMCard {
         this.extraActions = extraActions;
         this.drawCards = drawCards;
         this.extraPowers = extraPowers;
-        if (dummyCard) addToAllCards(this);
+        if (!dummyCard) addToAllCards(this);
+
+        // this.modelInWorld.canvas= document.createElement("canvas");
+        // this.modelInWorld.context= canvas.getContext("2d");
+        // this.modelInWorld.texture= new THREE.Texture(canvas);
     }
 
-    hideShow(hidden) {
-        GFX.setCardObjectText(
-            this.modelInWorld.canvas,
-            this.modelInWorld.context,
-            this.modelInWorld.texture,
-            this.getCardText(),
-            hidden ? "#000000" : "#00ff00"
-        );
+    setFrontTexture(f) {
+        this.frontTexture = f;
+        return this;
+    }
+    async frontTexture() {
+        if (this.modelInWorld.texture.isDummyTextTexture)
+            GFX.setCardObjectText(
+                this.modelInWorld.canvas,
+                this.modelInWorld.context,
+                this.modelInWorld.texture,
+                this.getCardText(),
+                "#00ff00"
+            );
+        return {
+            texture: this.modelInWorld.texture,
+        };
+    }
+    setBackTexture(f) {
+        this.backTexture = f;
+        return this;
+    }
+    async backTexture() {
+        if (this.modelInWorld.texture.isDummyTextTexture)
+            GFX.setCardObjectText(
+                this.modelInWorld.canvas,
+                this.modelInWorld.context,
+                this.modelInWorld.texture,
+                this.getCardText(),
+                "#000000"
+            );
+        return {
+            texture: this.modelInWorld ? this.modelInWorld.texture : null,
+        };
+    }
+    async hideShow(hidden) {
+        const tex = hidden
+            ? await this.backTexture()
+            : await this.frontTexture();
+        if (tex.texture && tex.texture != this.modelInWorld.texture) {
+            this.modelInWorld.texture = tex.texture;
+            this.modelInWorld.children[0].material.map = tex.texture;
+            tex.texture.needsUpdate = true;
+            this.modelInWorld.children[0].material.needsUpdate = true;
+        }
+        if (tex.uvCorners) {
+            this.modelInWorld.children[0].geometry.attributes.uv.set(
+                uvFromCorner(tex.uvCorners)
+            );
+            this.modelInWorld.children[0].geometry.attributes.uv.needsUpdate = true;
+        }
+        if (tex.uvCoords) {
+            console.trace(tex.uvCoords);
+            this.modelInWorld.children[0].geometry.attributes.uv.set(
+                tex.uvCoords
+            );
+            this.modelInWorld.children[0].geometry.attributes.uv.needsUpdate = true;
+        }
     }
 
     // encode() {
@@ -59,10 +112,6 @@ export class DMCard {
         return {
             indexInAllCards: this.indexInAllCards,
         };
-    }
-
-    makeThreeObject() {
-        return makeCardObject(this.name);
     }
 
     static shieldCard(name, amount) {

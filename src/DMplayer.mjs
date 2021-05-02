@@ -319,13 +319,7 @@ export class Player {
 
     handHideShow(hidden) {
         for (const card of this.hand) {
-            GFX.setCardObjectText(
-                card.modelInWorld.canvas,
-                card.modelInWorld.context,
-                card.modelInWorld.texture,
-                card.getCardText(),
-                hidden ? "#000000" : "#00ff00"
-            );
+            card.hideShow(hidden);
         }
     }
 

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-
+import * as cardTextures from "./cards/textures.js";
 import table from "./assets/table.glb";
 import { Vector3 } from "three";
 import { startLocalGame } from "./3dgame";
@@ -18,16 +18,17 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.autoClear = false;
 renderer.setClearColor(0xff0000, 0);
+renderer.shadowMap.enabled = true;
 
 export const loaders = {};
-function loaderProgress(name) {
+export function loaderProgress(name) {
     return xhr => {
         const pc = (xhr.loaded / xhr.total) * 100;
         loaders[name] = pc;
         console.log(`${pc} % loaded for ${name}`);
     };
 }
-function loaderError(error) {
+export function loaderError(error) {
     console.error(error);
 }
 
@@ -118,11 +119,11 @@ export function updatePlayerToken(player) {
 }
 
 let gameScene, gameMovables;
-export const renderPlayer = (player, i, first = false) => {
+export const renderPlayer = async (player, i, first = false) => {
     const numPlayers = player.context.players.length;
     const scene = gameScene;
     const movables = gameMovables;
-    console.log(`Rendering ${player.id} ${first ? "init" : ""}`);
+    // console.log(`Rendering ${player.id} ${first ? "init" : ""}`);
     if (first) {
         player.modelGroup = new THREE.Object3D();
         scene.add(player.modelGroup);
@@ -148,6 +149,7 @@ export const renderPlayer = (player, i, first = false) => {
         loadModel(player.character.modelPath(), gltf => {
             const token = gltf.scene.children[0];
             group.add(token);
+            token.castShadow = true;
             player.character.modelInWorld = token;
             player.modelInWorld = token;
 
@@ -163,7 +165,11 @@ export const renderPlayer = (player, i, first = false) => {
 
     if (first) {
         for (let j = 1; j <= DMChars.maxHealth; j++) {
-            let card = makeCardObject(`${j}`, 0.3, 0.3, 1);
+            let card = await makeCardObject(`${j}`, {
+                w: 0.3,
+                h: 0.3,
+                minLines: 1,
+            });
             card.position.copy(positionFromHealth(j));
             group.add(card);
             card.modelGroup = group;
@@ -171,20 +177,20 @@ export const renderPlayer = (player, i, first = false) => {
     }
 
     if (first) {
-        player.discardPile.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.getCardText());
+        player.discardPile.forEach(async (card, i) => {
+            card.modelInWorld = await makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
             card.modelGroup = group;
             moveCardToDiscard(card, player, i);
         });
-        player.deck.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.getCardText());
+        player.deck.forEach(async (card, i) => {
+            card.modelInWorld = await makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
             card.modelGroup = group;
             moveCardToDeck(card, player, i);
         });
-        player.hand.forEach((card, i) => {
-            card.modelInWorld = makeCardObject(card.getCardText());
+        player.hand.forEach(async (card, i) => {
+            card.modelInWorld = await makeCardObject(card.getCardText());
             group.add(card.modelInWorld);
             card.modelGroup = group;
             moveCardToHand(card, player, i);
@@ -202,7 +208,7 @@ export const renderPlayer = (player, i, first = false) => {
     }
 };
 export const initRenderPlayer = (player, i) => {
-    renderPlayer(player, i, true);
+    return renderPlayer(player, i, true);
 };
 const DiscardPilePosition = new Vector3(2, -0.49, 0);
 const HandPosition = new Vector3(0, 0.49, 1.2);
@@ -282,6 +288,7 @@ export function createGameScene() {
         const scale = 20;
         gltf.scene.scale.multiplyScalar(scale);
         gltf.scene.position.y -= 0.35 * scale + 0.5;
+        gltf.scene.receiveShadow = true;
         scene.add(gltf.scene);
     });
 
@@ -335,12 +342,16 @@ export function createGameScene() {
 
     const light1 = dir_light(scene);
     light1.position.set(-1, 2, 4);
+    light1.castShadow = true;
     const light2 = dir_light(scene);
     light2.position.set(1, 2, 4);
+    light2.castShadow = true;
     const light3 = dir_light(scene);
     light3.position.set(-1, 2, -4);
+    light3.castShadow = true;
     const light4 = dir_light(scene);
     light4.position.set(1, 2, -4);
+    light4.castShadow = true;
 
     return [scene, movables];
 }
@@ -415,24 +426,49 @@ export function setCardObjectText(
     texture.needsUpdate = true;
 }
 
-export function makeCardObject(name, w = 1, h = 1.618, minLines = 5) {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    const texture = new THREE.Texture(canvas);
+export function uvFromCorner(x0, y0, x1, y1) {
+    return [x0, y1, x1, y1, x0, y0, x1, y0];
+}
+export function uvFromGrid(i, rows = 7, cols = 10) {
+    const r = rows - 1 - Math.floor(i / cols);
+    const c = i % cols;
+    return uvFromCorner(c / cols, r / rows, (c + 1) / cols, (r + 1) / rows);
+}
+export async function makeCardObject(
+    name,
+    { w, h, minLines, texFront, texBack } = {
+        w: 1,
+        h: 1.618,
+        minLines: 5,
+        texFront: null,
+        texBack: null,
+    }
+) {
+    let canvas, context;
+    if (texFront == null) {
+        canvas = document.createElement("canvas");
+        context = canvas.getContext("2d");
+        texFront = new THREE.Texture(canvas);
+        setCardObjectText(canvas, context, texFront, name, "#00ff00", minLines);
+        texFront.isDummyTextTexture = true;
+    }
 
-    setCardObjectText(canvas, context, texture, name, "#00ff00", minLines);
-
-    const materialFront = new THREE.MeshPhongMaterial({
+    const materialFront = new THREE.MeshLambertMaterial({
         color: 0xffffff,
         // side: THREE.DoubleSide,
-        map: texture,
+        map: texFront,
     });
-    const materialBack = new THREE.MeshPhongMaterial({
-        color: 0x000000,
+    const materialBack = new THREE.MeshLambertMaterial({
+        color: texBack ? 0xffffff : 0,
+        map: texBack,
     });
     const front = new THREE.PlaneGeometry(w, h);
     const back = new THREE.PlaneGeometry(w, h);
-    back.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI));
+    const backUV = back.attributes.uv;
+    backUV.set(uvFromCorner(0, 0.8, 0.1, 1));
+    backUV.needsUpdate = true;
+    back.rotateY(Math.PI);
+    // back.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI));
 
     const card = new THREE.Object3D();
     card.add(new THREE.Mesh(front, materialFront));
@@ -441,7 +477,8 @@ export function makeCardObject(name, w = 1, h = 1.618, minLines = 5) {
     card.lookAt(new Vector3(0, 10000, 0));
     card.canvas = canvas;
     card.context = context;
-    card.texture = texture;
+    card.texture = texFront;
+    card.castShadow = true;
 
     return card;
 }

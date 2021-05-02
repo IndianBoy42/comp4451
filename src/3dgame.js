@@ -82,6 +82,11 @@ export let currentGame;
 
 function renderGame(scene, movables) {
     currentGame.players.forEach(initRenderPlayer);
+
+    setInterval(() => {
+        currentGame.updateGameState();
+    }, 1000);
+
     return currentGame;
 }
 
