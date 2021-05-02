@@ -103,17 +103,17 @@ function circlePos(angle, dist = 1) {
     return new Vector3(dist * Math.cos(angle), 0, dist * Math.sin(angle));
 }
 const positionFromHealthArray = [
-    new Vector3(1.35, 0, -0.2),
-    new Vector3(0.66, 0, -0.7),
-    new Vector3(0.06, 0, -0.5),
-    new Vector3(-0.57, 0, -0.7),
-    new Vector3(-1.2, 0, -0.58),
-    new Vector3(-1.48, 0, 0),
-    new Vector3(-1.42, 0, 0.6),
-    new Vector3(-0.79, 0, 0.4),
-    new Vector3(-0.16, 0, 0.6),
-    new Vector3(0.47, 0, 0.4),
-    new Vector3(1.1, 0, 0.6),
+    new Vector3(1.35, -0.49, -0.2),
+    new Vector3(0.66, -0.49, -0.7),
+    new Vector3(0.06, -0.49, -0.5),
+    new Vector3(-0.57, -0.49, -0.7),
+    new Vector3(-1.2, -0.49, -0.58),
+    new Vector3(-1.48, -0.49, 0),
+    new Vector3(-1.42, -0.49, 0.6),
+    new Vector3(-0.79, -0.49, 0.4),
+    new Vector3(-0.16, -0.49, 0.6),
+    new Vector3(0.47, -0.49, 0.4),
+    new Vector3(1.1, -0.49, 0.6),
 ];
 for (let i = 1; i <= DMChars.maxHealth; i++) {
     positionFromHealthArray.push(
@@ -153,7 +153,7 @@ export const renderPlayer = async (player, i, first = false) => {
     if (first || 1) {
         const angle =
             Math.PI / 2 + ((2 * Math.PI) / numPlayers) * (player.id - 1);
-        const dist = 7;
+        const dist = 8.5;
         const pos = new Vector3(
             dist * Math.cos(angle),
             0,

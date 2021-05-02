@@ -222,6 +222,7 @@ export function createGui() {
     }
     if (hashDict.hasOwnProperty("auto")) {
         values["debug_auto"] = true;
+        setDebugRngInput(true)
     }
     ["p1", "p2", "p3", "p4", "p5", "p6"].forEach(p => {
         if (p in hashDict) {

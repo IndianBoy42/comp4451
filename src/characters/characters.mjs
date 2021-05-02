@@ -97,7 +97,7 @@ export class Paladin extends Character {
     async instrCardTexture() {
         return {
             texture: await Tex.cardTexture47,
-            textureBack: await Tex.cardTexture12,
+            textureBack: await Tex.cardTexture4,
             uvCoords: uvFromGrid(1, 1, 2),
         };
     }
