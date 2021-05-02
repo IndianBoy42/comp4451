@@ -128,6 +128,24 @@ export class DMCard {
         };
     }
 
+    /**
+     * Clone the card
+     * @returns A cloned card
+     */
+    clone() {
+        let clone = new DMCard(
+            this.name,
+            this.shieldValue,
+            this.healValue,
+            this.dmgValue,
+            this.extraActions,
+            this.drawCards,
+            this.extraPowers.slice(0),
+            false
+        );
+        return clone;
+    }
+
     static shieldCard(name, amount) {
         return new DMCard(name, amount, 0, 0, 0, 0);
     }
@@ -197,10 +215,9 @@ export class DMCard {
      */
     async play(player, context) {
         //debug
-        console.log(
+        if (!player.isClone) console.log(
             "" +
                 player.name +
-                (player.isClone ? " (clone)" : "") +
                 " plays " +
                 this.name
         );

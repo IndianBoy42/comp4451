@@ -2,12 +2,13 @@ import { DungeonMayhem } from './DMgame.mjs';
 import { Player } from './DMplayer.mjs';
 
 //Simulation parameters
-const NUM_SIM_GAMES = 1000;
+const NUM_SIM_GAMES = 200;
 const NUM_SIM_ROUNDS = 5;
 const PLAYER_HP_WEIGHT = 0.5;
 const OPPONENT_HP_WEIGHT = 0.5;
+const PLAYER_HAND_WEIGHT = 0.05;
 //theoretical worst scenario: for all NUM_SIM_GAMES, playerHP = 0 while opponentHP combined = 10
-export const MIN_SCORE = -NUM_SIM_GAMES*10;
+export const MIN_SCORE = -NUM_SIM_GAMES*20;
 
 export class Decision {
     /**
@@ -19,6 +20,10 @@ export class Decision {
         this.playType = playType;
         this.playNum = playNum;
     }
+
+    toString() {
+        return this.playType[0] + "" + this.playNum;
+    }
 }
 
 export class GameState {
@@ -29,6 +34,7 @@ export class GameState {
         this.score = MIN_SCORE;
         this.children = [];
         this.decision = null;
+        this.decisionChain = ""; //for debug
     }
 
     /**
@@ -104,23 +110,16 @@ export class GameState {
                 await this.player.playCard(cardPos, this.context);
                 break;
             case 'Player':
-                await this.player.playerDeadTurn();
-                break;
             case 'Shield':
-                //TODO
-                console.log(this.player.cloneParentDecisions);
-                throw new Error("Unsupported.");
-                break;
             case 'Discard':
-                //TODO
                 console.log(this.player.cloneParentDecisions);
-                throw new Error("Unsupported.");
+                throw new Error("PlayType " + nextPlay + " unsupported.");
                 break;
             default:
                 throw new Error("Invalid playType: " + nextPlay);
         }
 
-        console.log("GAMESTATE FINISHED PROGRESS");
+        //console.log("GAMESTATE FINISHED PROGRESS");
     }
 
     /**
@@ -133,14 +132,19 @@ export class GameState {
             let maxScore = MIN_SCORE;
             let bestChild = null;
             for (const child of this.children) {
-                child.calculateScore();
-                if (child.score > maxScore) {
+                await child.calculateScore();
+                if (child.score >= maxScore) {
+                    if (child.score === maxScore && Math.random() < 0.5) {
+                        //if scores are the same, randomize decision
+                        continue;
+                    }
                     maxScore = child.score;
                     bestChild = child;
                 }
             }
             this.score = maxScore;
-            console.log("BEST CHILD SCORE: " + this.score);
+            this.decisionChain = this.decision.toString() + " " + bestChild.decisionChain;
+            console.log("BEST CHILD SCORE: " + this.score + " DECISIONS " + this.decisionChain);
             return bestChild;
         }
 
@@ -158,31 +162,29 @@ export class GameState {
             // therefore, just need to keep track of what decision the player has made for this new card
             // and randomize the rest
             // also game shouldn't do startTurn() for the first player
-            let simContext = this.context.clone();
+            let simContext = this.player.rootGameState.context.clone();
             let simPlayer = null;
-            for (const p of this.allPlayers) {
-                const c = p.clone(simContext, !(p === this.player));
+            for (const p of this.player.rootGameState.allPlayers) {
+                let c = p.clone(simContext, !(p === this.player.rootGameState.player));
                 //set everyone to be in randomSim mode
                 c.isRandomSimClone = true;
                 //copy this player's parent decisions to the clone
-                if (p === this.player) {
+                if (p === this.player.rootGameState.player) {
                     simPlayer = c;
                     simPlayer.cloneParentDecisions = this.player.cloneParentDecisions;
                 }
             }
-            if (simPlayer === null) {
-                throw new Error("No current player found???");
-            }
             //let the simContext run for NUM_SIM_ROUND rounds
             let remainingTurns = NUM_SIM_ROUNDS * simContext.players.length;
             let midTurnSim = true;
-            while (remainingTurns > 0 && simContext.gameEnded()) {
+            while (remainingTurns > 0 && !simContext.gameEnded()) {
                 await simContext.processNextTurn(null, midTurnSim);
                 midTurnSim = false;
                 remainingTurns -= 1;
             }
             //calculate score of this run
             let playerHP = simPlayer.character.effectiveHealth;
+            let playerHand = simPlayer.hand.length;
             let oppHP = 0;
             for (const opp of simContext.players) {
                 if (opp === simPlayer) continue;
@@ -190,7 +192,8 @@ export class GameState {
             }
             if (oppHP === 0) playerHP *= 100; //win bonus
             const simScore = 
-                playerHP * PLAYER_HP_WEIGHT - 
+                playerHP * PLAYER_HP_WEIGHT +
+                playerHand * PLAYER_HAND_WEIGHT - 
                 oppHP * OPPONENT_HP_WEIGHT / (simContext.players.length - 1)
             ;
             if (isNaN(simScore)) {
@@ -201,35 +204,10 @@ export class GameState {
         }
 
         console.log("GAMESTATE FINISHED CALCULATING SCORE");
-        console.log("SCORE: " + this.score);
+        this.decisionChain = this.decision.toString();
+        console.log("SCORE: " + this.score + " DECISION " + this.decisionChain);
         return this;
     }
     
 
 }
-
-// export class AI {
-//     constructor(player) {
-//         this.player = player;
-//         this.resetPlays();
-//     }
-
-//     resetPlays() {
-//         this.explorePlays = [];
-//         this.optimalPlays = [];
-//     }
-
-//     getOptimalPlay(choices) {
-//         //set up 
-//         const clones = [];
-//         clones.push(this.player.clone());
-//         for (const opp in this.player.context.allOpponents(this.player)) {
-//             clones.push(opp.clone());
-//         }
-
-//         for (const choice of choices) {
-
-//         }
-//     }
-
-// }

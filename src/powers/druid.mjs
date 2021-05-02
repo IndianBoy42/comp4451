@@ -50,7 +50,7 @@ export class DruidFreeShapeshift extends MightyPower {
                     card.extraPowers[0].constructor.name ===
                         "DruidShapeshiftBear"
                 ) {
-                    console.log("Playable card " + j + ": " + card.name);
+                    //console.log("Playable card " + j + ": " + card.name);
                     ++j;
                     shapeshiftCardsIndex.push(i);
                     shapeshiftCards.push(card);
@@ -66,8 +66,7 @@ export class DruidFreeShapeshift extends MightyPower {
             // );
             const k = await player.selectCardCustom(shapeshiftCards, "Choose shapeshift card to play for free: ");
             const cardIndex = shapeshiftCardsIndex[k];
-            const card = player.hand.splice(cardIndex, 1)[0];
-            card.play(player, context);
+            await player.playCard(cardIndex, context);
         }
     }
 }

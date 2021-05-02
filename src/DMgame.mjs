@@ -116,7 +116,8 @@ export class DungeonMayhem {
         chooseAnyone = false,
         targetSelf = false,
         targetDisguise = false,
-        isGhostPing = false
+        isGhostPing = false,
+        specialCase = false
     ) {
         let opps = [];
         if (chooseAnyone) {
@@ -161,7 +162,7 @@ export class DungeonMayhem {
         }
 
         if (opps.length === 0 || opps.length === 1) return opps;
-        const i = await player.selectPlayer(opps);
+        const i = await player.selectPlayer(opps, specialCase);
         return [opps[i]];
     }
 
@@ -173,7 +174,7 @@ export class DungeonMayhem {
      */
     async chooseShield(player, targetSelf = false) {
         const t = await this.choosePlayer(player, true, targetSelf);
-        console.trace(t);
+        //console.trace(t);
         if (t.length === 0) return [null, -1];
         const target = t[0];
         let ishield = -1;

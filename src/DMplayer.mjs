@@ -121,27 +121,31 @@ export class Player {
         return clone;
     }
 
+    // helper function to clone an array of cards
+    cloneCards(cards) {
+        let cloneCards = [];
+        for (const card of cards) {
+            cloneCards.push(card.clone());
+        }
+        return cloneCards;
+    }
+
     // helper function for clone(), to be used by AIPlayer as well
     cloneAttributes(original, isOpponent) {
         //copy attributes
         this.id = original.id;
-        this.discardPile = original.discardPile.slice(0);
+        this.discardPile = this.cloneCards(original.discardPile);
         if (isOpponent) {
             //randomize the deck + hand to simulate not knowing opponent's hand
-            let deckhand = original.deck.slice(0);
-            deckhand.push(original.hand.slice(0));
+            let deckhand = this.cloneCards(original.deck);
+            deckhand = deckhand.concat(this.cloneCards(original.hand));
             shuffle(deckhand);
             this.hand = deckhand.splice(0, original.hand.length);
             this.deck = deckhand;
         } else {
-            this.hand = original.hand.slice(0);
-            // (nvm should keep original deck for simulator) replace deck with a deck full of dummy cards for AI simulations
-            this.deck = original.deck.slice(0);
+            this.hand = this.cloneCards(original.hand);
+            this.deck = this.cloneCards(original.deck);
             shuffle(this.deck);
-            // this.deck = [];
-            // for (const i in original.deck) {
-            //     this.deck.push(DummyCard());
-            // }
         }
     }
 
@@ -366,10 +370,11 @@ export class Player {
     async playerDeadTurn() {
         const opp = await this.context.choosePlayer(
             this,
-            true,
+            true, //chooseAnyone
             false,
             false,
-            true
+            true, //isGhostPing
+            true //specialCase
         );
         if (opp.length > 0) this.character.doDamage(opp, 1);
     }
@@ -422,10 +427,11 @@ export class Player {
 
     /**
      * Selects a player from an array of players
-     * @param players array of selectable players
+     * @param opponents array of selectable players
+     * @param specialCase does not affect normal players, is used by AI
      * @returns index of chosen player
      */
-    async selectPlayer(opponents) {
+    async selectPlayer(opponents, specialCase = false) {
         return await this.selectObjects("Choose target: ", opponents);
     }
 
