@@ -25,7 +25,7 @@ export function loaderProgress(name) {
     return xhr => {
         const pc = (xhr.loaded / xhr.total) * 100;
         loaders[name] = pc;
-        console.log(`${pc} % loaded for ${name}`);
+        //console.log(`${pc} % loaded for ${name}`);
     };
 }
 export function loaderError(error) {
