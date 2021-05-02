@@ -47,7 +47,7 @@ export class Player {
     isLocalOnHost() {
         // Remember this is only valid on host
         // On remote use the currentPlayer variable in remoteGame.js
-        return this.constructor.name == "DMplayer";
+        return this.constructor.name == "Player";
     }
 
     encode() {

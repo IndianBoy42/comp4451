@@ -108,7 +108,11 @@ export function createGui() {
         folder.open();
         const player = {};
         values.players.push(player);
-        gui.remove(joinGameBtn);
+        try {
+            gui.remove(joinGameBtn);
+        } catch (e) {
+            e;
+        }
         const connected = addPeer(player, folder, true);
 
         connected.then(() => remotePlayerConnect(player));
@@ -158,10 +162,26 @@ export function createGui() {
         folder.open();
         values.joinedGame = {};
         values.host = false;
-        gui.remove(addRemotePlayerBtn);
-        gui.removeFolder(addLocalPlayerFolder);
-        gui.remove(joinGameBtn);
-        gui.remove(startGameBtn);
+        try {
+            gui.remove(addRemotePlayerBtn);
+        } catch (e) {
+            e;
+        }
+        try {
+            gui.removeFolder(addLocalPlayerFolder);
+        } catch (e) {
+            e;
+        }
+        try {
+            gui.remove(joinGameBtn);
+        } catch (e) {
+            e;
+        }
+        try {
+            gui.remove(startGameBtn);
+        } catch (e) {
+            e;
+        }
         add("name", "", folder, values.joinedGame).name("Name");
         add(
             "class",
@@ -183,16 +203,32 @@ export function createGui() {
 
     const startGameBtn = add("start", () => {
         try {
-            gui.remove(addRemotePlayerBtn);
+            try {
+                gui.remove(addRemotePlayerBtn);
+            } catch (e) {
+                e;
+            }
         } catch (e) {}
         try {
-            gui.remove(joinGameBtn);
+            try {
+                gui.remove(joinGameBtn);
+            } catch (e) {
+                e;
+            }
         } catch (e) {}
         try {
-            gui.remove(startGameBtn);
+            try {
+                gui.remove(startGameBtn);
+            } catch (e) {
+                e;
+            }
         } catch (e) {}
         try {
-            gui.removeFolder(addLocalPlayerFolder);
+            try {
+                gui.removeFolder(addLocalPlayerFolder);
+            } catch (e) {
+                e;
+            }
         } catch (e) {}
         startCurrentGame();
     }).name("Start Game");
@@ -212,7 +248,11 @@ export function createGui() {
             values.loading = pc / c;
             if (pc >= c * 100) {
                 clearInterval(loadingBarMonitor);
-                gui.remove(loadingBar);
+                try {
+                    gui.remove(loadingBar);
+                } catch (e) {
+                    e;
+                }
             }
         }, 250);
     }
@@ -222,7 +262,7 @@ export function createGui() {
     }
     if (hashDict.hasOwnProperty("auto")) {
         values["debug_auto"] = true;
-        setDebugRngInput(true)
+        setDebugRngInput(true);
     }
     ["p1", "p2", "p3", "p4", "p5", "p6"].forEach(p => {
         if (p in hashDict) {

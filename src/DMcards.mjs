@@ -66,9 +66,9 @@ export class DMCard {
     async hideShow(hidden) {
         if (hidden) {
             // FIXME: hiding cards in local mode is broken?
-            // console.log("hideshow hidden")
-            // const tex = await this.backTexture();
-            // GFX.renderCard(this.modelInWorld.children[0], tex);
+            console.log("hideshow hidden")
+            const tex = await this.backTexture();
+            GFX.renderCard(this.modelInWorld.children[0], tex);
         } else {
             const backTex = await this.backTexture();
             const tex = await this.frontTexture();

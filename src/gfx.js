@@ -555,7 +555,7 @@ export async function makeCardObject(
 }
 
 export function renderCard(side, tex) {
-    if (tex.texture && tex.texture != side.material.map) {
+    if ( tex.texture != side.material.map) {
         side.material.color.set(0xffffff);
         side.material.map = tex.texture;
         tex.texture.needsUpdate = true;
