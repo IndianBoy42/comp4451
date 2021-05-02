@@ -86,6 +86,18 @@ export class RemotePlayer extends Player {
         return [this.callAndResponse(msg)];
     }
 
+    handHideShow(hidden) {
+        for (const card of this.hand) {
+            card.hideShow(true);
+        }
+    }
+
+    drawCard() {
+        const c = super.drawCard();
+        c.hideShow(true);
+        return c;
+    }
+
     /**
      * Selects a card to play from hand
      * @returns index of chosen card

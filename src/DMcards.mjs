@@ -64,11 +64,12 @@ export class DMCard {
         };
     }
     async hideShow(hidden) {
+        // console.trace("hideShow");
         if (hidden) {
             // FIXME: hiding cards in local mode is broken?
-            console.log("hideshow hidden")
             const tex = await this.backTexture();
             GFX.renderCard(this.modelInWorld.children[0], tex);
+            GFX.renderCard(this.modelInWorld.children[1], tex);
         } else {
             const backTex = await this.backTexture();
             const tex = await this.frontTexture();

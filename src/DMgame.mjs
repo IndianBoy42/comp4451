@@ -220,10 +220,12 @@ export class DungeonMayhem {
         spotlightPlayerTurn(player);
 
         if (player.character.health > 0) {
-            if (!midTurnSim) player.startTurn(!(hostPlayer && hostPlayer.id == player.id));
+            const doHiding=false;//!(hostPlayer && hostPlayer.id == player.id)
+            console.log("startTurn hidden=", doHiding)
             if (!midTurnSim) player.drawCards(1);
+            if (!midTurnSim) player.startTurn(doHiding);
             await player.playerTurn();
-            player.endTurn(!(hostPlayer && hostPlayer.id == player.id));
+            player.endTurn(doHiding);
         } else {
             // ghost ping
             await player.playerDeadTurn();
