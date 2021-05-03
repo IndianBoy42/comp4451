@@ -6,8 +6,8 @@ import evokerWizard from "../assets/evoker_wizard.glb";
 import tieflingRogue from "../assets/tiefling_rogue.glb";
 import sunPaladin from "../assets/sun_paladin.glb";
 import halflingDruid from "../assets/halfling_druid.glb";
-import orcBarbarian from "../assets/orc_barbarian.glb";
-import crossbowRanger from "../assets/crossbow_ranger.glb";
+import barbarian from "../assets/barbarian.glb";
+import bowRanger from "../assets/bow_ranger.glb";
 import * as Tex from "../cards/textures.js";
 import { uvFromCorner, uvFromGrid } from "../gfx.js";
 
@@ -118,7 +118,7 @@ export class Barbarian extends Character {
         return Cards.getBarbarianDeck();
     }
     modelPath(i = 0) {
-        if (i == 0) return orcBarbarian;
+        if (i == 0) return barbarian;
         else return null;
     }
     async healthCardTexture() {
@@ -217,7 +217,7 @@ export class Ranger extends Character {
         return Cards.getRangerDeck();
     }
     modelPath(i = 0) {
-        if (i == 0) return crossbowRanger;
+        if (i == 0) return bowRanger;
         else return null;
     }
     async healthCardTexture() {
