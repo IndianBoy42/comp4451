@@ -21,7 +21,7 @@ module.exports = {
             chunks: ["index"],
         }),
         new HtmlWebpackPlugin({
-            title: "Simple Peer Testing",
+            title: "Dungeon Mayhem Online",
             chunks: ["game"],
             filename: "game.html",
         }),

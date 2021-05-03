@@ -26,7 +26,7 @@ export function loaderError(error) {
     console.error(error);
 }
 
-import museum from "./assets/skycubes/castle.jpg";
+import museum from "./assets/skycubes/museum.jpg";
 function loadBackground(scene) {
     textureLoader.load(
         museum,
