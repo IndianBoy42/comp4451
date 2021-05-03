@@ -7,7 +7,7 @@ module.exports = {
     mode: "development",
     entry: {
         index: "./src/index.js",
-        peertest: "./src/peertest.js",
+        game: "./src/game.js",
     },
     output: {
         // filename: "main.js",
@@ -22,8 +22,8 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             title: "Simple Peer Testing",
-            chunks: ["peertest"],
-            filename: "peertest.html",
+            chunks: ["game"],
+            filename: "game.html",
         }),
         new webpack.ProvidePlugin({
             process: "process/browser",
@@ -40,29 +40,30 @@ module.exports = {
             //         filename: "[name][ext]",
             //     },
             // },
-            // {
-            //     test: /\.html$/,
-            //     use: [
-            //         // {
-            //         //     loader: "file-loader",
-            //         //     options: {
-            //         //         esModule: true,
-            //         //     },
-            //         // },
-            //         {
-            //             loader: "extract-loader",
-            //             options: {
-            //                 esModule: false,
-            //             },
-            //         },
-            //         {
-            //             loader: "html-loader",
-            //             options: {
-            //                 esModule: false,
-            //             },
-            //         },
-            //     ],
-            // },
+            {
+                test: /\.html$/,
+                use: [
+                    // {
+                    //     loader: "file-loader",
+                    //     options: {
+                    //         esModule: true,
+                    //     },
+                    // },
+                    // {
+                    //     loader: "extract-loader",
+                    //     options: {
+                    //         esModule: false,
+                    //     },
+                    // },
+                    "html-loader",
+                    // {
+                    //     loader: "html-loader",
+                    //     options: {
+                    //         esModule: false,
+                    //     },
+                    // },
+                ],
+            },
             {
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"],

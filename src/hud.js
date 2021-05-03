@@ -110,9 +110,7 @@ export function createGui() {
         values.players.push(player);
         try {
             gui.remove(joinGameBtn);
-        } catch (e) {
-            e;
-        }
+        } catch (e) {}
         const connected = addPeer(player, folder, true);
 
         connected.then(() => remotePlayerConnect(player));
@@ -133,14 +131,23 @@ export function createGui() {
         const deckFolder = folder.addFolder("Deck");
         for (const cardIndex in p.deck) {
             const card = p.deck[cardIndex];
-            const cardFolder = deckFolder.addFolder("Card " + (+cardIndex + 1) + ": " + card.name);
+            const cardFolder = deckFolder.addFolder(
+                "Card " + (+cardIndex + 1) + ": " + card.name
+            );
             add("Name: " + card.name, () => {}, cardFolder);
             add("Dmg: " + card.dmgValue, () => {}, cardFolder);
             add("Heal: " + card.healValue, () => {}, cardFolder);
             add("Shield: " + card.shieldValue, () => {}, cardFolder);
             add("Extra: " + card.extraActions, () => {}, cardFolder);
             add("Draw: " + card.drawCards, () => {}, cardFolder);
-            add("P: " + (card.extraPowers.length > 0 ? card.extraPowers[0].constructor.name : ""), () => {}, cardFolder);
+            add(
+                "P: " +
+                    (card.extraPowers.length > 0
+                        ? card.extraPowers[0].constructor.name
+                        : ""),
+                () => {},
+                cardFolder
+            );
         }
     };
     values.localPlayerButtons = {};
@@ -154,14 +161,23 @@ export function createGui() {
         const deckFolder = folder.addFolder("Deck");
         for (const cardIndex in p.deck) {
             const card = p.deck[cardIndex];
-            const cardFolder = deckFolder.addFolder("Card " + (+cardIndex + 1) + ": " + card.name);
+            const cardFolder = deckFolder.addFolder(
+                "Card " + (+cardIndex + 1) + ": " + card.name
+            );
             add("Name: " + card.name, () => {}, cardFolder);
             add("Dmg: " + card.dmgValue, () => {}, cardFolder);
             add("Heal: " + card.healValue, () => {}, cardFolder);
             add("Shield: " + card.shieldValue, () => {}, cardFolder);
             add("Extra: " + card.extraActions, () => {}, cardFolder);
             add("Draw: " + card.drawCards, () => {}, cardFolder);
-            add("P: " + (card.extraPowers.length > 0 ? card.extraPowers[0].constructor.name : ""), () => {}, cardFolder);
+            add(
+                "P: " +
+                    (card.extraPowers.length > 0
+                        ? card.extraPowers[0].constructor.name
+                        : ""),
+                () => {},
+                cardFolder
+            );
         }
     };
     allCharacters.forEach(c => {
@@ -188,24 +204,19 @@ export function createGui() {
         values.host = false;
         try {
             gui.remove(addRemotePlayerBtn);
-        } catch (e) {
-            e;
-        }
+        } catch (e) {}
+        try {
+            gui.removeFolder(addAIPlayerFolder);
+        } catch (e) {}
         try {
             gui.removeFolder(addLocalPlayerFolder);
-        } catch (e) {
-            e;
-        }
+        } catch (e) {}
         try {
             gui.remove(joinGameBtn);
-        } catch (e) {
-            e;
-        }
+        } catch (e) {}
         try {
             gui.remove(startGameBtn);
-        } catch (e) {
-            e;
-        }
+        } catch (e) {}
         add("name", "", folder, values.joinedGame).name("Name");
         add(
             "class",
@@ -227,32 +238,19 @@ export function createGui() {
 
     const startGameBtn = add("start", () => {
         try {
-            try {
-                gui.remove(addRemotePlayerBtn);
-            } catch (e) {
-                e;
-            }
+            gui.remove(addRemotePlayerBtn);
         } catch (e) {}
         try {
-            try {
-                gui.remove(joinGameBtn);
-            } catch (e) {
-                e;
-            }
+            gui.remove(joinGameBtn);
         } catch (e) {}
         try {
-            try {
-                gui.remove(startGameBtn);
-            } catch (e) {
-                e;
-            }
+            gui.remove(startGameBtn);
         } catch (e) {}
         try {
-            try {
-                gui.removeFolder(addLocalPlayerFolder);
-            } catch (e) {
-                e;
-            }
+            gui.removeFolder(addAIPlayerFolder);
+        } catch (e) {}
+        try {
+            gui.removeFolder(addLocalPlayerFolder);
         } catch (e) {}
         startCurrentGame();
     }).name("Start Game");

@@ -461,9 +461,9 @@ export class Player {
         while (player.discardPile.length > 0) {
             player.hand.push(player.discardPile.pop());
         }
-        player.discardPile.forEach((card, i) => {
-            // GFX.moveCardToHand(card, this, i + this.hand.length);
-        });
+        // player.discardPile.forEach((card, i) => {
+        //     // GFX.moveCardToHand(card, this, i + this.hand.length);
+        // });
         const chosen = await this.selectObjects(
             "Choose discarded card: ",
             discardPile

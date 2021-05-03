@@ -2,7 +2,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 // import { DragControls } from "three/examples/jsm/controls/DragControls";
 import { DragControls } from "./DragControls.js"; // Fix a bug by pulling in the source myself
 import * as THREE from "three";
-import { addSpotLightTo } from "./gfx.js";
+import { addSpotLightTo, removeSpotLightFrom } from "./gfx.js";
 
 let objectChoices = [];
 let objectChoicesIntersectables = [];
@@ -44,9 +44,7 @@ function onMouseClick(event) {
             const len = objectChoices.length;
             for (let i = 0; i < len; i++) {
                 const e = objectChoices.pop();
-                const light = e.selectionLight;
-                e.modelInWorld.remove(light);
-                e.selectionLight = null;
+                removeSpotLightFrom(e);
             }
             objectChoicesIntersectables = [];
         }

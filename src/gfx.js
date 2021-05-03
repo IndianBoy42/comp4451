@@ -10,15 +10,9 @@ import * as DMChars from "./DMchars.mjs";
 export const textureLoader = new THREE.TextureLoader();
 export const modelLoader = new GLTFLoader();
 
-export const canvas = document.createElement("canvas");
-document.body.appendChild(canvas);
-
-export const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.autoClear = false;
-renderer.setClearColor(0xff0000, 0);
-renderer.shadowMap.enabled = true;
+export let canvas, renderer;
+export const setCanvas = c => (canvas = c);
+export const setRenderer = c => (renderer = c);
 
 export const loaders = {};
 export function loaderProgress(name) {
@@ -80,7 +74,7 @@ function cube(scene, matprops = { color: 0x44aa88 }) {
 
 function dir_light(scene) {
     const color = 0xffffff;
-    const intensity = 1;
+    const intensity = 0.7;
     const light = new THREE.DirectionalLight(color, intensity);
     // light.position.set(-1, 2, 4);
 
@@ -89,8 +83,13 @@ function dir_light(scene) {
     return light;
 }
 
+export function removeSpotLightFrom(e) {
+    const light = e.selectionLight;
+    e.modelInWorld.remove(light);
+    e.selectionLight = null;
+}
 export function addSpotLightTo(obj, color = 0xff0000, light = null) {
-    obj.selectionLight = light ? null : new THREE.SpotLight(color, 5);
+    obj.selectionLight = new THREE.SpotLight(color, 5);
     obj.selectionLight.angle = Math.PI / 6;
     obj.selectionLight.penumbra = 0;
     obj.selectionLight.position.set(0, 2 / obj.modelInWorld.scale.length(), 0);
@@ -257,16 +256,17 @@ export const initRenderPlayer = (player, i) => {
 };
 let playerTurnSpotlight = null;
 export function spotlightPlayerTurn(player) {
-    const color = 0x00ffff;
+    const color = 0xffffff;
     if (playerTurnSpotlight == null) {
-        playerTurnSpotlight = new THREE.SpotLight(color, 2);
+        playerTurnSpotlight = new THREE.SpotLight(color, 1);
         playerTurnSpotlight.angle = Math.PI / 6;
         playerTurnSpotlight.penumbra = 0;
+        // playerTurnSpotlight.lookAt(0, 0, -10)
     } else if (playerTurnSpotlight.onPlayer)
         playerTurnSpotlight.onPlayer.remove(playerTurnSpotlight);
     const model = player.modelGroup;
     if (model) {
-        playerTurnSpotlight.position.set(0, 2 / model.scale.length(), 0);
+        playerTurnSpotlight.position.set(0, 4 / model.scale.length(), -10);
         playerTurnSpotlight.target = model;
         model.add(playerTurnSpotlight);
         playerTurnSpotlight.onPlayer = model;
@@ -400,6 +400,8 @@ export function createGameScene() {
     // startGameCard.rotateX(Math.PI / 2);
     // scene.add(startGameCard);
 
+    // const light = new THREE.HemisphereLight("white", "white", 1.5)
+    // scene.add(light)
     const light1 = dir_light(scene);
     light1.position.set(-1, 2, 4);
     light1.castShadow = true;
@@ -555,7 +557,7 @@ export async function makeCardObject(
 }
 
 export function renderCard(side, tex) {
-    if ( tex.texture != side.material.map) {
+    if (tex.texture != side.material.map) {
         side.material.color.set(0xffffff);
         side.material.map = tex.texture;
         tex.texture.needsUpdate = true;

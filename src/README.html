@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html id="html">
+    <head lang="en">
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>@@name Help Guide | ThemeBeans</title>
+        <!-- <style type="text/css" src=require("./README.css")></style> -->
+    </head>
+
+    <body>
+        <section id="Menu">
+            <header>
+                <h1>Dungeon Mayhem Online</h1>
+                <p>
+                    Use the Add Local Player section to add a controllable
+                    player on this computer, click the Class you want and a new
+                    set of cards should be added to the table. Use the Add AI
+                    Player section similarly to add a computer controlled
+                    player, warning: Its quite good.
+                </p>
+
+                <p>
+                    You can play locally, or connect to other people on the same
+                    network. For testing you can use multiple tabs on the same
+                    computer/browser.
+                </p>
+                <p>
+                    On one computer/tab click "Add Remote", a new section is
+                    added, you can follow the instruction in the Status field.
+                    You need to send a token back and forth to establish the
+                    connection, the Copy and Paste will automatically use your
+                    clipboard so you dont have to select or type manually.
+                </p>
+
+                <ul>
+                    <li>
+                        Host: Copy the token by clicking Copy, send that string
+                        to the other person.
+                    </li>
+                    <li>
+                        Player: Copy the token you received from the host, and
+                        click the Paste button.
+                    </li>
+                    <ul>
+                        <li>
+                            A new token will be added to your clipboard
+                            automatically, send it to the host
+                        </li>
+                    </ul>
+                    <li>
+                        Host: Copy the token you received from the player, and
+                        click the Paste button
+                    </li>
+                    <li>
+                        A new set of cards should be added, and the remote
+                        player should see the game state.
+                    </li>
+                </ul>
+
+                <p>
+                    The game should be fairly simple to follow, selectable items
+                    have a red spotlight on them, the current player has a cyan
+                    spotlight
+                </p>
+            </header>
+            <nav>
+                <a href="game.html" id="playNow" target="blank">Play Now</a>
+            </nav>
+        </section>
+
+        <section>
+            <h1>Shortcuts from the URL</h1>
+
+            <p>
+                There are some shortcuts you can access by adding to the url
+                after game.html, add multiple by putting & between each
+            </p>
+
+            <p>
+                You can add <a href="game.html#join" target="blank">#join</a> to
+                automatically open the menu for joining a game
+            </p>
+            <p>
+                You can add
+                <a href="game.html#p1=Wizard" target="blank">#p1=Wizard</a> to
+                automatically add a local player
+            </p>
+            <p>
+                change 1 to any number up to 6 and change Wizard to any class or
+                <a href="game.html#p1=remote" target="blank"></a>remote to add a
+                remote player
+
+            You can add AI before the class to make it a computer player
+        </p>
+        </section>
+    </body>
+</html>
