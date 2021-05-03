@@ -40,8 +40,13 @@
 The Game looks okay, I could not achieve some of the more interesting visual effects I wanted.
 
 ## Demo
-<video data-autoplay>
+<!-- <video data-autoplay>
   <source src="./RandomFast.webm">
+          data-external="1" type="video/webm">
+  </source>
+</video> -->
+<video data-autoplay>
+  <source src="./PlayingWith2Tabs2.webm">
           data-external="1" type="video/webm">
   </source>
 </video>
@@ -53,12 +58,14 @@ An EquirectangularTexture is used to create the background image
 
 The cards were scanned and cut from the original game.
 
-- A single image with all the cards was created, we modify the UV coordinates to map to a different section of the Texture sheet
+- A single image with all the cards was created, we modify the UV coordinates to map to a different sections of the Texture sheet
 - This cuts down on loading time
 
 ## THREE.js
 
 Very easy to work with.
+
+Dynamic typing is very flexible
 
 We used async/await to handle loading of assets
 
@@ -89,14 +96,14 @@ The Game logic had a lot of edge cases due to the complex nature of the game wit
 
 # AI
 
-Uses Monte Carlo Tree Search. ie
+Inspired by Monte Carlo Tree Search. ie
 Iterate over all the Cards it has to play and randomly play out a selection of games starting with that move.
 
 This gives an expected value of playing that card.
 
-We don't use minimax as the decision tree is too complicated, its not just one move per turm, there are subdecisions and a lot of randomness
+We don't use minimax as the decision tree is too complicated, its not just one move per turn, there are subdecisions and a lot of randomness
 
-## 
+## Challenges
 
 We reduce our use of global state as much as possible.
 
@@ -126,22 +133,25 @@ Use WebRTC to allow Peer to Peer connections without any server.
 
 Use the `simple-peer` library to make setting up the connection easy
 
-All the game logic runs on one computer (the host)
 
-## Remote Players
+## How
 
-On the host side, RemotePlayer is a subclass of Player that uses WebRTC to coordinate making choices with the other computer
+<!-- On the host side, RemotePlayer is a subclass of Player that uses WebRTC to coordinate making choices with the other computer
 
-On the remote side, it is event driven, either we receives a request to choose from some players or cards, or we receive a serialized version of the game state.
+On the remote side, it is event driven, either we receives a request to choose from some players or cards, or we receive a serialized version of the game state. -->
+
+All the game logic runs on one computer (the host), the remote players simply react and render
+
+We use inheritance hierarchies to make the decision making functions overridable.
 
 We made sure to store all state within Player and Card objects, and make rendering a pure function of state.  
 
-##
+<!-- ##
 <video data-autoplay controls=1>
   <source src="./StartingAGame.webm">
           data-external="1" type="video/webm">
   </source>
-</video>
+</video> -->
 
 ##
 <video data-autoplay controls=1>
@@ -149,3 +159,7 @@ We made sure to store all state within Player and Card objects, and make renderi
           data-external="1" type="video/webm">
   </source>
 </video>
+
+# Thank you for Listening
+
+we will publish the game to github.io soon :)
