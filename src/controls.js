@@ -162,10 +162,8 @@ export function chooseFromObjects(query, min, max, objects) {
             }, 100);
         });
     }
-    // TODO: the controls
     console.log(query);
     return new Promise(resolve => {
-        // TODO: outline the selectable objects
         // https://stackoverflow.com/questions/26341396/outline-a-3d-object-in-three-js
         objectChoices = objects.map(obj => addSpotLightTo(obj));
         objectChoicesIntersectables = objects.map(obj => obj.modelInWorld);

@@ -15,6 +15,7 @@ export class Character {
         this.bonus = 0; //ranger
         this.disguised = false; //rogue
         this.forme = ""; //druid
+        this.formCard = null;
         this.ignoringShields = false; //icecube
         this.multiAttack = false; //owl
 
@@ -33,6 +34,7 @@ export class Character {
             bonus: this.bonus,
             disguised: this.disguised,
             forme: this.forme,
+            formCard: this.formCard.encode(),
             ignoringShields: this.ignoringShields,
             multiAttack: this.multiAttack,
         };
@@ -45,6 +47,7 @@ export class Character {
         this.bonus = obj.bonus;
         this.disguised = obj.disguised;
         this.forme = obj.forme;
+        this.formCard.decode(obj.formCard);
         this.ignoringShields = obj.ignoringShields;
         this.multiAttack = obj.multiAttack;
     }
@@ -63,10 +66,11 @@ export class Character {
         clone.bonus = this.bonus;
         clone.disguised = this.disguised;
         clone.forme = this.forme;
+        clone.formCard = this.formCard.clone();
         clone.ignoringShields = this.ignoringShields;
         clone.multiAttack = this.multiAttack;
-        clone.startTurnCallbacks = this.startTurnCallbacks.slice(0); //TODO???
-        clone.endTurnCallbacks = this.endTurnCallbacks.slice(0); //TODO???
+        clone.startTurnCallbacks = this.startTurnCallbacks.slice(0);
+        clone.endTurnCallbacks = this.endTurnCallbacks.slice(0);
         return clone;
     }
 

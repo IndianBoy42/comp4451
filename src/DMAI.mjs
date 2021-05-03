@@ -93,7 +93,7 @@ export class GameState {
      * The clone would now either be the root of more branches,
      * or it has finished simulating everything related to making the first decision.
      *
-     * TODO: GameState needs to know what functions were called originally so that it can catch up
+     * Note: GameState needs to know what functions were called originally so that it can catch up
      * In case of normal turn, just call player.selectCard() and player.playCard()
      * and the turn should progress normally (until it reaches decision branching time)
      * For other cases where AI would be invoked (ghost ping, shield attack, etc),
@@ -193,7 +193,7 @@ export class GameState {
             }
             //calculate score of this run
             let playerHP = simPlayer.character.effectiveHealth;
-            let playerHand = simPlayer.hand.length;
+            let playerHand = (playerHp === 0 ? 0 : simPlayer.hand.length);
             let oppHP = 0;
             for (const opp of simContext.players) {
                 if (opp === simPlayer) continue;

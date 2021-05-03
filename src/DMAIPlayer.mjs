@@ -88,8 +88,6 @@ export class AIPlayer extends Player {
      * =================================================================================
      * Selection functions
      * Call this function to let the player or AI decide what card/target/etc to select
-     *
-     * TODO implement AI
      * =================================================================================
      */
 

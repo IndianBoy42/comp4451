@@ -183,7 +183,6 @@ export const renderPlayer = async (player, i, first = false) => {
     }
 
     if (first) {
-        // TODO: use the health card
         for (let j = 0; j <= DMChars.maxHealth; j++) {
             let card = await makeCardObject(`${j}`, {
                 w: 0.3,

@@ -224,13 +224,12 @@ export class DMCard {
         for (const p of this.extraPowers) {
             await p.play(player, context);
             // special cases
-            // TODO: dont like special cases.
-            if (p.constructor.name == "GelCubeDmgShield") {
+            if (p.constructor.name === "GelCubeDmgShield") {
                 this.shieldObj = new DamagingShield(3, 2);
                 player.addShield(this);
                 discard = false;
             }
-            if (p.constructor.name == "RogueImmune") {
+            if (p.constructor.name === "RogueImmune") {
                 GFX.moveCardToShields(
                     this,
                     player,
@@ -240,6 +239,19 @@ export class DMCard {
                 player.character.startTurnCallbacks.push(() => {
                     player.disCard(this);
                 });
+            }
+            if (p.constructor.name === "DruidShapeshiftBear" || p.constructor.name === "DruidShapeshiftWolf") {
+                GFX.moveCardToShields(
+                    this,
+                    player,
+                    player.character.shields.length
+                );
+                discard = false;
+                // discard old form card
+                if (player.character.formCard != null) {
+                    player.disCard(player.character.formCard);
+                }
+                player.character.formCard = this;
             }
         }
         if (this.shieldValue != 0) {

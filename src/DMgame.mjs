@@ -129,7 +129,6 @@ export class DungeonMayhem {
             );
         } else {
             const allPlayers = this.allAliveOpponents(player, true); //ghostPing doesnt care about left/right
-            //TODO can rewrite this part using ID
             let thisIndex = 0;
             for (const pIndex in allPlayers) {
                 if (player === allPlayers[pIndex]) {

@@ -63,8 +63,6 @@ var DragControls = function (_objects, _camera, _domElement) {
             case "pen":
                 onMouseMove(event);
                 break;
-
-            // TODO touch
         }
     }
 
@@ -132,8 +130,6 @@ var DragControls = function (_objects, _camera, _domElement) {
             case "pen":
                 onMouseDown(event);
                 break;
-
-            // TODO touch
         }
     }
 
@@ -176,8 +172,6 @@ var DragControls = function (_objects, _camera, _domElement) {
             case "pen":
                 onMouseCancel(event);
                 break;
-
-            // TODO touch
         }
     }
 

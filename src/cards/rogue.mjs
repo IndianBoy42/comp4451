@@ -10,7 +10,6 @@ import { cardTexture11, cardTexture18 } from "./textures.js";
 /**
  * Notes:
  * - done
- * - TODO: check powers
  */
 const backTex = async () => {
     return {
