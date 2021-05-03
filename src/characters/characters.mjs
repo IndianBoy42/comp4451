@@ -255,7 +255,7 @@ export class GelatinousCube extends Character {
     }
     async healthCardTexture() {
         return {
-            texture: await Tex.cardTexture28,
+            texture: await Tex.cardTexture29,
             uvCoords: uvFromGrid(0),
         };
     }

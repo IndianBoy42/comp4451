@@ -341,7 +341,8 @@ export function createGameScene() {
     const scene = new THREE.Scene();
     const movables = [];
 
-    loadBackground(scene);
+    //TODO
+    //loadBackground(scene);
 
     loadModel(table, gltf => {
         const scale = 30;

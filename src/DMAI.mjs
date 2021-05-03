@@ -193,7 +193,7 @@ export class GameState {
             }
             //calculate score of this run
             let playerHP = simPlayer.character.effectiveHealth;
-            let playerHand = (playerHp === 0 ? 0 : simPlayer.hand.length);
+            let playerHand = (playerHP === 0 ? 0 : simPlayer.hand.length);
             let oppHP = 0;
             for (const opp of simContext.players) {
                 if (opp === simPlayer) continue;

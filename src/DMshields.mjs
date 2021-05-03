@@ -35,8 +35,7 @@ export class Shield {
 
 export class DamagingShield extends Shield {
     constructor(max, dmg) {
-        this.max = max;
-        this.current = max;
+        super(max);
         this.dmg = dmg;
     }
     encode() {
@@ -52,9 +51,9 @@ export class DamagingShield extends Shield {
     }
 
     async getDamaged(amt, by, owner) {
-        const ret = this.getDamaged(amt, by);
+        const ret = super.getDamaged(amt, by);
         if (this.current == 0) {
-            const others = await context.choosePlayer(
+            const others = await owner.player.context.choosePlayer(
                 owner.player,
                 true,
                 false,

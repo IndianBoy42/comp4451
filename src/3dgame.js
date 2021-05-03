@@ -111,5 +111,6 @@ export async function addRemotePlayer(playerValues, name, character) {
 }
 
 export function startCurrentGame() {
+    currentGame.reset();
     gameLoop(currentGame);
 }

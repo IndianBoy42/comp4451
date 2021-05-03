@@ -38,9 +38,25 @@ export class Player {
             this.discardPile = [];
             console.log(this.character);
             this.deck = this.character.defaultDeck();
+            this.deck.forEach(card => card.ogPlayer = this);
             shuffle(this.deck);
             this.hand = [];
             // this.drawCards(3);
+        }
+    }
+
+    reset() {
+        this.character.reset();
+        const tempDeck = [];
+        while (this.deck.length > 0) tempDeck.push(this.deck.pop());
+        while (this.hand.length > 0) tempDeck.push(this.hand.pop());
+        while (this.discardPile.length > 0) tempDeck.push(this.discardPile.pop());
+        while (this.character.shields.length > 0) tempDeck.push(this.character.shields.pop());
+        while (this.character.attributeCards.length > 0) tempDeck.push(this.character.attributeCards.pop());
+
+        while (tempDeck.length > 0) {
+            const card = tempDeck.pop();
+            card.ogPlayer.deck.push(card);
         }
     }
 
@@ -273,25 +289,25 @@ export class Player {
         function logCard(card, verbose = false, cardNo = "") {
             console.log(
                 "Card " +
-                    cardNo +
-                    ": " +
-                    card.name.padEnd(30) +
-                    (verbose
-                        ? ", shield = " +
-                          card.shieldValue +
-                          ", heal = " +
-                          card.healValue +
-                          ", dmg = " +
-                          card.dmgValue +
-                          ", extra = " +
-                          card.extraActions +
-                          ", draw = " +
-                          card.drawCards +
-                          ", super = " +
-                          (card.extraPowers.length === 0
-                              ? "None"
-                              : card.extraPowers[0].constructor.name)
-                        : "")
+                cardNo +
+                ": " +
+                card.name.padEnd(30) +
+                (verbose
+                    ? ", shield = " +
+                    card.shieldValue +
+                    ", heal = " +
+                    card.healValue +
+                    ", dmg = " +
+                    card.dmgValue +
+                    ", extra = " +
+                    card.extraActions +
+                    ", draw = " +
+                    card.drawCards +
+                    ", super = " +
+                    (card.extraPowers.length === 0
+                        ? "None"
+                        : card.extraPowers[0].constructor.name)
+                    : "")
             );
         }
 
@@ -305,11 +321,11 @@ export class Player {
         function logShield(shield) {
             console.log(
                 "Shield: " +
-                    shield.name +
-                    "-" +
-                    shield.shieldObj.current +
-                    "/" +
-                    shield.shieldObj.max
+                shield.name +
+                "-" +
+                shield.shieldObj.current +
+                "/" +
+                shield.shieldObj.max
             );
         }
 
