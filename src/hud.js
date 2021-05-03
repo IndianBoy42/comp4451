@@ -129,8 +129,8 @@ export function createGui() {
         add("Name (AI): " + values.Name, () => {}, folder);
         add("Class: " + c.name, () => {}, folder);
         const deckFolder = folder.addFolder("Deck");
-        for (const cardIndex in p.deck) {
-            const card = p.deck[cardIndex];
+        for (const cardIndex in p.character.defaultDeck()) {
+            const card = p.character.defaultDeck()[cardIndex];
             const cardFolder = deckFolder.addFolder(
                 "Card " + (+cardIndex + 1) + ": " + card.name
             );
@@ -141,10 +141,10 @@ export function createGui() {
             add("Extra: " + card.extraActions, () => {}, cardFolder);
             add("Draw: " + card.drawCards, () => {}, cardFolder);
             add(
-                "P: " +
+                "Power: " +
                     (card.extraPowers.length > 0
                         ? card.extraPowers[0].constructor.name
-                        : ""),
+                        : "None"),
                 () => {},
                 cardFolder
             );
@@ -159,8 +159,8 @@ export function createGui() {
         add("Name: " + values.Name, () => {}, folder);
         add("Class: " + c.name, () => {}, folder);
         const deckFolder = folder.addFolder("Deck");
-        for (const cardIndex in p.deck) {
-            const card = p.deck[cardIndex];
+        for (const cardIndex in p.character.defaultDeck()) {
+            const card = p.character.defaultDeck()[cardIndex];
             const cardFolder = deckFolder.addFolder(
                 "Card " + (+cardIndex + 1) + ": " + card.name
             );
@@ -171,10 +171,10 @@ export function createGui() {
             add("Extra: " + card.extraActions, () => {}, cardFolder);
             add("Draw: " + card.drawCards, () => {}, cardFolder);
             add(
-                "P: " +
+                "Power: " +
                     (card.extraPowers.length > 0
                         ? card.extraPowers[0].constructor.name
-                        : ""),
+                        : "None"),
                 () => {},
                 cardFolder
             );
@@ -243,15 +243,16 @@ export function createGui() {
         try {
             gui.remove(joinGameBtn);
         } catch (e) {}
-        try {
-            gui.remove(startGameBtn);
-        } catch (e) {}
+        // try {
+        //     gui.remove(startGameBtn);
+        // } catch (e) {}
         try {
             gui.removeFolder(addAIPlayerFolder);
         } catch (e) {}
         try {
             gui.removeFolder(addLocalPlayerFolder);
         } catch (e) {}
+        startGameBtn.name("Restart Game");
         startCurrentGame();
     }).name("Start Game");
 
@@ -286,7 +287,7 @@ export function createGui() {
         values["debug_auto"] = true;
         setDebugRngInput(true);
     }
-    ["p1", "p2", "p3", "p4", "p5", "p6"].forEach(p => {
+    ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"].forEach(p => {
         if (p in hashDict) {
             if ("remote".startsWith(hashDict[p].toLowerCase())) {
                 values["addRemotePlayer"]();

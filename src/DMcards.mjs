@@ -20,6 +20,7 @@ export class DMCard {
         this.extraActions = extraActions;
         this.drawCards = drawCards;
         this.extraPowers = extraPowers;
+        this.isClone = false;
         if (!dummyCard) addToAllCards(this);
 
         // this.modelInWorld.canvas= document.createElement("canvas");
@@ -49,6 +50,9 @@ export class DMCard {
         return this;
     }
     async backTexture() {
+        if (this.modelInWorld === undefined) {
+            console.log(this);
+        }
         if (this.modelInWorld.texture.isDummyTextTexture) {
             console.log("backTexture dummy text");
             GFX.setCardObjectText(
@@ -64,6 +68,7 @@ export class DMCard {
         };
     }
     async hideShow(hidden) {
+        if (this.isClone) return;
         // console.trace("hideShow");
         if (hidden) {
             // FIXME: hiding cards in local mode is broken?
@@ -144,6 +149,7 @@ export class DMCard {
             this.extraPowers.slice(0),
             false
         );
+        clone.isClone = true;
         return clone;
     }
 
@@ -235,9 +241,10 @@ export class DMCard {
                     player,
                     player.character.shields.length
                 );
+                player.character.attributeCards.push(this);
                 discard = false;
                 player.character.startTurnCallbacks.push(() => {
-                    player.disCard(this);
+                    player.character.removeAttributeCard("RogueImmune");
                 });
             }
             if (p.constructor.name === "DruidShapeshiftBear" || p.constructor.name === "DruidShapeshiftWolf") {
@@ -247,11 +254,9 @@ export class DMCard {
                     player.character.shields.length
                 );
                 discard = false;
-                // discard old form card
-                if (player.character.formCard != null) {
-                    player.disCard(player.character.formCard);
-                }
-                player.character.formCard = this;
+                player.character.removeAttributeCard("DruidShapeshiftBear");
+                player.character.removeAttributeCard("DruidShapeshiftWolf");
+                player.character.attributeCards.push(this);
             }
         }
         if (this.shieldValue != 0) {

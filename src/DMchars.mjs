@@ -7,15 +7,19 @@ export class Character {
      */
     constructor(name) {
         this.name = name;
-        this.health = maxHealth;
         this.shields = [];
+        this.attributeCards = [];
+        this.reset();
+    }
+
+    reset() {
+        this.health = maxHealth;
         this.actionsLeft = 0;
 
         // mighty powers
         this.bonus = 0; //ranger
         this.disguised = false; //rogue
         this.forme = ""; //druid
-        this.formCard = null;
         this.ignoringShields = false; //icecube
         this.multiAttack = false; //owl
 
@@ -34,7 +38,7 @@ export class Character {
             bonus: this.bonus,
             disguised: this.disguised,
             forme: this.forme,
-            formCard: this.formCard.encode(),
+            attributeCards: this.attributeCards.map(card => card.encode()),
             ignoringShields: this.ignoringShields,
             multiAttack: this.multiAttack,
         };
@@ -47,7 +51,13 @@ export class Character {
         this.bonus = obj.bonus;
         this.disguised = obj.disguised;
         this.forme = obj.forme;
-        this.formCard.decode(obj.formCard);
+        this.attributeCards.push(
+            ...obj.attributeCards.map((cardObj, i) => {
+                let card = allCards[cardObj.indexInAllCards];
+                GFX.moveCardToShields(card, this.player, i);
+                return card;
+            })
+        );
         this.ignoringShields = obj.ignoringShields;
         this.multiAttack = obj.multiAttack;
     }
@@ -66,7 +76,7 @@ export class Character {
         clone.bonus = this.bonus;
         clone.disguised = this.disguised;
         clone.forme = this.forme;
-        clone.formCard = this.formCard.clone();
+        clone.attributeCards = this.player.cloneCards(this.attributeCards);
         clone.ignoringShields = this.ignoringShields;
         clone.multiAttack = this.multiAttack;
         clone.startTurnCallbacks = this.startTurnCallbacks.slice(0);
@@ -83,6 +93,16 @@ export class Character {
         return {
             texture: null,
         };
+    }
+
+    removeAttributeCard(type) {
+        for (const cardIndex in this.attributeCards) {
+            const card = this.attributeCards[cardIndex];
+            if (card.extraPowers[0].constructor.name === type) {
+                this.attributeCards.splice(cardIndex, 1);
+                this.player.disCard(card);
+            }
+        }
     }
 
     mightyPowers() {

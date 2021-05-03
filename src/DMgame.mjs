@@ -1,5 +1,6 @@
 import { Player } from "./DMplayer.mjs";
 import { initRenderPlayer, spotlightPlayerTurn } from "./gfx.js";
+import { shuffle } from "./shuffle.mjs";
 
 export class DungeonMayhem {
     constructor() {
@@ -192,7 +193,7 @@ export class DungeonMayhem {
     }
 
     updateGameState() {
-        console.log("updateGameState");
+        //console.log("updateGameState");
         return Promise.all(this.players.flatMap(p => p.updateGameState()));
     }
 
@@ -231,5 +232,13 @@ export class DungeonMayhem {
             this.playerTurn = 0;
             this.round += 1;
         }
+    }
+
+
+    reset() {
+        this.playerTurn = 0;
+        this.round = 1;
+        this.players.forEach(p => p.reset());
+        this.players.forEach(p => shuffle(p.deck));
     }
 }

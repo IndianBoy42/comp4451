@@ -12,6 +12,7 @@ import mindflayer from "../assets/mindflayer.glb";
 import gelCube from "../assets/gelatinous_cube.glb";
 import * as Tex from "../cards/textures.js";
 import { uvFromCorner, uvFromGrid } from "../gfx.js";
+import { getTentaculousDeck } from "../cards/tentaculous.mjs";
 
 /**
  * Returns a random integer between min (inclusive) and max (inclusive).
@@ -257,7 +258,7 @@ export class GelatinousCube extends Character {
     }
     async healthCardTexture() {
         return {
-            texture: await Tex.cardTexture28,
+            texture: await Tex.cardTexture29,
             uvCoords: uvFromGrid(0),
         };
     }
@@ -270,15 +271,19 @@ export class GelatinousCube extends Character {
     }
 }
 
-export class OwlBear extends Character {
+export class MindFlayer extends Character {
     constructor() {
-        super("Hoots McGoots");
+        super("Dr. Tentaculous");
     }
     mightyPowers() {
-        return []; // TODO: Add mightyPowers
+        return [
+            Powers.TentaculousSwapHand,
+            Powers.TentaculousStealCards,
+            Powers.TentaculousAttackHand,
+        ];
     }
     defaultDeck() {
-        return []; // TOOD: Add defaultDeck
+        return Cards.getTentaculousDeck();
     }
     modelPath(i = 0) {
         if (i == 0) return tieflingRogue;
@@ -286,14 +291,14 @@ export class OwlBear extends Character {
     }
     async healthCardTexture() {
         return {
-            texture: await Tex.cardTexture30,
+            texture: await Tex.cardTexture0,
             uvCoords: uvFromGrid(0),
         };
     }
     async instrCardTexture() {
         return {
-            texture: await Tex.cardTexture30,
-            textureBack: await Tex.cardTexture22,
+            texture: await Tex.cardTexture0,
+            textureBack: await Tex.cardTexture13,
             uvCoords: uvFromGrid(1),
         };
     }
@@ -307,7 +312,7 @@ export const allCharacters = [
     Druid,
     Ranger,
     GelatinousCube,
-    //OwlBear,
+    MindFlayer,
 ];
 export let characterMap = {};
 allCharacters.forEach(c => {
