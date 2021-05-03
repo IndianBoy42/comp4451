@@ -216,22 +216,30 @@ export class DMCard {
      */
     async play(player, context) {
         //debug
-        if (!player.isClone) console.log(
-            "" +
-                player.name +
-                " plays " +
-                this.name
-        );
+        if (!player.isClone)
+            console.log("" + player.name + " plays " + this.name);
 
         let discard = true;
         player.character.actionsLeft -= 1;
         for (const p of this.extraPowers) {
             await p.play(player, context);
             // special cases
+            // TODO: dont like special cases.
             if (p.constructor.name == "GelCubeDmgShield") {
                 this.shieldObj = new DamagingShield(3, 2);
                 player.addShield(this);
                 discard = false;
+            }
+            if (p.constructor.name == "RogueImmune") {
+                GFX.moveCardToShields(
+                    this,
+                    player,
+                    player.character.shields.length
+                );
+                discard = false;
+                player.character.startTurnCallbacks.push(() => {
+                    player.disCard(this);
+                });
             }
         }
         if (this.shieldValue != 0) {
@@ -239,6 +247,7 @@ export class DMCard {
             player.addShield(this);
             discard = false;
         }
+        if (discard) player.disCard(this);
         if (this.healValue != 0) {
             player.character.heal(this.healValue);
         }
@@ -257,7 +266,6 @@ export class DMCard {
         if (this.drawCards != 0) {
             player.drawCards(this.drawCards);
         }
-        if (discard) player.disCard(this);
         if (player.hand.length === 0) {
             player.drawCards(2);
         }

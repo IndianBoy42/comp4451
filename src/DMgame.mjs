@@ -193,6 +193,7 @@ export class DungeonMayhem {
     }
 
     updateGameState() {
+        console.log("updateGameState");
         return Promise.all(this.players.flatMap(p => p.updateGameState()));
     }
 
@@ -203,7 +204,6 @@ export class DungeonMayhem {
         }
         return null; //in case everyone dies
     }
-
 
     /**
      * Process a turn in the game
@@ -216,8 +216,7 @@ export class DungeonMayhem {
         spotlightPlayerTurn(player);
 
         if (player.character.health > 0) {
-            const doHiding=false;//!(hostPlayer && hostPlayer.id == player.id)
-            console.log("startTurn hidden=", doHiding)
+            const doHiding = false; //!(hostPlayer && hostPlayer.id == player.id)
             if (!midTurnSim) player.drawCards(1);
             if (!midTurnSim) player.startTurn(doHiding);
             await player.playerTurn();
@@ -234,5 +233,4 @@ export class DungeonMayhem {
             this.round += 1;
         }
     }
-
 }

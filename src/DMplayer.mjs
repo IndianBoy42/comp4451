@@ -222,6 +222,7 @@ export class Player {
     }
     async playCard(index, game) {
         const playCard = this.hand.splice(index, 1)[0];
+        this.currentlyPlayingCard = playCard;
         await playCard.play(this, game);
     }
     /**
@@ -393,11 +394,12 @@ export class Player {
      * @param message message to be displayed
      * @returns index of chosen object
      */
-    async selectObjects(message, objects) {
+    async selectObjects(message, objects, pre = null) {
         if (this.isRandomSimClone) {
             return Math.floor(Math.random() * objects.length);
         } else {
             await this.context.updateGameState();
+            if (pre) pre();
             return await chooseFromObjects(
                 message,
                 0,
@@ -454,9 +456,24 @@ export class Player {
      */
     async selectDiscardedCard(player) {
         if (player.discardPile.length === 0) return -1;
-        return await this.selectObjects(
+
+        const discardPile = player.discardPile.slice(0);
+        while (player.discardPile.length > 0) {
+            player.hand.push(player.discardPile.pop());
+        }
+        player.discardPile.forEach((card, i) => {
+            // GFX.moveCardToHand(card, this, i + this.hand.length);
+        });
+        const chosen = await this.selectObjects(
             "Choose discarded card: ",
-            player.discardPile
+            discardPile
         );
+        discardPile.forEach((card, i) => {
+            // if (i != chosen) GFX.moveCardToDiscard(card, this, i);
+            player.discardPile.push(
+                player.hand.splice(player.hand.indexOf(card))[0]
+            );
+        });
+        return chosen;
     }
 }
