@@ -31,7 +31,10 @@ export class DruidShapeshiftBear extends MightyPower {
 // Changed to attack if player is in an animal form to fit an online game
 export class DruidAnimalMultiattack extends MightyPower {
     play(player, context) {
-        if (player.character.forme == "bear" || player.character.forme == "wolf"/*context.makeAnimalNoise()*/) {
+        if (
+            player.character.forme == "bear" ||
+            player.character.forme == "wolf" /*context.makeAnimalNoise()*/
+        ) {
             player.character.doDamage(context.allOpponents(player), 1);
         }
     }
@@ -65,7 +68,10 @@ export class DruidFreeShapeshift extends MightyPower {
             //     j - 1,
             //     shapeshiftCards
             // );
-            const k = await player.selectCardCustom(shapeshiftCards, "Choose shapeshift card to play for free: ");
+            const k = await player.selectCardCustom(
+                shapeshiftCards,
+                "Choose shapeshift card to play for free: "
+            );
             const cardIndex = shapeshiftCardsIndex[k];
             await player.playCard(cardIndex, context);
         }

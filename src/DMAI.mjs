@@ -1,5 +1,5 @@
-import { DungeonMayhem } from './DMgame.mjs';
-import { Player } from './DMplayer.mjs';
+import { DungeonMayhem } from "./DMgame.mjs";
+import { Player } from "./DMplayer.mjs";
 
 //Simulation parameters
 const NUM_SIM_GAMES = 200;
@@ -8,7 +8,7 @@ const PLAYER_HP_WEIGHT = 0.5;
 const OPPONENT_HP_WEIGHT = 0.5;
 const PLAYER_HAND_WEIGHT = 0.05;
 //theoretical worst scenario: for all NUM_SIM_GAMES, playerHP = 0 while opponentHP combined = 10
-export const MIN_SCORE = -NUM_SIM_GAMES*20;
+export const MIN_SCORE = -NUM_SIM_GAMES * 20;
 
 export class Decision {
     /**
@@ -68,8 +68,8 @@ export class GameState {
 
     /**
      * Generate child GameStates
-     * @param parentDecisions 
-     * @param newDecisions 
+     * @param parentDecisions
+     * @param newDecisions
      */
     async generateChildrenStates(parentDecisions, newDecisions) {
         for (const decision of newDecisions) {
@@ -92,26 +92,26 @@ export class GameState {
      * Let the clone GameState progress until it reaches end of parentDecisions
      * The clone would now either be the root of more branches,
      * or it has finished simulating everything related to making the first decision.
-     * 
+     *
      * TODO: GameState needs to know what functions were called originally so that it can catch up
      * In case of normal turn, just call player.selectCard() and player.playCard()
      * and the turn should progress normally (until it reaches decision branching time)
      * For other cases where AI would be invoked (ghost ping, shield attack, etc),
      * how to let this function know what functions should be called?
      * Maybe handle those cases separately idk, reserve this for decision making in player's turn
-     * 
+     *
      */
     async progress() {
         //console.log(this.player);
         const nextPlay = this.player.cloneParentDecisions[0].playType;
         switch (nextPlay) {
-            case 'Card':
+            case "Card":
                 const cardPos = await this.player.selectCard();
                 await this.player.playCard(cardPos, this.context);
                 break;
-            case 'Player':
-            case 'Shield':
-            case 'Discard':
+            case "Player":
+            case "Shield":
+            case "Discard":
                 console.log(this.player.cloneParentDecisions);
                 throw new Error("PlayType " + nextPlay + " unsupported.");
                 break;
@@ -143,8 +143,14 @@ export class GameState {
                 }
             }
             this.score = maxScore;
-            this.decisionChain = this.decision.toString() + " " + bestChild.decisionChain;
-            console.log("BEST CHILD SCORE: " + this.score + " DECISIONS " + this.decisionChain);
+            this.decisionChain =
+                this.decision.toString() + " " + bestChild.decisionChain;
+            console.log(
+                "BEST CHILD SCORE: " +
+                    this.score +
+                    " DECISIONS " +
+                    this.decisionChain
+            );
             return bestChild;
         }
 
@@ -165,7 +171,10 @@ export class GameState {
             let simContext = this.player.rootGameState.context.clone();
             let simPlayer = null;
             for (const p of this.player.rootGameState.allPlayers) {
-                let c = p.clone(simContext, !(p === this.player.rootGameState.player));
+                let c = p.clone(
+                    simContext,
+                    !(p === this.player.rootGameState.player)
+                );
                 //set everyone to be in randomSim mode
                 c.isRandomSimClone = true;
                 //copy this player's parent decisions to the clone
@@ -178,7 +187,7 @@ export class GameState {
             let remainingTurns = NUM_SIM_ROUNDS * simContext.players.length;
             let midTurnSim = true;
             while (remainingTurns > 0 && !simContext.gameEnded()) {
-                await simContext.processNextTurn(null, midTurnSim);
+                await simContext.processNextTurn(null, midTurnSim, true);
                 midTurnSim = false;
                 remainingTurns -= 1;
             }
@@ -191,14 +200,15 @@ export class GameState {
                 oppHP += opp.character.effectiveHealth;
             }
             if (oppHP === 0) playerHP *= 100; //win bonus
-            const simScore = 
+            const simScore =
                 playerHP * PLAYER_HP_WEIGHT +
-                playerHand * PLAYER_HAND_WEIGHT - 
-                oppHP * OPPONENT_HP_WEIGHT / (simContext.players.length - 1)
-            ;
+                playerHand * PLAYER_HAND_WEIGHT -
+                (oppHP * OPPONENT_HP_WEIGHT) / (simContext.players.length - 1);
             if (isNaN(simScore)) {
                 console.log(simPlayer);
-                throw new Error("player hp: " + playerHP + ", opp hp: " + oppHP);
+                throw new Error(
+                    "player hp: " + playerHP + ", opp hp: " + oppHP
+                );
             }
             this.score += simScore;
         }
@@ -208,6 +218,4 @@ export class GameState {
         console.log("SCORE: " + this.score + " DECISION " + this.decisionChain);
         return this;
     }
-    
-
 }

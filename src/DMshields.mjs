@@ -54,7 +54,14 @@ export class DamagingShield extends Shield {
     async getDamaged(amt, by, owner) {
         const ret = this.getDamaged(amt, by);
         if (this.current == 0) {
-            const others = await context.choosePlayer(owner.player, true, false, false, false, true);
+            const others = await context.choosePlayer(
+                owner.player,
+                true,
+                false,
+                false,
+                false,
+                true
+            );
             owner.doDamage(others, this.dmg);
         }
         return ret;

@@ -102,7 +102,6 @@ async function playerTurn(player) {
     player.endTurn();
 }
 
-
 //game
 console.log("====================================");
 for (const pl of game.players) {
@@ -154,5 +153,3 @@ console.log("==============GAME END==============");
 for (const pl of game.players) {
     logPlayer(pl);
 }
-
-

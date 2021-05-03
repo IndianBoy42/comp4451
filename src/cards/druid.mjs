@@ -14,7 +14,7 @@ import { cardTexture38 } from "./textures.js";
  * - done
  */
 
- const backTex = async () => {
+const backTex = async () => {
     return {
         texture: await cardTexture38,
         uvCoords: uvFromGrid(28, 3),

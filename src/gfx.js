@@ -26,7 +26,7 @@ export function loaderError(error) {
     console.error(error);
 }
 
-import museum from "./assets/skycubes/museum.jpg";
+import museum from "./assets/skycubes/castle.jpg";
 function loadBackground(scene) {
     textureLoader.load(
         museum,
@@ -74,7 +74,7 @@ function cube(scene, matprops = { color: 0x44aa88 }) {
 
 function dir_light(scene) {
     const color = 0xffffff;
-    const intensity = 0.7;
+    const intensity = 0.8;
     const light = new THREE.DirectionalLight(color, intensity);
     // light.position.set(-1, 2, 4);
 
@@ -403,16 +403,16 @@ export function createGameScene() {
     // const light = new THREE.HemisphereLight("white", "white", 1.5)
     // scene.add(light)
     const light1 = dir_light(scene);
-    light1.position.set(-1, 2, 4);
+    light1.position.set(-4, 2, 4);
     light1.castShadow = true;
     const light2 = dir_light(scene);
-    light2.position.set(1, 2, 4);
+    light2.position.set(4, 2, 4);
     light2.castShadow = true;
     const light3 = dir_light(scene);
-    light3.position.set(-1, 2, -4);
+    light3.position.set(-4, 2, -4);
     light3.castShadow = true;
     const light4 = dir_light(scene);
-    light4.position.set(1, 2, -4);
+    light4.position.set(4, 2, -4);
     light4.castShadow = true;
 
     return [scene, movables];

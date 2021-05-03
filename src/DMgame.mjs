@@ -211,9 +211,9 @@ export class DungeonMayhem {
      * @param hostPlayer if not null, this is the actual game and will hide/show cards
      * @param midTurnSim is true, this is simulating from the middle of a player's turn, so don't do startTurn
      */
-    async processNextTurn(hostPlayer = null, midTurnSim = false) {
+    async processNextTurn(hostPlayer = null, midTurnSim = false, sim = false) {
         const player = this.players[this.playerTurn];
-        spotlightPlayerTurn(player);
+        if (!sim) spotlightPlayerTurn(player);
 
         if (player.character.health > 0) {
             const doHiding = false; //!(hostPlayer && hostPlayer.id == player.id)

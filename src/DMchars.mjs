@@ -139,7 +139,8 @@ export class Character {
      * @returns remaining unreceived damage
      */
     directDamage(amt, by) {
-        if (!this.player.isClone) console.log("" + this.player.name + " took " + amt + " damage");
+        if (!this.player.isClone)
+            console.log("" + this.player.name + " took " + amt + " damage");
         if (this.health > amt) {
             this.health -= amt;
             return 0;
@@ -161,7 +162,8 @@ export class Character {
             const shield = this.shields[i].shieldObj;
             amt = shield.getDamaged(amt, by, this);
             if (shield.current == 0) {
-                if (!this.player.isClone) console.log("" + this.shields[i].name + " destroyed");
+                if (!this.player.isClone)
+                    console.log("" + this.shields[i].name + " destroyed");
                 this.player.disCard(this.stealShield(i));
             }
             if (amt == 0) return 0;
@@ -169,7 +171,8 @@ export class Character {
         this.directDamage(amt, by);
     }
     heal(amt) {
-        if (!this.player.isClone) console.log("" + this.player.name + " healed " + amt + " hp");
+        if (!this.player.isClone)
+            console.log("" + this.player.name + " healed " + amt + " hp");
         this.health = Math.min(this.health + amt, maxHealth);
     }
     addShield(shield) {

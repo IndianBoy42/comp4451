@@ -23,11 +23,15 @@ export async function gameLoop(game) {
             return null;
         }
     })();
-    console.log({hostPlayer: hostPlayer});
+    console.log({ hostPlayer: hostPlayer });
 
     while (true) {
         console.log(
-            "==========PLAYER " + (game.playerTurn + 1) + " TURN " + game.round + "==========="
+            "==========PLAYER " +
+                (game.playerTurn + 1) +
+                " TURN " +
+                game.round +
+                "==========="
         );
 
         await game.processNextTurn(hostPlayer);

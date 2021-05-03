@@ -87,14 +87,16 @@ export class RemotePlayer extends Player {
     }
 
     handHideShow(hidden) {
-        for (const card of this.hand) {
-            card.hideShow(true);
-        }
+        if (!this.isRandomSimClone)
+            for (const card of this.hand) {
+                card.hideShow(true);
+            }
     }
 
     drawCard() {
         const c = super.drawCard();
-        c.hideShow(true);
+        if (!this.isRandomSimClone)
+            if (!this.isRandomSimClone) c.hideShow(true);
         return c;
     }
 

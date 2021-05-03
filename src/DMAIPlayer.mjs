@@ -34,6 +34,28 @@ export class AIPlayer extends Player {
         this.rootGameState = original.rootGameState;
     }
 
+    handHideShow(hidden) {
+        if (!this.isRandomSimClone) {
+            for (const card of this.hand) {
+                card.hideShow(
+                    hidden ||
+                        this.context.players.filter(p => p.isLocalOnHost())
+                            .length > 0
+                );
+            }
+        }
+    }
+    drawCard() {
+        const c = super.drawCard();
+        if (
+            !this.isRandomSimClone &&
+            this.context.players.filter(p => p.isLocalOnHost()).length > 0
+        ) {
+            c.hideShow(true);
+        }
+        return c;
+    }
+
     /**
      * Reset decision related variables
      * - bestChildDecisions: Set to decisions made by the child with best score after simulation
@@ -87,7 +109,12 @@ export class AIPlayer extends Player {
      * @param newDecisions
      */
     async getBestDecision(parentDecisions, newDecisions) {
-        console.log((this.isClone ? "CLONE " : "") + "GENERATING " + newDecisions[0].playType + " TREE");
+        console.log(
+            (this.isClone ? "CLONE " : "") +
+                "GENERATING " +
+                newDecisions[0].playType +
+                " TREE"
+        );
         await this.gameState.generateChildrenStates(
             parentDecisions,
             newDecisions
@@ -106,7 +133,8 @@ export class AIPlayer extends Player {
      * @returns Decision representing chosen option
      */
     async makeDecision(decisions) {
-        if (!this.isRandomSimClone) await new Promise(resolve => setInterval(() => resolve(), 100));
+        if (!this.isRandomSimClone)
+            await new Promise(resolve => setTimeout(() => resolve(), 1));
 
         // put everything in a try block. if error exists, throw warning and make a random decision
         try {
@@ -118,7 +146,8 @@ export class AIPlayer extends Player {
                     //first decisions of the original player's clone is determined
                     chosenDecision = nextDecision;
                 } else {
-                    chosenDecision = decisions[Math.floor(Math.random() * decisions.length)];
+                    chosenDecision =
+                        decisions[Math.floor(Math.random() * decisions.length)];
                 }
             } else if (this.isClone) {
                 /**
@@ -132,7 +161,8 @@ export class AIPlayer extends Player {
                 const nextDecision = this.getNextParentDecision();
                 if (nextDecision != null) {
                     if (
-                        this.cloneDecisionIndex === this.cloneParentDecisions.length
+                        this.cloneDecisionIndex ===
+                        this.cloneParentDecisions.length
                     ) {
                         //console.log("CLONE USING CURRENT DECISION");
                     } else {
@@ -171,37 +201,46 @@ export class AIPlayer extends Player {
                 }
                 console.log(
                     "DECISION TAKEN: " +
-                    this.bestChildDecisions[0].playType +
-                    " " +
-                    this.bestChildDecisions[0].playNum
+                        this.bestChildDecisions[0].playType +
+                        " " +
+                        this.bestChildDecisions[0].playNum
                 );
                 chosenDecision = this.bestChildDecisions.splice(0, 1)[0];
             }
             // double check playType
             if (chosenDecision.playType != decisions[0].playType) {
-                throw new Error(this.debugWrongTypeError(
-                    chosenDecision.playType, 
-                    decisions[0].playType)
+                throw new Error(
+                    this.debugWrongTypeError(
+                        chosenDecision.playType,
+                        decisions[0].playType
+                    )
                 );
             }
             // return the chosen decision
             return chosenDecision;
-        }
-        catch (err) {
+        } catch (err) {
             console.warn(err);
             return decisions[Math.floor(Math.random() * decisions.length)];
         }
     }
 
     debugWrongTypeError(playType, expectedType) {
-        let msg = "Wrong playType: " + playType + " instead of " + expectedType + ". ";
+        let msg =
+            "Wrong playType: " +
+            playType +
+            " instead of " +
+            expectedType +
+            ". ";
         msg += "Parent decision types: ";
         for (const decision of this.cloneParentDecisions) {
             msg += decision.playType + ", ";
         }
         msg += "Current index: " + this.cloneDecisionIndex + ". ";
-        msg += "This " + (this.isRandomSimClone ? "IS" : "is NOT") + " randomSimClone. ";
-        return msg
+        msg +=
+            "This " +
+            (this.isRandomSimClone ? "IS" : "is NOT") +
+            " randomSimClone. ";
+        return msg;
     }
 
     /**
