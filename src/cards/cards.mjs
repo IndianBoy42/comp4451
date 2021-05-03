@@ -6,6 +6,7 @@ export * from "./paladin.mjs";
 export * from "./wizard.mjs";
 export * from "./rogue.mjs";
 export * from "./gelcube.mjs";
+export * from "./tentaculous.mjs";
 
 export const allCardsCounter = 0;
 export const allCards = [];

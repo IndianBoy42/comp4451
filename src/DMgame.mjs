@@ -193,7 +193,7 @@ export class DungeonMayhem {
     }
 
     updateGameState() {
-        console.log("updateGameState");
+        //console.log("updateGameState");
         return Promise.all(this.players.flatMap(p => p.updateGameState()));
     }
 
