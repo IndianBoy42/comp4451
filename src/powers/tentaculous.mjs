@@ -8,8 +8,8 @@ export class TentaculousSwapHand extends MightyPower {
         if (o.length === 0) return;
         const opponent = o[0];
         const temp = opponent.hand.splice(0, opponent.hand.length);
-        opponent.hand = player.hand.splice(0, player.hand.length);
-        player.hand = temp; 
+        opponent.hand.push(...player.hand.splice(0, player.hand.length));
+        player.hand.push(...temp);
     }
 }
 

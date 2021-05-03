@@ -286,7 +286,7 @@ export class MindFlayer extends Character {
         return Cards.getTentaculousDeck();
     }
     modelPath(i = 0) {
-        if (i == 0) return tieflingRogue;
+        if (i == 0) return mindflayer;
         else return null;
     }
     async healthCardTexture() {
