@@ -3,10 +3,12 @@ import * as Cards from "../cards/cards.mjs";
 import * as Powers from "../powers/powers.mjs";
 
 import evokerWizard from "../assets/evoker_wizard.glb";
-import tieflingRogue from "../assets/tiefling_rogue.glb"; import sunPaladin from "../assets/sun_paladin.glb";
+import tieflingRogue from "../assets/tiefling_rogue.glb";
+import sunPaladin from "../assets/sun_paladin.glb";
 import halflingDruid from "../assets/halfling_druid.glb";
 import barbarian from "../assets/barbarian.glb";
 import bowRanger from "../assets/bow_ranger.glb";
+import mindflayer from "../assets/mindflayer.glb";
 import gelCube from "../assets/gelatinous_cube.glb";
 import * as Tex from "../cards/textures.js";
 import { uvFromCorner, uvFromGrid } from "../gfx.js";
@@ -151,7 +153,7 @@ export class Rogue extends Character {
         return Cards.getRogueDeck();
     }
     modelPath(i = 0) {
-        if (i == 0) return gelCube;
+        if (i == 0) return tieflingRogue;
         else return null;
     }
     async healthCardTexture() {

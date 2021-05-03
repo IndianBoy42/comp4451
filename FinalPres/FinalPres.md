@@ -39,16 +39,22 @@
 
 The Game looks okay, I could not achieve some of the more interesting visual effects I wanted.
 
+## Demo
+<video data-autoplay>
+  <source src="./RandomFast.webm">
+          data-external="1" type="video/webm">
+  </source>
+</video>
+
 ## Assets
 I used a online free collection of 3D printable miniatures for Dungeons and Dragons to create the tokens for each character
 
 An EquirectangularTexture is used to create the background image
 
-The Images were scanned and cut from the original game.
+The cards were scanned and cut from the original game.
 
-A single image with all the cards was created, we modify the UV coordinates to map to a different section of the Texture sheet
-
-This cuts down on loading time
+- A single image with all the cards was created, we modify the UV coordinates to map to a different section of the Texture sheet
+- This cuts down on loading time
 
 ## THREE.js
 
@@ -56,8 +62,21 @@ Very easy to work with.
 
 We used async/await to handle loading of assets
 
+We use GLB files for the models, which are natively supported
+
+There is also a Raycaster inbuilt which we used for implementing selections
+
+## Other Libraries
+
+OrbitControls, an auxiliary library for THREE.js
+
+dat.gui, easy library for the sidebar GUI
 
 # Game Logic
+
+We have implemented 7 of the classes from the original game.
+
+The rest of the classes have more complicated mechanics, so we focused on AI and networking first.
 
 The Game logic had a lot of edge cases due to the complex nature of the game with many unique abilities
 
@@ -70,11 +89,12 @@ The Game logic had a lot of edge cases due to the complex nature of the game wit
 
 # AI
 
-Uses Monte Carlo Tree Search.
-
+Uses Monte Carlo Tree Search. ie
 Iterate over all the Cards it has to play and randomly play out a selection of games starting with that move.
 
 This gives an expected value of playing that card.
+
+We don't use minimax as the decision tree is too complicated, its not just one move per turm, there are subdecisions and a lot of randomness
 
 ## 
 
