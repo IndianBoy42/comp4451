@@ -74,7 +74,7 @@ dat.gui, easy library for the sidebar GUI
 
 # Game Logic
 
-We have implemented 7 of the classes from the original game.
+We have implemented 8 of the classes from the original game.
 
 The rest of the classes have more complicated mechanics, so we focused on AI and networking first.
 
