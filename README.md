@@ -5,6 +5,7 @@ by **Anshuman Medhi** and **Dung Dinh Anh**
 ## Playing the game
 
 If you got the source code from the git repo please run:
+For COMP4451 submission this should already be built
 ```sh
 npm install
 npm run build # pack all the sources into dist/
